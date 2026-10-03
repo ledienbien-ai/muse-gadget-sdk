@@ -662,6 +662,12 @@ static void build_answer(lv_obj_t *face, int ring_in)
     int spk_x = -s_w / 2 + 8 + spk_r, spk_y = -s_h / 2 + 8 + spk_r;
     if (muse_board->round) {
         spk_y = -ring_in * 5 / 8;
+        /* On a circle smaller than the Watcher's, a button that high sits on
+         * the ends of the longer state words: it goes just under them. */
+        int state_bottom = 40 + s_dy + 16 - s_h / 2;
+        if (s_h < 412 && spk_y - spk_r < state_bottom + 4) {
+            spk_y = state_bottom + 4 + spk_r;
+        }
         int d = ring_in - spk_r - 4;   /* just inside the ring, even when swollen */
         spk_x = -(int)sqrtf((float)(d * d - spk_y * spk_y));
     }

@@ -60,13 +60,14 @@ ERROR_LINES = 60
 BOARDS = {
     "Waveshare ESP32-S3-Touch-AMOLED-1.75C": "s3",
     "Waveshare ESP32-S3-Touch-AMOLED-1.75": "s3n",
+    "Waveshare ESP32-S3-Touch-LCD-1.85C": "s3lcd",
     "AIPI Lite": "aipi",
     "Waveshare ESP32-C6-Touch-AMOLED-1.8": "c6",
     "Seeed SenseCAP Watcher": "watcher",
     "M5Stack StickS3": "sticks3",
     "M5Stack StickC Plus2": "plus2",
 }
-CHAT_BOARDS = ("s3", "s3n", "aipi", "sticks3", "watcher")
+CHAT_BOARDS = ("s3", "s3n", "s3lcd", "aipi", "sticks3", "watcher")
 
 
 class Stop(Exception):

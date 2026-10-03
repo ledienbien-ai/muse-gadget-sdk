@@ -36,6 +36,7 @@ session to Muse. The rest depends on the hardware.
 | **Home Assistant Voice Preview Edition** | ESP32-S3 | None (12-LED ring) | 16 MB / 8 MB | [ESPHome repo](https://github.com/esphome/home-assistant-voice-pe) | [Home Assistant](https://www.home-assistant.io/voice-pe/) |
 | **Waveshare ESP32-S3-Touch-AMOLED-1.75C** | ESP32-S3 | 1.75" 466×466 round AMOLED, touch | 32 MB / 8 MB | [Waveshare wiki](https://www.waveshare.com/wiki/ESP32-S3-Touch-AMOLED-1.75C), [GitHub](https://github.com/waveshareteam/ESP32-S3-Touch-AMOLED-1.75C) | [Waveshare](https://www.waveshare.com/esp32-s3-touch-amoled-1.75c.htm) |
 | **Waveshare ESP32-S3-Touch-AMOLED-1.75** | ESP32-S3 | 1.75" 466×466 round AMOLED, touch | 16 MB / 8 MB | [Waveshare wiki](https://www.waveshare.com/wiki/ESP32-S3-Touch-AMOLED-1.75), [GitHub](https://github.com/waveshareteam/ESP32-S3-Touch-AMOLED-1.75) | [Waveshare](https://www.waveshare.com/esp32-s3-touch-amoled-1.75.htm) |
+| **Waveshare ESP32-S3-Touch-LCD-1.85C** (V1 and V2) | ESP32-S3 | 1.85" 360×360 round LCD, touch | 16 MB / 8 MB | [Waveshare docs](https://docs.waveshare.com/ESP32-S3-Touch-LCD-1.85C), [GitHub](https://github.com/waveshareteam/ESP32-S3-Touch-LCD-1.85C) | [Waveshare](https://www.waveshare.com/esp32-s3-touch-lcd-1.85c.htm) |
 | **AIPI Lite** | ESP32-S3 | 128×128 LCD | 16 MB / 8 MB | [xiaozhi-esp32 board](https://github.com/78/xiaozhi-esp32/tree/main/main/boards/xorigin/aipi-lite) | [AliExpress](https://www.aliexpress.com/w/wholesale-aipi-lite.html) |
 | **Waveshare ESP32-C6-Touch-AMOLED-1.8** | ESP32-C6 | 1.8" 368×448 AMOLED, touch | 16 MB / none | [Waveshare wiki](https://www.waveshare.com/wiki/ESP32-C6-Touch-AMOLED-1.8) | [Waveshare](https://www.waveshare.com/esp32-c6-touch-amoled-1.8.htm) |
 | **Seeed SenseCAP Watcher** | ESP32-S3 | 1.45" 412×412 round LCD, touch | 32 MB / 8 MB | [Seeed wiki](https://wiki.seeedstudio.com/watcher/), [GitHub](https://github.com/Seeed-Studio/SenseCAP-Watcher-Firmware) | [Seeed Studio](https://www.seeedstudio.com/SenseCAP-Watcher-W1-A-p-5979.html) |
@@ -44,19 +45,19 @@ session to Muse. The rest depends on the hardware.
 
 ## Features
 
-| | DevKitC-1 | ideaspark | SenseCAP Indicator | reTerminal E1001 | HA Voice PE | Waveshare S3 1.75C | Waveshare S3 1.75 | AIPI Lite | Waveshare C6 1.8 | Watcher | StickS3 | StickC Plus2 |
-|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-| Home-network tunnel | ✅ | — | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | ✅ | ✅ | ✅ |
-| Shows status on | Light | Screen | Screen | E-paper | Light ring | Avatar | Avatar | Avatar | Avatar | Avatar | Avatar | Avatar |
-| Images from Muse | — | ✅ | ✅ | Black and white | — | ✅ | ✅ | ✅ | — | ✅ | ✅ | ✅ |
-| UI and settings | — | — | — | — | — | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Push-to-talk | — | — | — | — | ✅ | ✅ | ✅ | ✅ | Text replies | ✅ | ✅ | ✅ |
-| Speaker and mic | — | — | — | — | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Buzzer and mic |
-| Air sensors | — | — | D1S, D1Pro | — | — | — | — | — | — | — | — | — |
-| Touch | — | — | — | — | — | ✅ | ✅ | — | ✅ | ✅ | — | — |
-| Battery status | — | — | — | — | — | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Voltage only |
-| Over-the-air updates | Off | Off | Off | Off | Off | On | On | On | On | On | On | On |
-| Buttons | BOOT | BOOT | Top | Green | Centre (talk), dial | PWR (talk), BOOT | BOOT (talk), PWR | Two | BOOT (talk), PWR | Wheel (press to talk, turn to sleep) | Front (talk), side (menu), PWR | Front (talk), side (menu), PWR |
+| | DevKitC-1 | ideaspark | SenseCAP Indicator | reTerminal E1001 | HA Voice PE | Waveshare S3 1.75C | Waveshare S3 1.75 | Waveshare S3 LCD 1.85C | AIPI Lite | Waveshare C6 1.8 | Watcher | StickS3 | StickC Plus2 |
+|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| Home-network tunnel | ✅ | — | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | ✅ | ✅ | ✅ |
+| Shows status on | Light | Screen | Screen | E-paper | Light ring | Avatar | Avatar | Avatar | Avatar | Avatar | Avatar | Avatar | Avatar |
+| Images from Muse | — | ✅ | ✅ | Black and white | — | ✅ | ✅ | ✅ | ✅ | — | ✅ | ✅ | ✅ |
+| UI and settings | — | — | — | — | — | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Push-to-talk | — | — | — | — | ✅ | ✅ | ✅ | ✅ | ✅ | Text replies | ✅ | ✅ | ✅ |
+| Speaker and mic | — | — | — | — | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Buzzer and mic |
+| Air sensors | — | — | D1S, D1Pro | — | — | — | — | — | — | — | — | — | — |
+| Touch | — | — | — | — | — | ✅ | ✅ | ✅ | — | ✅ | ✅ | — | — |
+| Battery status | — | — | — | — | — | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Voltage only |
+| Over-the-air updates | Off | Off | Off | Off | Off | On | On | On | On | On | On | On | On |
+| Buttons | BOOT | BOOT | Top | Green | Centre (talk), dial | PWR (talk), BOOT | BOOT (talk), PWR | BOOT (talk) | Two | BOOT (talk), PWR | Wheel (press to talk, turn to sleep) | Front (talk), side (menu), PWR | Front (talk), side (menu), PWR |
 
 Boards without PSRAM (the ideaspark and the Waveshare C6) don't have room for
 the home-network tunnel. Muse can still reach and control them once the
@@ -177,6 +178,7 @@ board's overlays, in order:
 | Home Assistant Voice PE | `esp32s3` | [`devices/sdkconfig.home-assistant-voice`](sdkconfig.home-assistant-voice) | `tools/board.sh home-assistant-voice build` |
 | Waveshare S3 1.75C | `esp32s3` | [`devices/sdkconfig.muse`](sdkconfig.muse), [`devices/sdkconfig.muse-waveshare-s3-175c`](sdkconfig.muse-waveshare-s3-175c) | by hand |
 | Waveshare S3 1.75 | `esp32s3` | [`devices/sdkconfig.muse`](sdkconfig.muse), [`devices/sdkconfig.muse-waveshare-s3-175`](sdkconfig.muse-waveshare-s3-175) | by hand |
+| Waveshare S3 LCD 1.85C | `esp32s3` | [`devices/sdkconfig.muse`](sdkconfig.muse), [`devices/sdkconfig.muse-waveshare-s3-185c`](sdkconfig.muse-waveshare-s3-185c) | by hand |
 | AIPI Lite | `esp32s3` | [`devices/sdkconfig.muse`](sdkconfig.muse), [`devices/sdkconfig.muse-aipi`](sdkconfig.muse-aipi) | by hand |
 | Waveshare C6 1.8 | `esp32c6` | [`devices/sdkconfig.muse`](sdkconfig.muse), [`devices/sdkconfig.muse-waveshare-c6-18`](sdkconfig.muse-waveshare-c6-18) | by hand |
 | SenseCAP Watcher | `esp32s3` | [`devices/sdkconfig.muse`](sdkconfig.muse), [`devices/sdkconfig.muse-sensecap-watcher`](sdkconfig.muse-sensecap-watcher) | by hand |

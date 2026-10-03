@@ -35,6 +35,7 @@ CH9102 = (0x1A86, 0x55D4)   # WCH single UART bridge
 USB = {
     "s3": USJ,
     "s3n": USJ,
+    "s3lcd": USJ,
     "aipi": USJ,
     "c6": USJ,
     "sticks3": USJ,
@@ -43,7 +44,7 @@ USB = {
 }
 # Boards whose console takes Muse's serial commands (tools/muse/chat.py). The
 # Watcher reads them on its CH342 port with MUSE_CONSOLE_UART.
-COMMANDS = ("s3", "s3n", "aipi", "c6", "sticks3", "watcher", "plus2")
+COMMANDS = ("s3", "s3n", "s3lcd", "aipi", "c6", "sticks3", "watcher", "plus2")
 # Bridges that drop bytes when a whole packet arrives at once, so writes to them
 # go 64 bytes at a time at the line rate (paced_esptool.py, chat.Board.write).
 PACED = (CH342,)
