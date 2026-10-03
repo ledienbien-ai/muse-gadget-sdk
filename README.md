@@ -47,8 +47,8 @@ settings by touch, and images from Muse.
 
 | Board | Screen | Name | Profile | Status |
 |---|---|---|---|---|
-| [Waveshare ESP32-S3-Touch-LCD-1.85C](#waveshare-esp32-s3-touch-lcd-185c) | 1.85" round 360×360, touch | `s3lcd` | `waveshare-s3-185c` | Flashed on a board: it boots and shows the UI. Talking to Muse hasn't been tried |
-| [OSTB-3ST](#ostb-3st) | 1.83" 296×240, touch | `ostb` | `ostb-3st` | Builds; not yet run on the board |
+| [Waveshare ESP32-S3-Touch-LCD-1.85C](#waveshare-esp32-s3-touch-lcd-185c) | 1.85" round 360×360, touch | `s3lcd` | `waveshare-s3-185c` | Flash the firmware online at: https://dbrobot.vn/firmware.html |
+| [OSTB-3ST](#ostb-3st) | 1.83" 296×240, touch | `ostb` | `ostb-3st` | Flash the firmware online at: https://dbrobot.vn/firmware.html |
 
 The name is what `tools/muse/board.sh` calls the board; the profile names its
 build settings and build directory. The boards upstream supports are still
@@ -56,6 +56,10 @@ here, listed in [`esp32/devices/README.md`](esp32/devices/README.md).
 
 ## Waveshare ESP32-S3-Touch-LCD-1.85C
 
+<p align="center">
+  <img src="doc/image/waveshare-s3-185c-device.jpg" width="300" alt="The Waveshare ESP32-S3-Touch-LCD-1.85C in its case">
+  <img src="doc/image/waveshare-s3-185c-muse.jpg" width="300" alt="Muse's settings on the 1.85C">
+</p>
 <p align="center">
   <img src="doc/image/Wareshare%20Touch%20LCD%201.85C.png" width="720" alt="The Muse UI at 360 px round, drawn by the simulator: ready, pairing, listening, thinking, error and speaking">
 </p>
@@ -89,6 +93,9 @@ Hardware reference: [Waveshare's documentation](https://docs.waveshare.com/ESP32
 ## OSTB-3ST
 
 <p align="center">
+  <img src="doc/image/ostb-3st-device.jpg" width="560" alt="The OSTB-3ST, front and back">
+</p>
+<p align="center">
   <img src="doc/image/ostb-3st.png" width="720" alt="The Muse UI at 296×240, drawn by the simulator: ready, pairing, listening, thinking, error and speaking">
 </p>
 <p align="center">
@@ -104,7 +111,7 @@ Ported from the source of the board's xiaozhi-esp32 firmware
 | Display | 1.83" 240×296 NV3023 LCD on SPI, used in landscape, PWM backlight |
 | Touch | CST816, read by polling: it has no interrupt line |
 | Audio | ES8311 DAC and ES7210 ADC |
-| Keys | Upper (volume up): hold to talk. Lower (volume down): press to sleep the screen, hold to power off |
+| Keys | On the top edge. **+** (volume up): hold to talk. **−** (volume down): press to sleep the screen, hold to power off. The key between them isn't used |
 | Battery | Level from the firmware's ADC table, and the charger's status pin |
 
 **Status:** builds with ESP-IDF v6.0.1. It has not been run on the board. The
@@ -115,7 +122,7 @@ or mirrored, or touches land in the wrong place, change `LCD_MADCTL` or
 
 Known limits: the 4G modem and the LED aren't used. The battery shows a level
 but no voltage. Powering off drives the board's power-off pin; on USB power the
-board may stay up, with the screen off until the upper key is pressed. Once
+board may stay up, with the screen off until the + key is pressed. Once
 the battery is full, the board knows it's on USB power only while a computer
 is attached.
 
@@ -168,7 +175,7 @@ The steps are the same for every board. Take its name and profile from the
    publish the file.
 5. In the Muse app, turn on **Settings > Devices > Developer mode**, add the
    device named `MuseGadget-XXXXXX`, and press the board's talk button when
-   asked (BOOT on the 1.85C, the upper key on the OSTB-3ST).
+   asked (BOOT on the 1.85C, the + key on the OSTB-3ST).
 
 ## Startup logo
 
@@ -246,8 +253,10 @@ an issue on this repository.
 - Two upstream files keep their own licenses: `minimp3.h` (CC0-1.0) and
   `pixel_font.c` (BSD-2-Clause). Components fetched at build time are under
   their own licenses.
-- The Apache License does not cover the [Jollybot avatar](esp32/avatar), the
-  DB_ROBOT startup logo, or the Meta, Muse and Waveshare names and marks.
+- The DB_ROBOT startup logo is ledienbien-ai's and free to use, under the
+  same license as the rest of this fork's changes.
+- The Apache License does not cover the [Jollybot avatar](esp32/avatar), nor
+  the Meta, Muse and Waveshare names and marks.
 
 [`CREDITS.md`](CREDITS.md) has the full list: every source, its license, the
 files this fork added or changed, and what to keep in order in later versions.

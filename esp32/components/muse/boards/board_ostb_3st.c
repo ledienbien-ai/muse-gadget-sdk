@@ -18,7 +18,8 @@
  * OSTB-3ST ("ostb-xiaozhi-3st"): ESP32-S3 with a 1.83" 240x296 NV3023 LCD on
  * SPI, used in landscape (296x240), a CST816 touch controller with no
  * interrupt line, an ES8311 DAC and ES7210 ADC on one duplex I2S port, two
- * volume keys, a charge-status pin and a pin that cuts the board's power.
+ * volume keys on the top edge, a charge-status pin and a pin that cuts the
+ * board's power.
  *
  * Everything here about the hardware (pins, the panel's setup table and
  * orientation, the battery's ADC table) is from the board's xiaozhi-esp32
@@ -89,8 +90,8 @@ static const char *TAG = "board";
 #define I2S_DIN GPIO_NUM_7
 #define PA_EN GPIO_NUM_4
 
-#define TALK_GPIO GPIO_NUM_39   /* volume up, the upper key */
-#define AUX_GPIO GPIO_NUM_40    /* volume down, the lower key */
+#define TALK_GPIO GPIO_NUM_39   /* volume up, the + key */
+#define AUX_GPIO GPIO_NUM_40    /* volume down, the - key */
 #define CHG_GPIO GPIO_NUM_47    /* the charger's status: low while charging */
 #define PWR_OFF_GPIO GPIO_NUM_3 /* high: the board switches itself off */
 #define BATT_ADC ADC_CHANNEL_6  /* GPIO17, on ADC2 */
@@ -529,7 +530,7 @@ static void panel_off(void *arg)
 
 /*
  * The power-off pin switches the board off, as its own firmware does. On USB
- * power it may stay up: then the screen stays off until the upper key is
+ * power it may stay up: then the screen stays off until the + key is
  * pressed, which restarts it.
  */
 static esp_err_t power_off(void)
@@ -555,11 +556,14 @@ static const muse_board_t s_board = {
     .round = false,
     .touch = true,
     .diagonal_in = 1.83f,
-    .talk_button = "upper",
-    .aux_button = "lower",
-    /* The two keys' icons, one above the other at the right edge. */
-    .talk_hint = { LV_ALIGN_TOP_RIGHT, -16, 60 },
-    .aux_hint = { LV_ALIGN_TOP_RIGHT, -14, 110 },
+    .talk_button = "+",
+    .aux_button = "-",
+    /* The keys are in a row on the top edge, as the maker's pictures show the
+     * case: + on the left, - on the right, and between them a key this
+     * firmware doesn't read. Their icons go under them, at either end of the
+     * status line, which has the middle of the top edge. */
+    .talk_hint = { LV_ALIGN_TOP_LEFT, 36, 4 },
+    .aux_hint = { LV_ALIGN_TOP_RIGHT, -36, 4 },
     .frame_ms = 40,
     .init = init,
     .display_start = display_start,

@@ -47,8 +47,8 @@ Muse gadget은 직접 만드는 오픈 소스 기기입니다. 시중에서 파�
 
 | 보드 | 화면 | 이름 | 프로필 | 상태 |
 |---|---|---|---|---|
-| [Waveshare ESP32-S3-Touch-LCD-1.85C](#waveshare-esp32-s3-touch-lcd-185c) | 1.85인치 원형 360×360, 터치 | `s3lcd` | `waveshare-s3-185c` | 실제 보드에 플래시함: 부팅되고 UI가 표시됩니다. Muse와의 대화는 아직 확인하지 않았습니다 |
-| [OSTB-3ST](#ostb-3st) | 1.83인치 296×240, 터치 | `ostb` | `ostb-3st` | 빌드됩니다. 실제 보드에서는 아직 실행하지 않았습니다 |
+| [Waveshare ESP32-S3-Touch-LCD-1.85C](#waveshare-esp32-s3-touch-lcd-185c) | 1.85인치 원형 360×360, 터치 | `s3lcd` | `waveshare-s3-185c` | 펌웨어 온라인 플래시: https://dbrobot.vn/firmware.html |
+| [OSTB-3ST](#ostb-3st) | 1.83인치 296×240, 터치 | `ostb` | `ostb-3st` | 펌웨어 온라인 플래시: https://dbrobot.vn/firmware.html |
 
 이름은 `tools/muse/board.sh`가 보드를 부르는 이름이고, 프로필은 빌드 설정과
 빌드 디렉터리의 이름입니다. 업스트림이 지원하는 보드도 그대로 남아 있으며,
@@ -56,6 +56,10 @@ Muse gadget은 직접 만드는 오픈 소스 기기입니다. 시중에서 파�
 
 ## Waveshare ESP32-S3-Touch-LCD-1.85C
 
+<p align="center">
+  <img src="doc/image/waveshare-s3-185c-device.jpg" width="300" alt="케이스에 든 Waveshare ESP32-S3-Touch-LCD-1.85C">
+  <img src="doc/image/waveshare-s3-185c-muse.jpg" width="300" alt="1.85C에 표시된 Muse 설정 화면">
+</p>
 <p align="center">
   <img src="doc/image/Wareshare%20Touch%20LCD%201.85C.png" width="720" alt="시뮬레이터로 그린 360 px 원형 화면의 Muse UI: 대기, 페어링, 듣는 중, 생각 중, 오류, 말하는 중">
 </p>
@@ -90,6 +94,9 @@ Settings의 Power 페이지에 있습니다(보드는 딥 슬립에 들어가며
 ## OSTB-3ST
 
 <p align="center">
+  <img src="doc/image/ostb-3st-device.jpg" width="560" alt="OSTB-3ST의 앞면과 뒷면">
+</p>
+<p align="center">
   <img src="doc/image/ostb-3st.png" width="720" alt="시뮬레이터로 그린 296×240 Muse UI: 대기, 페어링, 듣는 중, 생각 중, 오류, 말하는 중">
 </p>
 <p align="center">
@@ -105,7 +112,7 @@ Settings의 Power 페이지에 있습니다(보드는 딥 슬립에 들어가며
 | 디스플레이 | 1.83인치 240×296 NV3023 LCD(SPI), 가로로 사용, PWM 백라이트 |
 | 터치 | CST816. 인터럽트 선이 없어 폴링으로 읽습니다 |
 | 오디오 | ES8311 DAC와 ES7210 ADC |
-| 키 | 위 키(볼륨 +): 누르고 있는 동안 말하기. 아래 키(볼륨 −): 누르면 화면 끄기, 길게 누르면 전원 끄기 |
+| 키 | 윗면에 있습니다. **+**(볼륨 +): 누르고 있는 동안 말하기. **−**(볼륨 −): 누르면 화면 끄기, 길게 누르면 전원 끄기. 가운데 키는 쓰지 않습니다 |
 | 배터리 | 원래 펌웨어의 ADC 표로 계산한 잔량과 충전 상태 핀 |
 
 **상태:** ESP-IDF v6.0.1로 빌드됩니다. 실제 보드에서는 아직 실행하지
@@ -116,7 +123,7 @@ Settings의 Power 페이지에 있습니다(보드는 딥 슬립에 들어가며
 
 알려진 제한: 4G 모뎀과 LED는 쓰지 않습니다. 배터리는 잔량만 표시하고 전압은
 표시하지 않습니다. 전원 끄기는 보드의 전원 차단 핀을 구동합니다. USB 전원에서는
-보드가 꺼지지 않을 수 있으며, 그때는 위 키를 누를 때까지 화면이 꺼진 상태로
+보드가 꺼지지 않을 수 있으며, 그때는 + 키를 누를 때까지 화면이 꺼진 상태로
 있습니다. 배터리가 가득 찬 뒤에는 컴퓨터에 연결되어 있는 동안에만 USB 전원으로
 인식합니다.
 
@@ -169,7 +176,7 @@ Settings의 Power 페이지에 있습니다(보드는 딥 슬립에 들어가며
    공개하기 전에 신중히 생각하세요.
 5. Muse 앱에서 **Settings > Devices > Developer mode**를 켜고,
    `MuseGadget-XXXXXX`라는 이름의 기기를 추가한 다음, 요청이 나오면 보드의
-   말하기 버튼을 누릅니다(1.85C는 BOOT, OSTB-3ST는 위 키).
+   말하기 버튼을 누릅니다(1.85C는 BOOT, OSTB-3ST는 + 키).
 
 ## 시작 로고
 
@@ -248,8 +255,10 @@ ESP32와 Linux gadget은 iOS와 Android의 Muse 앱에서 Settings > Devices를 
 - 업스트림 파일 중 두 개는 자체 라이선스를 유지합니다: `minimp3.h`(CC0-1.0)와
   `pixel_font.c`(BSD-2-Clause). 빌드할 때 내려받는 컴포넌트에는 각자의
   라이선스가 적용됩니다.
-- Apache License는 [Jollybot 아바타](esp32/avatar)와 DB_ROBOT 시작 로고에
-  적용되지 않으며, Meta, Muse, Waveshare의 이름과 상표에도 적용되지 않습니다.
+- DB_ROBOT 시작 로고는 ledienbien-ai의 것이며, 이 포크의 다른 변경 사항과 같은
+  라이선스로 자유롭게 쓸 수 있습니다.
+- Apache License는 [Jollybot 아바타](esp32/avatar)에 적용되지 않으며, Meta,
+  Muse, Waveshare의 이름과 상표에도 적용되지 않습니다.
 
 전체 목록은 [`CREDITS.md`](CREDITS.md)(영어)에 있습니다. 각 출처와 그
 라이선스, 이 포크에서 추가하거나 변경한 파일, 이후 버전에서 지켜야 할 사항을

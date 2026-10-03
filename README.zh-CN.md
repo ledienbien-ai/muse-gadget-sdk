@@ -45,8 +45,8 @@ ESP32 Device SDK 增加上游尚未支持的 ESP32-S3 开发板，SDK 的其余�
 
 | 开发板 | 屏幕 | 名称 | Profile | 状态 |
 |---|---|---|---|---|
-| [Waveshare ESP32-S3-Touch-LCD-1.85C](#waveshare-esp32-s3-touch-lcd-185c) | 1.85 英寸圆形 360×360，触摸 | `s3lcd` | `waveshare-s3-185c` | 已烧录到实物：能启动并显示界面。尚未试过与 Muse 对话 |
-| [OSTB-3ST](#ostb-3st) | 1.83 英寸 296×240，触摸 | `ostb` | `ostb-3st` | 可以编译；尚未在实物上运行 |
+| [Waveshare ESP32-S3-Touch-LCD-1.85C](#waveshare-esp32-s3-touch-lcd-185c) | 1.85 英寸圆形 360×360，触摸 | `s3lcd` | `waveshare-s3-185c` | 在线烧录固件：https://dbrobot.vn/firmware.html |
+| [OSTB-3ST](#ostb-3st) | 1.83 英寸 296×240，触摸 | `ostb` | `ostb-3st` | 在线烧录固件：https://dbrobot.vn/firmware.html |
 
 名称是 `tools/muse/board.sh` 对开发板的叫法；profile 是它的编译配置和编译目录的
 名字。上游支持的开发板仍然保留，见
@@ -54,6 +54,10 @@ ESP32 Device SDK 增加上游尚未支持的 ESP32-S3 开发板，SDK 的其余�
 
 ## Waveshare ESP32-S3-Touch-LCD-1.85C
 
+<p align="center">
+  <img src="doc/image/waveshare-s3-185c-device.jpg" width="300" alt="带外壳的 Waveshare ESP32-S3-Touch-LCD-1.85C">
+  <img src="doc/image/waveshare-s3-185c-muse.jpg" width="300" alt="1.85C 上的 Muse 设置页面">
+</p>
 <p align="center">
   <img src="doc/image/Wareshare%20Touch%20LCD%201.85C.png" width="720" alt="模拟器绘制的 360 像素圆屏 Muse 界面：就绪、配对、聆听、思考、出错和说话">
 </p>
@@ -85,6 +89,9 @@ ESP32 Device SDK 增加上游尚未支持的 ESP32-S3 开发板，SDK 的其余�
 ## OSTB-3ST
 
 <p align="center">
+  <img src="doc/image/ostb-3st-device.jpg" width="560" alt="OSTB-3ST 的正面和背面">
+</p>
+<p align="center">
   <img src="doc/image/ostb-3st.png" width="720" alt="模拟器绘制的 296×240 Muse 界面：就绪、配对、聆听、思考、出错和说话">
 </p>
 <p align="center">
@@ -100,7 +107,7 @@ ESP32 Device SDK 增加上游尚未支持的 ESP32-S3 开发板，SDK 的其余�
 | 屏幕 | 1.83 英寸 240×296 NV3023 LCD，SPI 接口，横屏使用，PWM 背光 |
 | 触摸 | CST816，没有中断引脚，靠轮询读取 |
 | 音频 | ES8311 DAC 和 ES7210 ADC |
-| 按键 | 上键（音量加）：按住说话。下键（音量减）：短按息屏，长按关机 |
+| 按键 | 位于顶部。**+**（音量加）：按住说话。**−**（音量减）：短按息屏，长按关机。中间的按键没有用到 |
 | 电池 | 按原固件的 ADC 表换算电量，另有充电状态引脚 |
 
 **状态：** 可用 ESP-IDF v6.0.1 编译，尚未在实物上运行。引脚、屏幕初始化表和
@@ -109,7 +116,7 @@ ESP32 Device SDK 增加上游尚未支持的 ESP32-S3 开发板，SDK 的其余�
 `TP_MIRROR_X` 和 `TP_MIRROR_Y`。
 
 已知限制：4G 模块和 LED 没有用到。电池只显示电量，不显示电压。关机是拉高开发板
-的关机引脚；接着 USB 时开发板可能不会断电，屏幕保持熄灭，按上键后重新启动。
+的关机引脚；接着 USB 时开发板可能不会断电，屏幕保持熄灭，按 + 键后重新启动。
 电池充满后，只有连着电脑时开发板才知道自己接着 USB 电源。
 
 代码：[`board_ostb_3st.c`](esp32/components/muse/boards/board_ostb_3st.c)，
@@ -158,7 +165,7 @@ ESP32 Device SDK 增加上游尚未支持的 ESP32-S3 开发板，SDK 的其余�
    带有你的 SDK token 的固件会包含该 token，公开发布文件前请三思。
 5. 在 Muse 应用中打开 **Settings > Devices > Developer mode**，添加名为
    `MuseGadget-XXXXXX` 的设备，并在提示时按下开发板的说话键（1.85C 是 BOOT，
-   OSTB-3ST 是上键）。
+   OSTB-3ST 是 + 键）。
 
 ## 开机 logo
 
@@ -228,8 +235,10 @@ Settings > Devices。先在那里打开 Developer mode，再查找名称以 “M
   和电池表，这些文件本身没有许可证声明；xiaozhi-esp32 采用 MIT 许可。
 - 上游有两个文件保留各自的许可证：`minimp3.h`（CC0-1.0）和 `pixel_font.c`
   （BSD-2-Clause）。编译时下载的组件适用它们各自的许可证。
-- Apache 许可证不涵盖 [Jollybot 头像](esp32/avatar)、DB_ROBOT 开机 logo，也不
-  涵盖 Meta、Muse 和 Waveshare 的名称与商标。
+- DB_ROBOT 开机 logo 属于 ledienbien-ai，可以自由使用，采用与本分支其他修改相同
+  的许可证。
+- Apache 许可证不涵盖 [Jollybot 头像](esp32/avatar)，也不涵盖 Meta、Muse 和
+  Waveshare 的名称与商标。
 
 完整清单见 [`CREDITS.md`](CREDITS.md)（英文）：每个来源及其许可证、本分支新增或
 修改的文件，以及后续版本需要保持的事项。

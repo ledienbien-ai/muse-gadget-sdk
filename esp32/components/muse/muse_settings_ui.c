@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  * Modified by ledienbien-ai (2026): pages that fit a rectangular screen under 300 px
- * tall (for the OSTB-3ST).
+ * tall (for the OSTB-3ST); a "Muse AI by DB-robot" line under the settings list.
  */
 
 #include "muse_settings_ui.h"
@@ -1263,6 +1263,7 @@ static void build_home(lv_obj_t *tile)
     row(list, LV_SYMBOL_BATTERY_FULL, "Battery", &s_home_battery, on_nav, (void *)&BATTERY);
     row(list, LV_SYMBOL_POWER, "Power off", NULL, on_nav, (void *)&POWER);
     s_about = note(list, "");
+    note(list, "Muse AI by DB-robot");
 }
 
 static void tick_home(void)

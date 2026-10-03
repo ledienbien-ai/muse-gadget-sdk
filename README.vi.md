@@ -48,8 +48,8 @@ Mỗi bo chạy đầy đủ giao diện trên màn hình: avatar động, nhấ
 
 | Bo | Màn hình | Tên | Profile | Tình trạng |
 |---|---|---|---|---|
-| [Waveshare ESP32-S3-Touch-LCD-1.85C](#waveshare-esp32-s3-touch-lcd-185c) | Tròn 1,85" 360×360, cảm ứng | `s3lcd` | `waveshare-s3-185c` | Đã nạp lên bo thật: khởi động và hiện giao diện. Chưa thử trò chuyện với Muse |
-| [OSTB-3ST](#ostb-3st) | 1,83" 296×240, cảm ứng | `ostb` | `ostb-3st` | Biên dịch được; chưa chạy trên bo thật |
+| [Waveshare ESP32-S3-Touch-LCD-1.85C](#waveshare-esp32-s3-touch-lcd-185c) | Tròn 1,85" 360×360, cảm ứng | `s3lcd` | `waveshare-s3-185c` | Nạp firmware online tại: https://dbrobot.vn/firmware.html |
+| [OSTB-3ST](#ostb-3st) | 1,83" 296×240, cảm ứng | `ostb` | `ostb-3st` | Nạp firmware online tại: https://dbrobot.vn/firmware.html |
 
 Tên là cách `tools/muse/board.sh` gọi bo; profile là tên của cấu hình build và
 thư mục build. Các bo mà bản gốc hỗ trợ vẫn còn nguyên, liệt kê trong
@@ -57,6 +57,10 @@ thư mục build. Các bo mà bản gốc hỗ trợ vẫn còn nguyên, liệt 
 
 ## Waveshare ESP32-S3-Touch-LCD-1.85C
 
+<p align="center">
+  <img src="doc/image/waveshare-s3-185c-device.jpg" width="300" alt="Waveshare ESP32-S3-Touch-LCD-1.85C trong vỏ máy">
+  <img src="doc/image/waveshare-s3-185c-muse.jpg" width="300" alt="Trang cài đặt của Muse trên bo 1.85C">
+</p>
 <p align="center">
   <img src="doc/image/Wareshare%20Touch%20LCD%201.85C.png" width="720" alt="Giao diện Muse trên màn tròn 360 px, do trình mô phỏng vẽ: sẵn sàng, ghép đôi, đang nghe, đang nghĩ, lỗi và đang nói">
 </p>
@@ -90,6 +94,9 @@ Tài liệu phần cứng: [trang của Waveshare](https://docs.waveshare.com/ES
 ## OSTB-3ST
 
 <p align="center">
+  <img src="doc/image/ostb-3st-device.jpg" width="560" alt="OSTB-3ST, mặt trước và mặt sau">
+</p>
+<p align="center">
   <img src="doc/image/ostb-3st.png" width="720" alt="Giao diện Muse ở 296×240, do trình mô phỏng vẽ: sẵn sàng, ghép đôi, đang nghe, đang nghĩ, lỗi và đang nói">
 </p>
 <p align="center">
@@ -105,7 +112,7 @@ Giao diện được bố trí cho màn ngang 296×240.
 | Màn hình | LCD NV3023 1,83" 240×296 qua SPI, dùng theo chiều ngang, đèn nền PWM |
 | Cảm ứng | CST816, đọc bằng cách hỏi liên tục vì không có chân ngắt |
 | Âm thanh | DAC ES8311 và ADC ES7210 |
-| Phím | Phím trên (tăng âm lượng): giữ để nói. Phím dưới (giảm âm lượng): bấm để tắt màn hình, giữ để tắt nguồn |
+| Phím | Nằm ở cạnh trên. **+** (tăng âm lượng): giữ để nói. **−** (giảm âm lượng): bấm để tắt màn hình, giữ để tắt nguồn. Phím ở giữa không được dùng |
 | Pin | Mức pin theo bảng ADC của firmware gốc, và chân trạng thái của mạch sạc |
 
 **Tình trạng:** biên dịch được với ESP-IDF v6.0.1. Chưa chạy trên bo thật.
@@ -116,7 +123,7 @@ mã của bo.
 
 Giới hạn đã biết: modem 4G và đèn LED không được dùng. Pin chỉ hiện mức, không
 hiện điện áp. Tắt nguồn là kéo chân tắt nguồn của bo; khi cắm USB bo có thể vẫn
-chạy, màn hình tắt cho đến khi bấm phím trên. Khi pin đã đầy, bo chỉ biết mình
+chạy, màn hình tắt cho đến khi bấm phím +. Khi pin đã đầy, bo chỉ biết mình
 đang cắm USB lúc được nối với máy tính.
 
 Mã của bo: [`board_ostb_3st.c`](esp32/components/muse/boards/board_ostb_3st.c),
@@ -168,7 +175,7 @@ Các bước giống nhau cho mọi bo. Lấy tên và profile của bo ở
    khi đăng file công khai.
 5. Trong ứng dụng Muse, bật **Settings > Devices > Developer mode**, thêm thiết
    bị tên `MuseGadget-XXXXXX`, rồi nhấn nút nói của bo khi được hỏi (BOOT trên
-   bo 1.85C, phím trên của bo OSTB-3ST).
+   bo 1.85C, phím + của bo OSTB-3ST).
 
 ## Logo khởi động
 
@@ -248,8 +255,10 @@ hãy mở issue trên repo này.
 - Hai file của bản gốc giữ giấy phép riêng: `minimp3.h` (CC0-1.0) và
   `pixel_font.c` (BSD-2-Clause). Các component tải về lúc build theo giấy phép
   của chính chúng.
-- Giấy phép Apache không bao gồm [avatar Jollybot](esp32/avatar), logo khởi
-  động DB_ROBOT, cũng như tên và nhãn hiệu Meta, Muse và Waveshare.
+- Logo khởi động DB_ROBOT là của ledienbien-ai và được dùng tự do, theo cùng
+  giấy phép với các thay đổi khác của bản fork này.
+- Giấy phép Apache không bao gồm [avatar Jollybot](esp32/avatar), cũng không
+  bao gồm tên và nhãn hiệu Meta, Muse và Waveshare.
 
 [`CREDITS.md`](CREDITS.md) (tiếng Anh) có danh sách đầy đủ: từng nguồn, giấy
 phép của nguồn đó, các file bản fork này thêm hoặc sửa, và những việc cần giữ

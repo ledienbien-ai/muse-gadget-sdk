@@ -48,8 +48,8 @@ ESP32 Device SDK がまだ対応していない ESP32-S3 ボードを追加し�
 
 | ボード | 画面 | 名前 | プロファイル | 状況 |
 |---|---|---|---|---|
-| [Waveshare ESP32-S3-Touch-LCD-1.85C](#waveshare-esp32-s3-touch-lcd-185c) | 1.85 インチ円形 360×360、タッチ | `s3lcd` | `waveshare-s3-185c` | 実機に書き込み済み：起動して UI が表示されます。Muse との会話は未確認です |
-| [OSTB-3ST](#ostb-3st) | 1.83 インチ 296×240、タッチ | `ostb` | `ostb-3st` | ビルドできます。実機ではまだ動かしていません |
+| [Waveshare ESP32-S3-Touch-LCD-1.85C](#waveshare-esp32-s3-touch-lcd-185c) | 1.85 インチ円形 360×360、タッチ | `s3lcd` | `waveshare-s3-185c` | ファームウェアのオンライン書き込み：https://dbrobot.vn/firmware.html |
+| [OSTB-3ST](#ostb-3st) | 1.83 インチ 296×240、タッチ | `ostb` | `ostb-3st` | ファームウェアのオンライン書き込み：https://dbrobot.vn/firmware.html |
 
 名前は `tools/muse/board.sh` でのボードの呼び名、プロファイルはビルド設定と
 ビルドディレクトリの名前です。上流が対応しているボードもそのまま残っていて、
@@ -57,6 +57,10 @@ ESP32 Device SDK がまだ対応していない ESP32-S3 ボードを追加し�
 
 ## Waveshare ESP32-S3-Touch-LCD-1.85C
 
+<p align="center">
+  <img src="doc/image/waveshare-s3-185c-device.jpg" width="300" alt="ケースに入った Waveshare ESP32-S3-Touch-LCD-1.85C">
+  <img src="doc/image/waveshare-s3-185c-muse.jpg" width="300" alt="1.85C に表示した Muse の設定画面">
+</p>
 <p align="center">
   <img src="doc/image/Wareshare%20Touch%20LCD%201.85C.png" width="720" alt="シミュレーターで描いた 360 px 円形画面の Muse UI：待機、ペアリング、聞き取り、考え中、エラー、発話">
 </p>
@@ -92,6 +96,9 @@ Settings の Power ページから行います（ボードはディープスリ�
 ## OSTB-3ST
 
 <p align="center">
+  <img src="doc/image/ostb-3st-device.jpg" width="560" alt="OSTB-3ST の前面と背面">
+</p>
+<p align="center">
   <img src="doc/image/ostb-3st.png" width="720" alt="シミュレーターで描いた 296×240 の Muse UI：待機、ペアリング、聞き取り、考え中、エラー、発話">
 </p>
 <p align="center">
@@ -107,7 +114,7 @@ Settings の Power ページから行います（ボードはディープスリ�
 | ディスプレイ | 1.83 インチ 240×296 NV3023 LCD（SPI）、横向きで使用、PWM バックライト |
 | タッチ | CST816。割り込み線がないため、ポーリングで読みます |
 | オーディオ | ES8311 DAC と ES7210 ADC |
-| キー | 上のキー（音量 +）：押している間話す。下のキー（音量 −）：押すと画面オフ、長押しで電源オフ |
+| キー | 上面にあります。**+**（音量 +）：押している間話す。**−**（音量 −）：押すと画面オフ、長押しで電源オフ。中央のキーは使いません |
 | バッテリー | 元のファームウェアの ADC テーブルによる残量と、充電状態のピン |
 
 **状況：** ESP-IDF v6.0.1 でビルドできます。実機ではまだ動かしていません。
@@ -118,7 +125,7 @@ Settings の Power ページから行います（ボードはディープスリ�
 
 既知の制限：4G モデムと LED は使いません。バッテリーは残量だけを表示し、電圧は
 表示しません。電源オフはボードの電源オフのピンを駆動します。USB 給電中は電源が
-切れないことがあり、その場合は上のキーを押すまで画面が消えたままになります。
+切れないことがあり、その場合は + キーを押すまで画面が消えたままになります。
 満充電になった後は、パソコンにつないでいる間だけ USB 給電中と判定します。
 
 コード：[`board_ostb_3st.c`](esp32/components/muse/boards/board_ostb_3st.c)、
@@ -172,7 +179,7 @@ Settings の Power ページから行います（ボードはディープスリ�
    ファイルを公開する前によく考えてください。
 5. Muse アプリで **Settings > Devices > Developer mode** をオンにし、
    `MuseGadget-XXXXXX` という名前のデバイスを追加して、求められたらボードの
-   トークボタンを押します（1.85C では BOOT、OSTB-3ST では上のキー）。
+   トークボタンを押します（1.85C では BOOT、OSTB-3ST では + キー）。
 
 ## 起動ロゴ
 
@@ -253,8 +260,10 @@ Settings > Devices からペアリングします。先にそこで Developer mo
 - 上流のファイルのうち 2 つは独自のライセンスのままです：`minimp3.h`
   （CC0-1.0）と `pixel_font.c`（BSD-2-Clause）。ビルド時に取得する
   コンポーネントには、それぞれのライセンスが適用されます。
-- Apache License は [Jollybot アバター](esp32/avatar)と DB_ROBOT の起動ロゴには
-  適用されません。Meta、Muse、Waveshare の名称と商標にも適用されません。
+- DB_ROBOT の起動ロゴは ledienbien-ai のもので、このフォークのほかの変更と同じ
+  ライセンスで自由に使えます。
+- Apache License は [Jollybot アバター](esp32/avatar)には適用されません。Meta、
+  Muse、Waveshare の名称と商標にも適用されません。
 
 完全な一覧は [`CREDITS.md`](CREDITS.md)（英語）にあります。各ソースとその
 ライセンス、このフォークで追加または変更したファイル、今後のバージョンで守る

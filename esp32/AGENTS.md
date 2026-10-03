@@ -221,7 +221,7 @@ flash size and status backend.
    | `front` | M5Stack StickS3, or StickC Plus2 — tell them apart by the port: the StickS3 is native USB, the Plus2 is a CH9102 `usbserial` |
    | `top` | Waveshare ESP32-S3-Touch-AMOLED-1.75C |
    | `bottom right` | AIPI Lite |
-   | `upper` | OSTB-3ST |
+   | `+` | OSTB-3ST |
    | `wheel` | Seeed SenseCAP Watcher |
    | `boot` | Waveshare ESP32-C6-Touch-AMOLED-1.8, ESP32-S3-Touch-AMOLED-1.75 or ESP32-S3-Touch-LCD-1.85C — the target (`esp32c6` or `esp32s3`) picks out the C6; step 1's board name tells the two S3 boards apart |
 
