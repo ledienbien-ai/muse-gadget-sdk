@@ -15,6 +15,13 @@ limitations under the License.
 -->
 <!-- Modified by ledienbien-ai (2026): describes this fork and the ESP32-S3 boards it adds. -->
 
+<p align="center">
+  <a href="https://dbrobot.vn/"><img src="doc/image/db-robot-logo.png" width="160" alt="DB_ROBOT"></a>
+</p>
+<p align="center">
+  Developer: <b>ledienbien-ai</b> · Homepage: <a href="https://dbrobot.vn/">https://dbrobot.vn/</a>
+</p>
+
 # Muse Gadgets for the ESP32-S3 Device
 
 **English** | [Tiếng Việt](README.vi.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md)

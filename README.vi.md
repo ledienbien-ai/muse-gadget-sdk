@@ -15,6 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
+<p align="center">
+  <a href="https://dbrobot.vn/"><img src="doc/image/db-robot-logo.png" width="160" alt="DB_ROBOT"></a>
+</p>
+<p align="center">
+  Tác giả phát triển: <b>ledienbien-ai</b> · Trang chủ: <a href="https://dbrobot.vn/">https://dbrobot.vn/</a>
+</p>
+
 # Muse Gadgets cho thiết bị ESP32-S3
 
 [English](README.md) | **Tiếng Việt** | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md)

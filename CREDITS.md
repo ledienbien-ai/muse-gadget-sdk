@@ -70,6 +70,7 @@ Files added:
 | `doc/image/` | Pictures for the READMEs: the UI at each added board's screen size, drawn by the simulator. They show the default Jollybot avatar, which the Apache License does not cover (section 1) |
 | `CREDITS.md`, `README.vi.md`, `README.zh-CN.md`, `README.ja.md`, `README.ko.md` | This file and the translated READMEs |
 
+`doc/image/db-robot-logo.png` is the same logo as a picture, for the READMEs.
 `doc/image/` also holds pictures of the boards themselves.
 `waveshare-s3-185c-muse.jpg` is ledienbien-ai's own photo.
 `waveshare-s3-185c-device.jpg`, `ostb-3st-device.jpg`, `lcdwiki-s3-28-device.jpg`
