@@ -13,7 +13,7 @@
 # limitations under the License.
 #
 # Modified by ledienbien-ai (2026): added the Waveshare ESP32-S3-Touch-LCD-1.85C,
-# the OSTB-3ST and the startup logo.
+# the OSTB-3ST, the LCDWIKI 2.8inch ESP32-S3 Display and the startup logo.
 
 # Muse: the voice companion UI that runs beside Home Link on boards with a
 # display (CONFIG_MUSE_BOARD_*). Link-only builds register an empty component,
@@ -72,6 +72,8 @@ if(CONFIG_MUSE_ENABLED)
         list(APPEND srcs "boards/board_waveshare_s3_185c.c" "boards/muse_lcd_bands.c")
     elseif(CONFIG_MUSE_BOARD_OSTB_3ST)
         list(APPEND srcs "boards/board_ostb_3st.c" "boards/muse_lcd_bands.c")
+    elseif(CONFIG_MUSE_BOARD_LCDWIKI_S3_28)
+        list(APPEND srcs "boards/board_lcdwiki_s3_28.c" "boards/muse_lcd_bands.c")
     elseif(CONFIG_MUSE_BOARD_AIPI)
         list(APPEND srcs "boards/board_aipi.c")
     elseif(CONFIG_MUSE_BOARD_WAVESHARE_C6_18)

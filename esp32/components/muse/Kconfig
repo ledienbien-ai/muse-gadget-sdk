@@ -13,7 +13,7 @@
 # limitations under the License.
 #
 # Modified by ledienbien-ai (2026): added the Waveshare ESP32-S3-Touch-LCD-1.85C,
-# the OSTB-3ST and the startup logo.
+# the OSTB-3ST, the LCDWIKI 2.8inch ESP32-S3 Display and the startup logo.
 
 menu "Muse"
 
@@ -44,6 +44,10 @@ menu "Muse"
 
         config MUSE_BOARD_OSTB_3ST
             bool "OSTB-3ST (ESP32-S3, 1.83 inch touch LCD, two keys)"
+            depends on IDF_TARGET_ESP32S3
+
+        config MUSE_BOARD_LCDWIKI_S3_28
+            bool "LCDWIKI 2.8inch ESP32-S3 Display (ES3C28P with touch, ES3N28P without)"
             depends on IDF_TARGET_ESP32S3
 
         config MUSE_BOARD_AIPI
@@ -79,6 +83,7 @@ menu "Muse"
         default "waveshare_s3_175" if MUSE_BOARD_WAVESHARE_S3_175
         default "waveshare_s3_185c" if MUSE_BOARD_WAVESHARE_S3_185C
         default "ostb_3st" if MUSE_BOARD_OSTB_3ST
+        default "lcdwiki_s3_28" if MUSE_BOARD_LCDWIKI_S3_28
         default "aipi" if MUSE_BOARD_AIPI
         default "waveshare_c6_18" if MUSE_BOARD_WAVESHARE_C6_18
         default "sensecap_watcher" if MUSE_BOARD_SENSECAP_WATCHER

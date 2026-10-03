@@ -13,11 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Modified by ledienbien-ai (2026): added the Waveshare ESP32-S3-Touch-LCD-1.85C
-# and the OSTB-3ST.
+# Modified by ledienbien-ai (2026): added the Waveshare ESP32-S3-Touch-LCD-1.85C,
+# the OSTB-3ST and the LCDWIKI 2.8inch ESP32-S3 Display.
 
 # Build or flash Home Link for one board:
-#   tools/muse/board.sh build|flash <s3|s3n|s3lcd|ostb|aipi|c6|watcher|sticks3|plus2> [serial|port]
+#   tools/muse/board.sh build|flash <s3|s3n|s3lcd|ostb|lcd28|aipi|c6|watcher|sticks3|plus2> [serial|port]
 # Build log: /tmp/muse_build_<board>.log. flash finds the board's port by its
 # USB device (tools/muse/ports.py); with several of a kind attached, pass the
 # one's USB serial number (the MAC on native USB) or its port. Flashing from a
@@ -26,13 +26,14 @@
 # flashes in build-muse-<profile>-bench/, so neither build's sdkconfig hides
 # the other's.
 set -uo pipefail
-cmd=${1:?build|flash}; board=${2:?s3|s3n|s3lcd|ostb|aipi|c6|watcher|sticks3|plus2}
+cmd=${1:?build|flash}; board=${2:?s3|s3n|s3lcd|ostb|lcd28|aipi|c6|watcher|sticks3|plus2}
 root=$(cd "$(dirname "$0")/../.." && pwd)
 case $board in
     s3)      profile=waveshare-s3-175c;    target=esp32s3 ;;
     s3n)     profile=waveshare-s3-175;     target=esp32s3 ;;
     s3lcd)   profile=waveshare-s3-185c;    target=esp32s3 ;;
     ostb)    profile=ostb-3st;             target=esp32s3 ;;
+    lcd28)   profile=lcdwiki-s3-28;        target=esp32s3 ;;
     aipi)    profile=aipi;                 target=esp32s3 ;;
     c6)      profile=waveshare-c6-18;      target=esp32c6 ;;
     # Its CH342 bridge drops bytes when esptool sends a whole packet at once,

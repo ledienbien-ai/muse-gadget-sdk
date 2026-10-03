@@ -47,6 +47,7 @@ ESP32 Device SDK 增加上游尚未支持的 ESP32-S3 开发板，SDK 的其余�
 |---|---|---|---|---|
 | [Waveshare ESP32-S3-Touch-LCD-1.85C](#waveshare-esp32-s3-touch-lcd-185c) | 1.85 英寸圆形 360×360，触摸 | `s3lcd` | `waveshare-s3-185c` | 在线烧录固件：https://dbrobot.vn/firmware.html |
 | [OSTB-3ST](#ostb-3st) | 1.83 英寸 296×240，触摸 | `ostb` | `ostb-3st` | 在线烧录固件：https://dbrobot.vn/firmware.html |
+| [LCDWIKI 2.8inch ESP32-S3 Display](#lcdwiki-28inch-esp32-s3-display) | 2.8 英寸 320×240，ES3C28P 带触摸 | `lcd28` | `lcdwiki-s3-28` | 在线烧录固件：https://dbrobot.vn/firmware.html |
 
 名称是 `tools/muse/board.sh` 对开发板的叫法；profile 是它的编译配置和编译目录的
 名字。上游支持的开发板仍然保留，见
@@ -122,6 +123,43 @@ ESP32 Device SDK 增加上游尚未支持的 ESP32-S3 开发板，SDK 的其余�
 代码：[`board_ostb_3st.c`](esp32/components/muse/boards/board_ostb_3st.c)，
 编译配置：[`sdkconfig.muse-ostb-3st`](esp32/devices/sdkconfig.muse-ostb-3st)。
 
+## LCDWIKI 2.8inch ESP32-S3 Display
+
+<p align="center">
+  <img src="doc/image/lcdwiki-s3-28-device.jpg" width="330" alt="LCDWIKI 2.8inch ESP32-S3 Display 正面">
+  <img src="doc/image/lcdwiki-s3-28-back.jpg" width="330" alt="背面，标注了接口和按键">
+</p>
+<p align="center">
+  <img src="doc/image/lcdwiki-s3-28.png" width="720" alt="模拟器绘制的 320×240 Muse 界面">
+</p>
+
+一款以多种名称销售的 2.8 英寸屏幕开发板。LCDWIKI 有两个型号：带电容触摸的
+**ES3C28P** 和不带触摸的 **ES3N28P**。同一个固件支持两个型号：启动时会检测是否
+存在触摸芯片。
+
+| 部分 | 说明 |
+|---|---|
+| 芯片 | ESP32-S3R8，16 MB flash，8 MB 八线 PSRAM，原生 USB |
+| 屏幕 | 2.8 英寸 240×320 ILI9341V LCD，SPI 接口，40 MHz，横屏使用，PWM 背光 |
+| 触摸 | ES3C28P 为 FT6336G；ES3N28P 没有 |
+| 音频 | ES8311 编解码器，一个麦克风，FM8002E 功放 |
+| 按键 | BOOT：按住说话 |
+| 电池 | 按原固件的 ADC 范围换算电量，接在 GPIO9 |
+
+**状态：** 可用 ESP-IDF v6.0.1 编译，尚未在实物上运行。引脚来自
+[LCDWIKI 的页面](https://www.lcdwiki.com/2.8inch_ESP32-S3_Display)和该开发板的 xiaozhi-esp32 文件；触摸面板的方向和 40 MHz 的
+SPI 上限采用 [esphome-es3c28p-light-panel](https://github.com/jvduuren/esphome-es3c28p-light-panel) 在实物上测得的结果。如果触摸位置
+不对，请修改开发板代码文件开头的 `TP_SWAP_XY`、`TP_MIRROR_X` 和 `TP_MIRROR_Y`。
+
+已知限制：BOOT 是唯一的按键，所以屏幕按定时器熄屏，关机在 Settings 的 Power
+页面里（开发板进入深度睡眠，按 BOOT 唤醒）。ES3N28P 没有触摸，又只有一个按键，
+所以设备上没有设置界面：只能按住说话，并通过 Muse 应用完成设置。电池只显示
+电量，不显示电压；充电芯片的状态没有接到任何引脚，所以只有连接电脑时才会显示
+“充电中”。SD 卡槽和 RGB LED 没有用到。
+
+代码：[`board_lcdwiki_s3_28.c`](esp32/components/muse/boards/board_lcdwiki_s3_28.c)，
+编译配置：[`sdkconfig.muse-lcdwiki-s3-28`](esp32/devices/sdkconfig.muse-lcdwiki-s3-28)。
+
 ## 编译和烧录
 
 每块开发板的步骤都一样。名称和 profile 见[上面的表格](#本分支中的开发板)。
@@ -164,8 +202,8 @@ ESP32 Device SDK 增加上游尚未支持的 ESP32-S3 开发板，SDK 的其余�
 
    带有你的 SDK token 的固件会包含该 token，公开发布文件前请三思。
 5. 在 Muse 应用中打开 **Settings > Devices > Developer mode**，添加名为
-   `MuseGadget-XXXXXX` 的设备，并在提示时按下开发板的说话键（1.85C 是 BOOT，
-   OSTB-3ST 是 + 键）。
+   `MuseGadget-XXXXXX` 的设备，并在提示时按下开发板的说话键（1.85C 和
+   LCDWIKI 开发板是 BOOT，OSTB-3ST 是 + 键）。
 
 ## 开机 logo
 
@@ -233,6 +271,9 @@ Settings > Devices。先在那里打开 Developer mode，再查找名称以 “M
   中对应的开发板代码（MIT）。
 - OSTB-3ST 的移植从该开发板的 xiaozhi-esp32 固件源码中取得引脚、屏幕初始化表
   和电池表，这些文件本身没有许可证声明；xiaozhi-esp32 采用 MIT 许可。
+- LCDWIKI 2.8inch 的移植参考了 [LCDWIKI 的页面](https://www.lcdwiki.com/2.8inch_ESP32-S3_Display)、该开发板的 xiaozhi-esp32
+  文件，以及 [esphome-es3c28p-light-panel](https://github.com/jvduuren/esphome-es3c28p-light-panel) 中公布的实测结果；没有复制其中的
+  代码。
 - 上游有两个文件保留各自的许可证：`minimp3.h`（CC0-1.0）和 `pixel_font.c`
   （BSD-2-Clause）。编译时下载的组件适用它们各自的许可证。
 - DB_ROBOT 开机 logo 属于 ledienbien-ai，可以自由使用，采用与本分支其他修改相同

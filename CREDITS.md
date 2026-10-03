@@ -18,9 +18,10 @@ limitations under the License.
 
 This repository is a community fork of
 [facebookincubator/muse-gadget-sdk](https://github.com/facebookincubator/muse-gadget-sdk)
-that adds ESP32-S3 boards: so far the Waveshare ESP32-S3-Touch-LCD-1.85C and
-the OSTB-3ST. It is not affiliated with or endorsed by Meta, Waveshare,
-Espressif, the xiaozhi-esp32 project or the OSTB-3ST's maker.
+that adds ESP32-S3 boards: so far the Waveshare ESP32-S3-Touch-LCD-1.85C, the
+OSTB-3ST and the LCDWIKI 2.8inch ESP32-S3 Display. It is not affiliated with
+or endorsed by Meta, Waveshare, Espressif, LCDWIKI, the xiaozhi-esp32 project
+or the OSTB-3ST's maker.
 
 This file records where the code came from and under which terms. It is a
 plain-language record, not legal advice.
@@ -63,13 +64,16 @@ Files added:
 | [`esp32/devices/sdkconfig.muse-waveshare-s3-185c`](esp32/devices/sdkconfig.muse-waveshare-s3-185c) | Build settings for the 1.85C |
 | [`esp32/components/muse/boards/board_ostb_3st.c`](esp32/components/muse/boards/board_ostb_3st.c) | The OSTB-3ST: NV3023 display and its setup table (see section 3), touch, audio, keys, battery, power |
 | [`esp32/devices/sdkconfig.muse-ostb-3st`](esp32/devices/sdkconfig.muse-ostb-3st) | Build settings for the OSTB-3ST |
+| [`esp32/components/muse/boards/board_lcdwiki_s3_28.c`](esp32/components/muse/boards/board_lcdwiki_s3_28.c) | The LCDWIKI 2.8inch ESP32-S3 Display: display, touch, audio, button, battery, power |
+| [`esp32/devices/sdkconfig.muse-lcdwiki-s3-28`](esp32/devices/sdkconfig.muse-lcdwiki-s3-28) | Build settings for the LCDWIKI board |
 | [`esp32/components/muse/logo/logo.c`](esp32/components/muse/logo) | The DB_ROBOT startup logo, as LVGL's image converter exported it. Copyright (c) 2026 ledienbien-ai, free to use under the Apache License like the rest of this section |
 | `doc/image/` | Pictures for the READMEs: the UI at each added board's screen size, drawn by the simulator. They show the default Jollybot avatar, which the Apache License does not cover (section 1) |
 | `CREDITS.md`, `README.vi.md`, `README.zh-CN.md`, `README.ja.md`, `README.ko.md` | This file and the translated READMEs |
 
 `doc/image/` also holds pictures of the boards themselves.
 `waveshare-s3-185c-muse.jpg` is ledienbien-ai's own photo.
-`waveshare-s3-185c-device.jpg` and `ostb-3st-device.jpg` were supplied by this
+`waveshare-s3-185c-device.jpg`, `ostb-3st-device.jpg`, `lcdwiki-s3-28-device.jpg`
+and `lcdwiki-s3-28-back.jpg` were supplied by this
 fork's owner and look to be the makers' or sellers' product pictures: they are
 here to show which hardware is meant, belong to their owners, and are not
 under the Apache License.
@@ -81,10 +85,10 @@ license header, as section 4(b) of the Apache License asks:
 |---|---|
 | `README.md` | Describes this fork; links the translations and this file |
 | `esp32/README.md`, `esp32/AGENTS.md`, `esp32/devices/README.md`, `esp32/devices/AGENTS.md` | List the new boards |
-| `esp32/components/muse/Kconfig`, `CMakeLists.txt`, `idf_component.yml` | Register the boards and the 1.85C's `esp_lcd_st77916` dependency; the startup logo's options |
+| `esp32/components/muse/Kconfig`, `CMakeLists.txt`, `idf_component.yml` | Register the boards, the 1.85C's `esp_lcd_st77916` dependency and the LCDWIKI board's `esp_lcd_ili9341`; the startup logo's options |
 | `esp32/components/muse/muse_ui.c` | On round screens smaller than 412 px, the speaker button sits under the state word. On a rectangular screen under 300 px tall (the OSTB-3ST's 296×240), a smaller Muse and a bar in place of the ring. The startup logo |
 | `esp32/components/muse/muse_settings_ui.c` | Settings pages that fit a screen that short; a "Muse AI by DB-robot" line under the settings list |
-| `esp32/tools/muse/board.sh`, `ports.py`, `avatar.py` | Add the `s3lcd` and `ostb` board aliases |
+| `esp32/tools/muse/board.sh`, `ports.py`, `avatar.py` | Add the `s3lcd`, `ostb` and `lcd28` board aliases |
 
 ## 3. Sources used for the board ports
 
@@ -102,6 +106,14 @@ license header, as section 4(b) of the Apache License asks:
 | Source | Used for | License |
 |---|---|---|
 | The board's xiaozhi-esp32 board directory, `ostb-xiaozhi-3st` (`config.h`, `ostb-xiaozhi-3st.cc`, `power_manager.h`), supplied by this fork's owner. It is not in the xiaozhi-esp32 repository. | The NV3023 setup table and the battery's ADC table in `board_ostb_3st.c`, copied as data; pins, panel orientation, touch and power-off handling, as reference | The files carry no copyright or license notice. They are written against [78/xiaozhi-esp32](https://github.com/78/xiaozhi-esp32), which is MIT (notice below). If the board's maker publishes them under other terms, record those here. |
+
+### LCDWIKI 2.8inch ESP32-S3 Display
+
+| Source | Used for | License |
+|---|---|---|
+| [LCDWIKI's page for the board](https://www.lcdwiki.com/2.8inch_ESP32-S3_Display) | Hardware facts: chip, memory, pins, the two models, the amp enable's polarity | Reference only; no text or code copied |
+| The board's xiaozhi-esp32 board directory, `xiaozhi-ai-iot-vietnam-es3n28p-lcd-2.8` (`config.h`, the board's `.cc`, `power_manager.h`), supplied by this fork's owner | Pins, the panel's orientation and colour settings, as reference; the two ends of the battery's ADC range, copied as numbers | The files carry no copyright or license notice. They are written against [78/xiaozhi-esp32](https://github.com/78/xiaozhi-esp32), which is MIT (notice below) |
+| [jvduuren/esphome-es3c28p-light-panel](https://github.com/jvduuren/esphome-es3c28p-light-panel) | Two things measured on the board: the touch panel's orientation and the 40 MHz SPI limit | Reference only; no text or code copied |
 
 ### Notice for xiaozhi-esp32
 
@@ -141,7 +153,7 @@ each keeps its own license. For these boards they include:
 | Component | License |
 |---|---|
 | [ESP-IDF](https://github.com/espressif/esp-idf) v6.0.1 | Apache-2.0 |
-| `espressif/esp_lcd_st77916` (1.85C only), `esp_lvgl_adapter`, `esp_lcd_touch`, `esp_codec_dev`, `esp_websocket_client`, `led_strip`, `button`, `knob`, `esp_lv_fs`, `esp_lv_decoder`, `esp_mmap_assets`, `cmake_utilities` | Apache-2.0 |
+| `espressif/esp_lcd_st77916` (1.85C only), `esp_lcd_ili9341` (LCDWIKI board only), `esp_lvgl_adapter`, `esp_lcd_touch`, `esp_codec_dev`, `esp_websocket_client`, `led_strip`, `button`, `knob`, `esp_lv_fs`, `esp_lv_decoder`, `esp_mmap_assets`, `cmake_utilities` | Apache-2.0 |
 | `lvgl/lvgl` 9.5.0 | MIT |
 | `espressif/cjson` (cJSON) | MIT |
 | `espressif/esp_new_jpeg` | Espressif MIT |

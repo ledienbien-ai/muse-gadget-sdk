@@ -50,6 +50,7 @@ Mỗi bo chạy đầy đủ giao diện trên màn hình: avatar động, nhấ
 |---|---|---|---|---|
 | [Waveshare ESP32-S3-Touch-LCD-1.85C](#waveshare-esp32-s3-touch-lcd-185c) | Tròn 1,85" 360×360, cảm ứng | `s3lcd` | `waveshare-s3-185c` | Nạp firmware online tại: https://dbrobot.vn/firmware.html |
 | [OSTB-3ST](#ostb-3st) | 1,83" 296×240, cảm ứng | `ostb` | `ostb-3st` | Nạp firmware online tại: https://dbrobot.vn/firmware.html |
+| [LCDWIKI 2.8inch ESP32-S3 Display](#lcdwiki-28inch-esp32-s3-display) | 2,8" 320×240, bản ES3C28P có cảm ứng | `lcd28` | `lcdwiki-s3-28` | Nạp firmware online tại: https://dbrobot.vn/firmware.html |
 
 Tên là cách `tools/muse/board.sh` gọi bo; profile là tên của cấu hình build và
 thư mục build. Các bo mà bản gốc hỗ trợ vẫn còn nguyên, liệt kê trong
@@ -129,6 +130,46 @@ chạy, màn hình tắt cho đến khi bấm phím +. Khi pin đã đầy, bo c
 Mã của bo: [`board_ostb_3st.c`](esp32/components/muse/boards/board_ostb_3st.c),
 cấu hình build: [`sdkconfig.muse-ostb-3st`](esp32/devices/sdkconfig.muse-ostb-3st).
 
+## LCDWIKI 2.8inch ESP32-S3 Display
+
+<p align="center">
+  <img src="doc/image/lcdwiki-s3-28-device.jpg" width="330" alt="LCDWIKI 2.8inch ESP32-S3 Display, mặt trước">
+  <img src="doc/image/lcdwiki-s3-28-back.jpg" width="330" alt="Mặt sau, có chú thích các cổng và nút">
+</p>
+<p align="center">
+  <img src="doc/image/lcdwiki-s3-28.png" width="720" alt="Giao diện Muse ở 320×240, do trình mô phỏng vẽ">
+</p>
+
+Bo màn hình 2,8" được bán dưới nhiều tên khác nhau. LCDWIKI làm hai phiên bản:
+**ES3C28P** có cảm ứng điện dung và **ES3N28P** không có cảm ứng. Một firmware
+dùng cho cả hai: lúc khởi động nó dò xem có chip cảm ứng hay không.
+
+| Thành phần | Chi tiết |
+|---|---|
+| Chip | ESP32-S3R8, flash 16 MB, PSRAM octal 8 MB, USB gốc |
+| Màn hình | LCD ILI9341V 2,8" 240×320 qua SPI ở 40 MHz, dùng theo chiều ngang, đèn nền PWM |
+| Cảm ứng | FT6336G trên bản ES3C28P; bản ES3N28P không có |
+| Âm thanh | Codec ES8311 với một micro, ampli loa FM8002E |
+| Nút | BOOT: nhấn giữ để nói |
+| Pin | Mức pin theo dải ADC của firmware gốc, trên GPIO9 |
+
+**Tình trạng:** biên dịch được với ESP-IDF v6.0.1. Chưa chạy trên bo thật.
+Chân lấy từ [trang của LCDWIKI](https://www.lcdwiki.com/2.8inch_ESP32-S3_Display) và các file xiaozhi-esp32 của bo; hướng
+của tấm cảm ứng và giới hạn SPI 40 MHz lấy theo kết quả đo trên bo thật trong
+[esphome-es3c28p-light-panel](https://github.com/jvduuren/esphome-es3c28p-light-panel). Nếu cảm ứng lệch chỗ, hãy sửa `TP_SWAP_XY`,
+`TP_MIRROR_X` và `TP_MIRROR_Y` ở đầu file mã của bo.
+
+Giới hạn đã biết: BOOT là nút duy nhất, nên màn hình tự tắt theo hẹn giờ và
+việc tắt máy nằm ở trang Power trong Settings (bo vào deep sleep cho tới khi
+nhấn BOOT). Trên bản ES3N28P, không có cảm ứng và chỉ có một nút, nên không có
+phần cài đặt trên thiết bị: bo chỉ nhấn giữ để nói và được thiết lập từ ứng
+dụng Muse. Pin chỉ hiện mức, không hiện điện áp, và trạng thái của mạch sạc
+không nối về chân nào, nên bo chỉ báo "đang sạc" khi đang cắm vào máy tính. Khe
+thẻ SD và đèn LED RGB không được dùng.
+
+Mã của bo: [`board_lcdwiki_s3_28.c`](esp32/components/muse/boards/board_lcdwiki_s3_28.c),
+cấu hình build: [`sdkconfig.muse-lcdwiki-s3-28`](esp32/devices/sdkconfig.muse-lcdwiki-s3-28).
+
 ## Biên dịch và nạp
 
 Các bước giống nhau cho mọi bo. Lấy tên và profile của bo ở
@@ -175,7 +216,7 @@ Các bước giống nhau cho mọi bo. Lấy tên và profile của bo ở
    khi đăng file công khai.
 5. Trong ứng dụng Muse, bật **Settings > Devices > Developer mode**, thêm thiết
    bị tên `MuseGadget-XXXXXX`, rồi nhấn nút nói của bo khi được hỏi (BOOT trên
-   bo 1.85C, phím + của bo OSTB-3ST).
+   bo 1.85C và bo LCDWIKI, phím + của bo OSTB-3ST).
 
 ## Logo khởi động
 
@@ -252,6 +293,9 @@ hãy mở issue trên repo này.
 - Bản port OSTB-3ST lấy chân, bảng khởi tạo màn hình và bảng pin từ mã nguồn
   firmware xiaozhi-esp32 của bo, vốn không ghi giấy phép riêng; xiaozhi-esp32
   theo giấy phép MIT.
+- Bản port LCDWIKI 2.8inch dựa trên [trang của LCDWIKI](https://www.lcdwiki.com/2.8inch_ESP32-S3_Display) về bo này, trên
+  các file xiaozhi-esp32 của bo, và trên các phép đo công bố trong
+  [esphome-es3c28p-light-panel](https://github.com/jvduuren/esphome-es3c28p-light-panel); không chép mã nào từ các nguồn đó.
 - Hai file của bản gốc giữ giấy phép riêng: `minimp3.h` (CC0-1.0) và
   `pixel_font.c` (BSD-2-Clause). Các component tải về lúc build theo giấy phép
   của chính chúng.

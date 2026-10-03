@@ -50,6 +50,7 @@ ESP32 Device SDK がまだ対応していない ESP32-S3 ボードを追加し�
 |---|---|---|---|---|
 | [Waveshare ESP32-S3-Touch-LCD-1.85C](#waveshare-esp32-s3-touch-lcd-185c) | 1.85 インチ円形 360×360、タッチ | `s3lcd` | `waveshare-s3-185c` | ファームウェアのオンライン書き込み：https://dbrobot.vn/firmware.html |
 | [OSTB-3ST](#ostb-3st) | 1.83 インチ 296×240、タッチ | `ostb` | `ostb-3st` | ファームウェアのオンライン書き込み：https://dbrobot.vn/firmware.html |
+| [LCDWIKI 2.8inch ESP32-S3 Display](#lcdwiki-28inch-esp32-s3-display) | 2.8 インチ 320×240、ES3C28P はタッチ付き | `lcd28` | `lcdwiki-s3-28` | ファームウェアのオンライン書き込み：https://dbrobot.vn/firmware.html |
 
 名前は `tools/muse/board.sh` でのボードの呼び名、プロファイルはビルド設定と
 ビルドディレクトリの名前です。上流が対応しているボードもそのまま残っていて、
@@ -131,6 +132,48 @@ Settings の Power ページから行います（ボードはディープスリ�
 コード：[`board_ostb_3st.c`](esp32/components/muse/boards/board_ostb_3st.c)、
 ビルド設定：[`sdkconfig.muse-ostb-3st`](esp32/devices/sdkconfig.muse-ostb-3st)。
 
+## LCDWIKI 2.8inch ESP32-S3 Display
+
+<p align="center">
+  <img src="doc/image/lcdwiki-s3-28-device.jpg" width="330" alt="LCDWIKI 2.8inch ESP32-S3 Display の前面">
+  <img src="doc/image/lcdwiki-s3-28-back.jpg" width="330" alt="背面。コネクターとボタンの説明付き">
+</p>
+<p align="center">
+  <img src="doc/image/lcdwiki-s3-28.png" width="720" alt="シミュレーターで描いた 320×240 の Muse UI">
+</p>
+
+さまざまな名前で売られている 2.8 インチのディスプレイボードです。LCDWIKI には
+静電容量タッチ付きの **ES3C28P** と、タッチなしの **ES3N28P** の 2 モデルが
+あります。1 つのファームウェアで両方に対応します。起動時にタッチコントローラー
+の有無を調べます。
+
+| 項目 | 内容 |
+|---|---|
+| チップ | ESP32-S3R8、16 MB フラッシュ、8 MB オクタル PSRAM、ネイティブ USB |
+| ディスプレイ | 2.8 インチ 240×320 ILI9341V LCD（SPI、40 MHz）、横向きで使用、PWM バックライト |
+| タッチ | ES3C28P は FT6336G。ES3N28P にはありません |
+| オーディオ | ES8311 コーデックとマイク 1 個、FM8002E スピーカーアンプ |
+| ボタン | BOOT：押している間だけ話す |
+| バッテリー | 元のファームウェアの ADC 範囲による残量（GPIO9） |
+
+**状況：** ESP-IDF v6.0.1 でビルドできます。実機ではまだ動かしていません。
+ピンは [LCDWIKI のページ](https://www.lcdwiki.com/2.8inch_ESP32-S3_Display)とこのボードの xiaozhi-esp32 のファイルによる
+ものです。タッチパネルの向きと SPI の 40 MHz という上限は、
+[esphome-es3c28p-light-panel](https://github.com/jvduuren/esphome-es3c28p-light-panel) が実機で測定した結果に従っています。タッチの
+位置がずれる場合は、ボードのコードの先頭にある `TP_SWAP_XY`、`TP_MIRROR_X`、
+`TP_MIRROR_Y` を変えてください。
+
+既知の制限：ボタンは BOOT だけなので、画面はタイマーで消灯し、電源オフは
+Settings の Power ページから行います（ボードはディープスリープに入り、BOOT を
+押すと復帰します）。ES3N28P はタッチがなくボタンも 1 つなので、デバイス上に設定
+画面はありません。プッシュトゥトークだけができ、設定は Muse アプリから行います。
+バッテリーは残量だけを表示し、電圧は表示しません。充電 IC の状態はどのピンにも
+つながっていないため、「充電中」と表示されるのはパソコンに接続している間だけ
+です。SD カードスロットと RGB LED は使いません。
+
+コード：[`board_lcdwiki_s3_28.c`](esp32/components/muse/boards/board_lcdwiki_s3_28.c)、
+ビルド設定：[`sdkconfig.muse-lcdwiki-s3-28`](esp32/devices/sdkconfig.muse-lcdwiki-s3-28)。
+
 ## ビルドと書き込み
 
 手順はどのボードでも同じです。名前とプロファイルは
@@ -179,7 +222,7 @@ Settings の Power ページから行います（ボードはディープスリ�
    ファイルを公開する前によく考えてください。
 5. Muse アプリで **Settings > Devices > Developer mode** をオンにし、
    `MuseGadget-XXXXXX` という名前のデバイスを追加して、求められたらボードの
-   トークボタンを押します（1.85C では BOOT、OSTB-3ST では + キー）。
+   トークボタンを押します（1.85C と LCDWIKI のボードでは BOOT、OSTB-3ST では + キー）。
 
 ## 起動ロゴ
 
@@ -257,6 +300,10 @@ Settings > Devices からペアリングします。先にそこで Developer mo
 - OSTB-3ST への移植では、ピン、パネルの初期化テーブル、バッテリーのテーブルを
   このボードの xiaozhi-esp32 ファームウェアのソースから取っています。その
   ファイル自体にライセンス表記はありません。xiaozhi-esp32 は MIT です。
+- LCDWIKI 2.8inch への移植は、[LCDWIKI のページ](https://www.lcdwiki.com/2.8inch_ESP32-S3_Display)、このボードの
+  xiaozhi-esp32 のファイル、および
+  [esphome-es3c28p-light-panel](https://github.com/jvduuren/esphome-es3c28p-light-panel) で公開されている実測結果を参考にして
+  います。コードはコピーしていません。
 - 上流のファイルのうち 2 つは独自のライセンスのままです：`minimp3.h`
   （CC0-1.0）と `pixel_font.c`（BSD-2-Clause）。ビルド時に取得する
   コンポーネントには、それぞれのライセンスが適用されます。

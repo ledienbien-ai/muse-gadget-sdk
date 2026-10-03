@@ -49,6 +49,7 @@ settings by touch, and images from Muse.
 |---|---|---|---|---|
 | [Waveshare ESP32-S3-Touch-LCD-1.85C](#waveshare-esp32-s3-touch-lcd-185c) | 1.85" round 360×360, touch | `s3lcd` | `waveshare-s3-185c` | Flash the firmware online at: https://dbrobot.vn/firmware.html |
 | [OSTB-3ST](#ostb-3st) | 1.83" 296×240, touch | `ostb` | `ostb-3st` | Flash the firmware online at: https://dbrobot.vn/firmware.html |
+| [LCDWIKI 2.8inch ESP32-S3 Display](#lcdwiki-28inch-esp32-s3-display) | 2.8" 320×240, touch on the ES3C28P | `lcd28` | `lcdwiki-s3-28` | Flash the firmware online at: https://dbrobot.vn/firmware.html |
 
 The name is what `tools/muse/board.sh` calls the board; the profile names its
 build settings and build directory. The boards upstream supports are still
@@ -129,6 +130,47 @@ is attached.
 Code: [`board_ostb_3st.c`](esp32/components/muse/boards/board_ostb_3st.c),
 build settings: [`sdkconfig.muse-ostb-3st`](esp32/devices/sdkconfig.muse-ostb-3st).
 
+## LCDWIKI 2.8inch ESP32-S3 Display
+
+<p align="center">
+  <img src="doc/image/lcdwiki-s3-28-device.jpg" width="330" alt="The LCDWIKI 2.8inch ESP32-S3 Display, front">
+  <img src="doc/image/lcdwiki-s3-28-back.jpg" width="330" alt="Its back, with the connectors and buttons labelled">
+</p>
+<p align="center">
+  <img src="doc/image/lcdwiki-s3-28.png" width="720" alt="The Muse UI at 320×240, drawn by the simulator">
+</p>
+
+A 2.8" display board sold under many names. LCDWIKI makes two models: the
+**ES3C28P** with a capacitive touch panel and the **ES3N28P** without. One
+firmware serves both: it looks for the touch controller at boot.
+
+| Part | Details |
+|---|---|
+| Chip | ESP32-S3R8, 16 MB flash, 8 MB octal PSRAM, native USB |
+| Display | 2.8" 240×320 ILI9341V LCD on SPI at 40 MHz, used in landscape, PWM backlight |
+| Touch | FT6336G on the ES3C28P; none on the ES3N28P |
+| Audio | ES8311 codec with one microphone, FM8002E speaker amp |
+| Button | BOOT: hold to talk |
+| Battery | Level from the board firmware's ADC range, on GPIO9 |
+
+**Status:** builds with ESP-IDF v6.0.1. It has not been run on the board. The
+pins come from [LCDWIKI's page](https://www.lcdwiki.com/2.8inch_ESP32-S3_Display) and the board's xiaozhi-esp32 files; the
+touch panel's orientation and the 40 MHz SPI limit are as measured on the
+board in [esphome-es3c28p-light-panel](https://github.com/jvduuren/esphome-es3c28p-light-panel). If touches land in the wrong
+place, change `TP_SWAP_XY`, `TP_MIRROR_X` and `TP_MIRROR_Y` at the top of the
+board's code.
+
+Known limits: BOOT is the only button, so the screen sleeps on its timer and
+powering off is on the Power page in Settings (the board deep-sleeps until BOOT
+is pressed). On the ES3N28P, with no touch and one button, there are no
+settings on the device: it does push-to-talk and is set up from the Muse app.
+The battery shows a level but no voltage, and the charger's status reaches no
+pin, so the board shows "charging" only while a computer is attached. The SD
+card slot and the RGB LED aren't used.
+
+Code: [`board_lcdwiki_s3_28.c`](esp32/components/muse/boards/board_lcdwiki_s3_28.c),
+build settings: [`sdkconfig.muse-lcdwiki-s3-28`](esp32/devices/sdkconfig.muse-lcdwiki-s3-28).
+
 ## Build and flash
 
 The steps are the same for every board. Take its name and profile from the
@@ -175,7 +217,7 @@ The steps are the same for every board. Take its name and profile from the
    publish the file.
 5. In the Muse app, turn on **Settings > Devices > Developer mode**, add the
    device named `MuseGadget-XXXXXX`, and press the board's talk button when
-   asked (BOOT on the 1.85C, the + key on the OSTB-3ST).
+   asked (BOOT on the 1.85C and the LCDWIKI board, the + key on the OSTB-3ST).
 
 ## Startup logo
 
@@ -250,6 +292,9 @@ an issue on this repository.
 - The OSTB-3ST port takes its pins, panel setup table and battery table from
   the board's xiaozhi-esp32 firmware source, which carries no license notice of
   its own; xiaozhi-esp32 is MIT.
+- The LCDWIKI 2.8inch port draws on [LCDWIKI's page](https://www.lcdwiki.com/2.8inch_ESP32-S3_Display) for the board, on
+  the board's xiaozhi-esp32 files, and on measurements published in
+  [esphome-es3c28p-light-panel](https://github.com/jvduuren/esphome-es3c28p-light-panel); no code is copied from them.
 - Two upstream files keep their own licenses: `minimp3.h` (CC0-1.0) and
   `pixel_font.c` (BSD-2-Clause). Components fetched at build time are under
   their own licenses.

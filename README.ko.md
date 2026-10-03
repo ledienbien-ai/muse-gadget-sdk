@@ -49,6 +49,7 @@ Muse gadget은 직접 만드는 오픈 소스 기기입니다. 시중에서 파�
 |---|---|---|---|---|
 | [Waveshare ESP32-S3-Touch-LCD-1.85C](#waveshare-esp32-s3-touch-lcd-185c) | 1.85인치 원형 360×360, 터치 | `s3lcd` | `waveshare-s3-185c` | 펌웨어 온라인 플래시: https://dbrobot.vn/firmware.html |
 | [OSTB-3ST](#ostb-3st) | 1.83인치 296×240, 터치 | `ostb` | `ostb-3st` | 펌웨어 온라인 플래시: https://dbrobot.vn/firmware.html |
+| [LCDWIKI 2.8inch ESP32-S3 Display](#lcdwiki-28inch-esp32-s3-display) | 2.8인치 320×240, ES3C28P는 터치 지원 | `lcd28` | `lcdwiki-s3-28` | 펌웨어 온라인 플래시: https://dbrobot.vn/firmware.html |
 
 이름은 `tools/muse/board.sh`가 보드를 부르는 이름이고, 프로필은 빌드 설정과
 빌드 디렉터리의 이름입니다. 업스트림이 지원하는 보드도 그대로 남아 있으며,
@@ -130,6 +131,47 @@ Settings의 Power 페이지에 있습니다(보드는 딥 슬립에 들어가며
 코드: [`board_ostb_3st.c`](esp32/components/muse/boards/board_ostb_3st.c),
 빌드 설정: [`sdkconfig.muse-ostb-3st`](esp32/devices/sdkconfig.muse-ostb-3st).
 
+## LCDWIKI 2.8inch ESP32-S3 Display
+
+<p align="center">
+  <img src="doc/image/lcdwiki-s3-28-device.jpg" width="330" alt="LCDWIKI 2.8inch ESP32-S3 Display의 앞면">
+  <img src="doc/image/lcdwiki-s3-28-back.jpg" width="330" alt="뒷면. 커넥터와 버튼 설명 포함">
+</p>
+<p align="center">
+  <img src="doc/image/lcdwiki-s3-28.png" width="720" alt="시뮬레이터로 그린 320×240 Muse UI">
+</p>
+
+여러 이름으로 판매되는 2.8인치 디스플레이 보드입니다. LCDWIKI에는 정전식 터치가
+있는 **ES3C28P**와 터치가 없는 **ES3N28P** 두 모델이 있습니다. 펌웨어 하나로 두
+모델을 모두 지원합니다. 부팅할 때 터치 컨트롤러가 있는지 확인합니다.
+
+| 항목 | 내용 |
+|---|---|
+| 칩 | ESP32-S3R8, 16 MB 플래시, 8 MB 옥탈 PSRAM, 네이티브 USB |
+| 디스플레이 | 2.8인치 240×320 ILI9341V LCD(SPI, 40 MHz), 가로로 사용, PWM 백라이트 |
+| 터치 | ES3C28P는 FT6336G. ES3N28P에는 없습니다 |
+| 오디오 | ES8311 코덱과 마이크 1개, FM8002E 스피커 앰프 |
+| 버튼 | BOOT: 누르고 있는 동안 말하기 |
+| 배터리 | 원래 펌웨어의 ADC 범위로 계산한 잔량(GPIO9) |
+
+**상태:** ESP-IDF v6.0.1로 빌드됩니다. 실제 보드에서는 아직 실행하지
+못했습니다. 핀은 [LCDWIKI의 페이지](https://www.lcdwiki.com/2.8inch_ESP32-S3_Display)와 이 보드의 xiaozhi-esp32 파일에서
+가져왔고, 터치 패널의 방향과 SPI 40 MHz 한계는
+[esphome-es3c28p-light-panel](https://github.com/jvduuren/esphome-es3c28p-light-panel)이 실제 보드에서 측정한 결과를 따랐습니다.
+터치 위치가 맞지 않으면 보드 코드 파일 맨 위의 `TP_SWAP_XY`, `TP_MIRROR_X`,
+`TP_MIRROR_Y`를 바꾸세요.
+
+알려진 제한: 버튼이 BOOT 하나뿐이어서 화면은 타이머에 따라 꺼지고, 전원 끄기는
+Settings의 Power 페이지에 있습니다(보드는 딥 슬립에 들어가며 BOOT를 누르면
+깨어납니다). ES3N28P는 터치가 없고 버튼도 하나뿐이라 기기에 설정 화면이
+없습니다. 눌러서 말하기만 되고, 설정은 Muse 앱에서 합니다. 배터리는 잔량만
+표시하고 전압은 표시하지 않으며, 충전 IC의 상태가 어느 핀에도 연결되어 있지
+않아서 컴퓨터에 연결되어 있을 때만 "충전 중"으로 표시됩니다. SD 카드 슬롯과
+RGB LED는 쓰지 않습니다.
+
+코드: [`board_lcdwiki_s3_28.c`](esp32/components/muse/boards/board_lcdwiki_s3_28.c),
+빌드 설정: [`sdkconfig.muse-lcdwiki-s3-28`](esp32/devices/sdkconfig.muse-lcdwiki-s3-28).
+
 ## 빌드와 플래시
 
 절차는 모든 보드에서 같습니다. 이름과 프로필은 [위의 표](#이-포크의-보드)에서
@@ -176,7 +218,7 @@ Settings의 Power 페이지에 있습니다(보드는 딥 슬립에 들어가며
    공개하기 전에 신중히 생각하세요.
 5. Muse 앱에서 **Settings > Devices > Developer mode**를 켜고,
    `MuseGadget-XXXXXX`라는 이름의 기기를 추가한 다음, 요청이 나오면 보드의
-   말하기 버튼을 누릅니다(1.85C는 BOOT, OSTB-3ST는 + 키).
+   말하기 버튼을 누릅니다(1.85C와 LCDWIKI 보드는 BOOT, OSTB-3ST는 + 키).
 
 ## 시작 로고
 
@@ -252,6 +294,9 @@ ESP32와 Linux gadget은 iOS와 Android의 Muse 앱에서 Settings > Devices를 
 - OSTB-3ST 포팅은 핀, 패널 초기화 표, 배터리 표를 이 보드의 xiaozhi-esp32
   펌웨어 소스에서 가져왔습니다. 그 파일 자체에는 라이선스 표기가 없습니다.
   xiaozhi-esp32는 MIT입니다.
+- LCDWIKI 2.8inch 포팅은 [LCDWIKI의 페이지](https://www.lcdwiki.com/2.8inch_ESP32-S3_Display), 이 보드의 xiaozhi-esp32
+  파일, 그리고 [esphome-es3c28p-light-panel](https://github.com/jvduuren/esphome-es3c28p-light-panel)에 공개된 실측 결과를
+  참고했습니다. 코드는 복사하지 않았습니다.
 - 업스트림 파일 중 두 개는 자체 라이선스를 유지합니다: `minimp3.h`(CC0-1.0)와
   `pixel_font.c`(BSD-2-Clause). 빌드할 때 내려받는 컴포넌트에는 각자의
   라이선스가 적용됩니다.
