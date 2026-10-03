@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * Copyright (c) 2026 ledienbien-ai
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
  * Pins are from Waveshare's wiki (docs.waveshare.com/ESP32-S3-Touch-LCD-1.85C),
  * its ESP-IDF example (github.com/waveshareteam/ESP32-S3-Touch-LCD-1.85C, V2)
  * and xiaozhi-esp32's waveshare/esp32-s3-touch-lcd-1.85c board (both versions).
+ * CREDITS.md at the repository root lists these sources and their licenses.
  */
 #include <math.h>
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * Copyright (c) 2026 ledienbien-ai
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,9 @@
  * ST77916 register setup for the Waveshare ESP32-S3-Touch-LCD-1.85C panels
  * whose ID register (04h) reads 00 02 7F 7F. Panels that read 00 7F 7F 7F
  * take the driver's own defaults. From Waveshare's ESP-IDF example
- * (waveshareteam/ESP32-S3-Touch-LCD-1.85C, main/LCD_Driver/ST77916.c); the
- * same table is in xiaozhi-esp32's esp32-s3-touch-lcd-1.85c board.
+ * (waveshareteam/ESP32-S3-Touch-LCD-1.85C, main/LCD_Driver/ST77916.c,
+ * Apache-2.0); the same table is in xiaozhi-esp32's esp32-s3-touch-lcd-1.85c
+ * board (MIT). CREDITS.md at the repository root has both notices.
  */
 static const st77916_lcd_init_cmd_t waveshare_185c_st77916_init[] = {
     { 0xF0, (uint8_t[]){ 0x28 }, 1, 0 },

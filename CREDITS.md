@@ -1,0 +1,154 @@
+<!--
+Copyright (c) 2026 ledienbien-ai
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+# Credits and licenses
+
+This repository is a community fork of
+[facebookincubator/muse-gadget-sdk](https://github.com/facebookincubator/muse-gadget-sdk)
+that adds the Waveshare ESP32-S3-Touch-LCD-1.85C. It is not affiliated with or
+endorsed by Meta, Waveshare, Espressif or the xiaozhi-esp32 project.
+
+This file records where the code came from and under which terms. It is a
+plain-language record, not legal advice.
+
+## 1. The Muse Gadget SDK (upstream)
+
+| | |
+|---|---|
+| Source | <https://github.com/facebookincubator/muse-gadget-sdk> |
+| Copyright | Meta Platforms, Inc. and affiliates |
+| License | Apache License, Version 2.0, in [`LICENSE`](LICENSE) |
+| Forked from | commit `b9008abba7dc4109c66212b9b82e459d08b98b85` |
+
+Everything in this repository that is not listed in sections 2 to 4 is the
+upstream SDK, unchanged.
+
+Upstream keeps these third-party files under their own licenses:
+
+| Path | Upstream | License |
+|---|---|---|
+| [`esp32/components/minimp3/include/minimp3.h`](esp32/components/minimp3) | [lieff/minimp3](https://github.com/lieff/minimp3) | CC0-1.0, see [`LICENSE`](esp32/components/minimp3/LICENSE) |
+| [`esp32/main/pixel_font.c`](esp32/main/pixel_font.c) | Adafruit GFX `glcdfont.c` | BSD-2-Clause, in the file header |
+
+**The Apache License does not cover the [Jollybot avatar](esp32/avatar).** Its
+files carry only a Meta copyright line. Firmware built from this repository
+includes that avatar unless you replace it with your own
+(`esp32/tools/muse/AVATAR_RECIPE.md`).
+
+## 2. Changes made in this fork
+
+Copyright (c) 2026 ledienbien-ai. Licensed under the Apache License,
+Version 2.0, the same license as upstream.
+
+Files added:
+
+| Path | What it is |
+|---|---|
+| [`esp32/components/muse/boards/board_waveshare_s3_185c.c`](esp32/components/muse/boards/board_waveshare_s3_185c.c) | The board: display, touch, both audio versions, button, battery, power |
+| [`esp32/components/muse/boards/waveshare_s3_185c_lcd_init.h`](esp32/components/muse/boards/waveshare_s3_185c_lcd_init.h) | ST77916 register table (see section 3) |
+| [`esp32/devices/sdkconfig.muse-waveshare-s3-185c`](esp32/devices/sdkconfig.muse-waveshare-s3-185c) | Build settings for the board |
+| `CREDITS.md`, `README.vi.md`, `README.zh-CN.md`, `README.ja.md`, `README.ko.md` | This file and the translated READMEs |
+
+Upstream files modified, each marked "Modified by ledienbien-ai" under its
+license header, as section 4(b) of the Apache License asks:
+
+| Path | Change |
+|---|---|
+| `README.md` | Describes this fork; links the translations and this file |
+| `esp32/README.md`, `esp32/AGENTS.md`, `esp32/devices/README.md`, `esp32/devices/AGENTS.md` | List the new board |
+| `esp32/components/muse/Kconfig`, `CMakeLists.txt`, `idf_component.yml` | Register the board and its `esp_lcd_st77916` dependency |
+| `esp32/components/muse/muse_ui.c` | On round screens smaller than 412 px, the speaker button sits under the state word |
+| `esp32/tools/muse/board.sh`, `ports.py`, `avatar.py` | Add the `s3lcd` board alias |
+
+## 3. Sources used for the Waveshare ESP32-S3-Touch-LCD-1.85C port
+
+| Source | Used for | License |
+|---|---|---|
+| [Waveshare documentation](https://docs.waveshare.com/ESP32-S3-Touch-LCD-1.85C) and [wiki](https://www.waveshare.com/wiki/ESP32-S3-Touch-LCD-1.85C) | Hardware facts: chip, pins, the V1 and V2 audio versions | Reference only; no text or code copied |
+| [waveshareteam/ESP32-S3-Touch-LCD-1.85C](https://github.com/waveshareteam/ESP32-S3-Touch-LCD-1.85C) (`ESP-IDF/ESP32-S3-Touch-LCD-1.85C-Test`) | The ST77916 register table in `waveshare_s3_185c_lcd_init.h`, copied; panel ID check, reset lines, touch registers, battery divider and V2 codec pins, as reference | Apache-2.0 |
+| [78/xiaozhi-esp32](https://github.com/78/xiaozhi-esp32) (`main/boards/waveshare/esp32-s3-touch-lcd-1.85c`) | The same ST77916 register table; V1 and V2 audio pin maps and the V1 mic format, as reference | MIT (notice below) |
+| [waveshareteam/Waveshare-ESP32-components](https://github.com/waveshareteam/Waveshare-ESP32-components) (`bsp/esp32_s3_touch_amoled_1_75c`) | How the ES8311 and ES7210 pair is set up, as reference for V2 | Apache-2.0 |
+
+Notice for xiaozhi-esp32, as its license requires:
+
+```
+MIT License
+
+Copyright (c) 2025 Shenzhen Xinzhi Future Technology Co., Ltd.
+Copyright (c) 2025 Project Contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+## 4. Components fetched at build time
+
+The firmware links components that the ESP-IDF Component Manager downloads
+into `esp32/managed_components/`. They are not stored in this repository and
+each keeps its own license. For this board they include:
+
+| Component | License |
+|---|---|
+| [ESP-IDF](https://github.com/espressif/esp-idf) v6.0.1 | Apache-2.0 |
+| `espressif/esp_lcd_st77916`, `esp_lvgl_adapter`, `esp_lcd_touch`, `esp_codec_dev`, `esp_websocket_client`, `led_strip`, `button`, `knob`, `esp_lv_fs`, `esp_lv_decoder`, `esp_mmap_assets`, `cmake_utilities` | Apache-2.0 |
+| `lvgl/lvgl` 9.5.0 | MIT |
+| `espressif/cjson` (cJSON) | MIT |
+| `espressif/esp_new_jpeg` | Espressif MIT |
+| `espressif/freetype` | FreeType License |
+| `espressif/libpng` | PNG Reference Library License |
+| `espressif/zlib` | zlib License |
+
+The simulator's LVGL and SDL are listed in
+[`esp32/simulator/THIRD_PARTY.md`](esp32/simulator/THIRD_PARTY.md).
+
+## 5. What the licenses do not give you
+
+- **Names and logos.** The Apache License grants no right to the Meta, Muse,
+  Waveshare or Espressif names and marks beyond describing where the work came
+  from.
+- **The Muse service.** Pairing a gadget needs an SDK token and is governed by
+  the [Gadget SDK Terms](https://gadgets.muse.ai/sdk-terms), not by this
+  repository's license.
+- **Warranty.** Everything here is provided "as is". Flashing firmware can
+  brick a board.
+
+## 6. Keeping this in order in later versions
+
+- Keep `LICENSE` and this file in the repository and in any source archive.
+- Give each new file an Apache header with your own copyright line. Leave the
+  headers of upstream and third-party files as they are.
+- When you change an upstream file, add or extend the "Modified by" line under
+  its header and the table in section 2.
+- When you copy code or data from another project, check its license first and
+  add a row to section 3, with the notice text if the license asks for one.
+- When you publish a firmware `.bin`, link this file and `LICENSE` next to the
+  download: a binary is a distribution too. A build made with your SDK token
+  carries that token.

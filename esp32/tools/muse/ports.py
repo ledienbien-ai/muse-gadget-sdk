@@ -12,6 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# Modified by ledienbien-ai (2026): added the Waveshare ESP32-S3-Touch-LCD-1.85C.
 
 """Finds a board's serial port by the USB device behind it.
 

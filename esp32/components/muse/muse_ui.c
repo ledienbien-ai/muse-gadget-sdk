@@ -12,6 +12,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modified by ledienbien-ai (2026): on round screens smaller than 412 px, the speaker
+ * button sits under the state word (for the Waveshare ESP32-S3-Touch-LCD-1.85C).
  */
 
 #include "muse_ui.h"

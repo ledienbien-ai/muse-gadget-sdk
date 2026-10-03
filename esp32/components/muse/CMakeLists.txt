@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# Modified by ledienbien-ai (2026): added the Waveshare ESP32-S3-Touch-LCD-1.85C.
 
 # Muse: the voice companion UI that runs beside Home Link on boards with a
 # display (CONFIG_MUSE_BOARD_*). Link-only builds register an empty component,
