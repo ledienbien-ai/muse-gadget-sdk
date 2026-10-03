@@ -224,24 +224,6 @@ Settings の Power ページから行います（ボードはディープスリ�
    `MuseGadget-XXXXXX` という名前のデバイスを追加して、求められたらボードの
    トークボタンを押します（1.85C と LCDWIKI のボードでは BOOT、OSTB-3ST では + キー）。
 
-## 起動ロゴ
-
-<p align="center">
-  <img src="doc/image/boot-logo.png" width="560" alt="シミュレーターで描いた起動ロゴ：1.85C の円形画面と OSTB-3ST">
-</p>
-
-フル UI のボードはどれも、起動時にロゴを 2.5 秒表示してから、いつもの画面に
-なります。ロゴは
-[`esp32/components/muse/logo/logo.c`](esp32/components/muse/logo) で、透過付きの
-240×240 の画像です。
-[LVGL の画像コンバーター](https://lvgl.io/tools/imageconverter)が出力する形式
-そのままで、カラーフォーマットは RGB565A8、名前は `logo` です。自分のロゴを
-使うには、同じ名前で書き出したファイルに置き換えてください。画面より大きい
-画像は収まるように縮小され、小さい画像はそのままの大きさで表示されます。
-
-`idf.py -B build-muse-$P menuconfig`（Component config > Muse > Show a logo
-while starting up）で、ロゴをオフにしたり表示時間を変えたりできます。
-
 ## ほかのデバイスを追加する
 
 画面、スピーカー、マイクのあるボードなら、ドライバーのファイル 1 つと数行の登録で

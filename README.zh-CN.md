@@ -205,22 +205,6 @@ SPI 上限采用 [esphome-es3c28p-light-panel](https://github.com/jvduuren/espho
    `MuseGadget-XXXXXX` 的设备，并在提示时按下开发板的说话键（1.85C 和
    LCDWIKI 开发板是 BOOT，OSTB-3ST 是 + 键）。
 
-## 开机 logo
-
-<p align="center">
-  <img src="doc/image/boot-logo.png" width="560" alt="模拟器绘制的开机 logo：1.85C 的圆屏和 OSTB-3ST">
-</p>
-
-所有带完整界面的开发板在启动时都会显示 2.5 秒 logo，然后进入平常的界面。logo 是
-[`esp32/components/muse/logo/logo.c`](esp32/components/muse/logo)，一张
-240×240、带透明通道的图片，格式与
-[LVGL 图片转换工具](https://lvgl.io/tools/imageconverter)的输出一致：颜色格式
-RGB565A8，名称 `logo`。想换成自己的 logo，用同名的新导出文件替换它即可。比屏幕
-大的图片会缩小到刚好放下，比屏幕小的保持原尺寸。
-
-用 `idf.py -B build-muse-$P menuconfig`（Component config > Muse > Show a logo
-while starting up）可以关闭 logo 或修改显示时长。
-
 ## 添加其他设备
 
 一块带屏幕、扬声器和麦克风的开发板，只需要一个驱动文件和几行注册代码。本分支中

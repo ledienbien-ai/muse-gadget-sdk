@@ -219,24 +219,6 @@ The steps are the same for every board. Take its name and profile from the
    device named `MuseGadget-XXXXXX`, and press the board's talk button when
    asked (BOOT on the 1.85C and the LCDWIKI board, the + key on the OSTB-3ST).
 
-## Startup logo
-
-<p align="center">
-  <img src="doc/image/boot-logo.png" width="560" alt="The startup logo on the 1.85C's round screen and on the OSTB-3ST, drawn by the simulator">
-</p>
-
-Every board with the full UI shows a logo for 2.5 seconds when it starts, then
-the usual screen. The logo is
-[`esp32/components/muse/logo/logo.c`](esp32/components/muse/logo), a 240×240
-image with transparency, as
-[LVGL's image converter](https://lvgl.io/tools/imageconverter) writes it:
-colour format RGB565A8, name `logo`. To use your own, replace that file with a
-new export of the same name. An image larger than the screen is scaled down to
-fit; a smaller one keeps its size.
-
-`idf.py -B build-muse-$P menuconfig` (Component config > Muse > Show a logo
-while starting up) turns the logo off or changes how long it stays.
-
 ## Adding another device
 
 A board with a screen, a speaker and a microphone needs one driver file and a
