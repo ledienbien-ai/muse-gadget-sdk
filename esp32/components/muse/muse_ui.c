@@ -16,7 +16,7 @@
  * Modified by ledienbien-ai (2026): on round screens smaller than 412 px, the speaker
  * button sits under the state word (for the Waveshare ESP32-S3-Touch-LCD-1.85C); on a
  * rectangular screen under 300 px tall, a smaller Muse and a bar in place of the ring
- * (for the OSTB-3ST).
+ * (for the OSTB-3ST); a logo while starting up (CONFIG_MUSE_BOOT_LOGO).
  */
 
 #include "muse_ui.h"
@@ -1108,6 +1108,44 @@ static void build_overlays(void)
     }
 }
 
+#if CONFIG_MUSE_BOOT_LOGO
+LV_IMAGE_DECLARE(logo);     /* logo/logo.c, as LVGL's image converter writes it */
+
+static void boot_logo_done(lv_timer_t *t)
+{
+    lv_obj_delete(lv_timer_get_user_data(t));
+}
+
+/*
+ * The logo on black, over everything else, for the first moments after
+ * power-on. The UI runs under it meanwhile, so it's there when the logo goes.
+ * A logo larger than the screen is scaled down to fit; a smaller one keeps
+ * its size, since scaling a bitmap up blurs it.
+ */
+static void show_boot_logo(void)
+{
+    lv_obj_t *cover = lv_obj_create(lv_layer_top());
+    lv_obj_remove_style_all(cover);
+    lv_obj_set_size(cover, lv_pct(100), lv_pct(100));
+    lv_obj_set_style_bg_color(cover, lv_color_black(), 0);
+    lv_obj_set_style_bg_opa(cover, LV_OPA_COVER, 0);
+    lv_obj_remove_flag(cover, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_flag(cover, LV_OBJ_FLAG_CLICKABLE);   /* touches stop here */
+
+    lv_obj_t *img = lv_image_create(cover);
+    lv_image_set_src(img, &logo);
+    lv_obj_center(img);
+    int fit = LV_MIN(s_w, s_h);
+    int size = LV_MAX(logo.header.w, logo.header.h);
+    if (size > fit) {
+        lv_image_set_scale(img, fit * LV_SCALE_NONE / size);
+    }
+
+    lv_timer_t *t = lv_timer_create(boot_logo_done, CONFIG_MUSE_BOOT_LOGO_MS, cover);
+    lv_timer_set_repeat_count(t, 1);
+}
+#endif
+
 static void apply_brightness(int pct)
 {
     if (pct != s_brightness) {
@@ -1572,6 +1610,9 @@ esp_err_t muse_ui_start(void)
         muse_menu_build(lv_screen_active(), s_w, s_h);
     }
     build_overlays();
+#if CONFIG_MUSE_BOOT_LOGO
+    show_boot_logo();
+#endif
     lv_timer_create(frame_tick, muse_board->frame_ms, NULL);
     s_ready = true;
     muse_board->display_unlock();

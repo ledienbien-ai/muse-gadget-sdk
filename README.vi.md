@@ -170,6 +170,24 @@ Các bước giống nhau cho mọi bo. Lấy tên và profile của bo ở
    bị tên `MuseGadget-XXXXXX`, rồi nhấn nút nói của bo khi được hỏi (BOOT trên
    bo 1.85C, phím trên của bo OSTB-3ST).
 
+## Logo khởi động
+
+<p align="center">
+  <img src="doc/image/boot-logo.png" width="560" alt="Logo khởi động trên màn tròn của bo 1.85C và trên bo OSTB-3ST, do trình mô phỏng vẽ">
+</p>
+
+Mọi bo có giao diện đầy đủ đều hiện logo trong 2,5 giây khi khởi động, rồi mới
+tới màn hình thường lệ. Logo là file
+[`esp32/components/muse/logo/logo.c`](esp32/components/muse/logo), một ảnh
+240×240 có nền trong suốt, đúng dạng mà
+[công cụ chuyển ảnh của LVGL](https://lvgl.io/tools/imageconverter) xuất ra:
+định dạng màu RGB565A8, tên `logo`. Muốn dùng logo của riêng bạn, hãy thay file
+đó bằng một bản xuất mới cùng tên. Ảnh lớn hơn màn hình sẽ được thu nhỏ cho
+vừa; ảnh nhỏ hơn thì giữ nguyên kích thước.
+
+`idf.py -B build-muse-$P menuconfig` (Component config > Muse > Show a logo
+while starting up) dùng để tắt logo hoặc đổi thời gian hiển thị.
+
 ## Thêm một thiết bị khác
 
 Một bo có màn hình, loa và micro cần một file driver và vài dòng đăng ký. Mỗi
@@ -230,8 +248,8 @@ hãy mở issue trên repo này.
 - Hai file của bản gốc giữ giấy phép riêng: `minimp3.h` (CC0-1.0) và
   `pixel_font.c` (BSD-2-Clause). Các component tải về lúc build theo giấy phép
   của chính chúng.
-- Giấy phép Apache không bao gồm [avatar Jollybot](esp32/avatar), cũng không
-  bao gồm tên và nhãn hiệu Meta, Muse và Waveshare.
+- Giấy phép Apache không bao gồm [avatar Jollybot](esp32/avatar), logo khởi
+  động DB_ROBOT, cũng như tên và nhãn hiệu Meta, Muse và Waveshare.
 
 [`CREDITS.md`](CREDITS.md) (tiếng Anh) có danh sách đầy đủ: từng nguồn, giấy
 phép của nguồn đó, các file bản fork này thêm hoặc sửa, và những việc cần giữ

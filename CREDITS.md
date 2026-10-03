@@ -63,8 +63,15 @@ Files added:
 | [`esp32/devices/sdkconfig.muse-waveshare-s3-185c`](esp32/devices/sdkconfig.muse-waveshare-s3-185c) | Build settings for the 1.85C |
 | [`esp32/components/muse/boards/board_ostb_3st.c`](esp32/components/muse/boards/board_ostb_3st.c) | The OSTB-3ST: NV3023 display and its setup table (see section 3), touch, audio, keys, battery, power |
 | [`esp32/devices/sdkconfig.muse-ostb-3st`](esp32/devices/sdkconfig.muse-ostb-3st) | Build settings for the OSTB-3ST |
+| [`esp32/components/muse/logo/logo.c`](esp32/components/muse/logo) | The DB_ROBOT startup logo, as LVGL's image converter exported it. **Not under the Apache License** (see below) |
 | `doc/image/` | Pictures for the READMEs: the UI at each added board's screen size, drawn by the simulator. They show the default Jollybot avatar, which the Apache License does not cover (section 1) |
 | `CREDITS.md`, `README.vi.md`, `README.zh-CN.md`, `README.ja.md`, `README.ko.md` | This file and the translated READMEs |
+
+**The Apache License does not cover the DB_ROBOT logo.** It is ledienbien-ai's
+own mark, all rights reserved, and firmware built from this repository shows it
+at startup. If you build for yourself or publish a fork, replace
+`logo/logo.c` with your own image or turn the logo off
+(`CONFIG_MUSE_BOOT_LOGO`).
 
 Upstream files modified, each marked "Modified by ledienbien-ai" under its
 license header, as section 4(b) of the Apache License asks:
@@ -73,8 +80,8 @@ license header, as section 4(b) of the Apache License asks:
 |---|---|
 | `README.md` | Describes this fork; links the translations and this file |
 | `esp32/README.md`, `esp32/AGENTS.md`, `esp32/devices/README.md`, `esp32/devices/AGENTS.md` | List the new boards |
-| `esp32/components/muse/Kconfig`, `CMakeLists.txt`, `idf_component.yml` | Register the boards and the 1.85C's `esp_lcd_st77916` dependency |
-| `esp32/components/muse/muse_ui.c` | On round screens smaller than 412 px, the speaker button sits under the state word. On a rectangular screen under 300 px tall (the OSTB-3ST's 296×240), a smaller Muse and a bar in place of the ring |
+| `esp32/components/muse/Kconfig`, `CMakeLists.txt`, `idf_component.yml` | Register the boards and the 1.85C's `esp_lcd_st77916` dependency; the startup logo's options |
+| `esp32/components/muse/muse_ui.c` | On round screens smaller than 412 px, the speaker button sits under the state word. On a rectangular screen under 300 px tall (the OSTB-3ST's 296×240), a smaller Muse and a bar in place of the ring. The startup logo |
 | `esp32/components/muse/muse_settings_ui.c` | Settings pages that fit a screen that short |
 | `esp32/tools/muse/board.sh`, `ports.py`, `avatar.py` | Add the `s3lcd` and `ostb` board aliases |
 
@@ -148,7 +155,7 @@ The simulator's LVGL and SDL are listed in
 
 - **Names and logos.** The Apache License grants no right to the Meta, Muse,
   Waveshare or Espressif names and marks beyond describing where the work came
-  from.
+  from, nor to the DB_ROBOT name and logo.
 - **The Muse service.** Pairing a gadget needs an SDK token and is governed by
   the [Gadget SDK Terms](https://gadgets.muse.ai/sdk-terms), not by this
   repository's license.

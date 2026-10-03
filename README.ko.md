@@ -171,6 +171,24 @@ Settings의 Power 페이지에 있습니다(보드는 딥 슬립에 들어가며
    `MuseGadget-XXXXXX`라는 이름의 기기를 추가한 다음, 요청이 나오면 보드의
    말하기 버튼을 누릅니다(1.85C는 BOOT, OSTB-3ST는 위 키).
 
+## 시작 로고
+
+<p align="center">
+  <img src="doc/image/boot-logo.png" width="560" alt="시뮬레이터로 그린 시작 로고: 1.85C의 원형 화면과 OSTB-3ST">
+</p>
+
+전체 UI를 쓰는 보드는 모두 시작할 때 로고를 2.5초 동안 보여 준 다음 평소
+화면으로 넘어갑니다. 로고는
+[`esp32/components/muse/logo/logo.c`](esp32/components/muse/logo)이며, 투명도가
+있는 240×240 이미지입니다.
+[LVGL 이미지 변환기](https://lvgl.io/tools/imageconverter)가 출력하는 형식
+그대로이고, 색 형식은 RGB565A8, 이름은 `logo`입니다. 자신의 로고를 쓰려면 같은
+이름으로 새로 내보낸 파일로 바꾸면 됩니다. 화면보다 큰 이미지는 맞게 축소되고,
+작은 이미지는 원래 크기 그대로 표시됩니다.
+
+`idf.py -B build-muse-$P menuconfig`(Component config > Muse > Show a logo
+while starting up)에서 로고를 끄거나 표시 시간을 바꿀 수 있습니다.
+
 ## 다른 기기 추가하기
 
 화면, 스피커, 마이크가 있는 보드라면 드라이버 파일 하나와 등록 몇 줄이면
@@ -230,8 +248,8 @@ ESP32와 Linux gadget은 iOS와 Android의 Muse 앱에서 Settings > Devices를 
 - 업스트림 파일 중 두 개는 자체 라이선스를 유지합니다: `minimp3.h`(CC0-1.0)와
   `pixel_font.c`(BSD-2-Clause). 빌드할 때 내려받는 컴포넌트에는 각자의
   라이선스가 적용됩니다.
-- Apache License는 [Jollybot 아바타](esp32/avatar)에 적용되지 않으며, Meta,
-  Muse, Waveshare의 이름과 상표에도 적용되지 않습니다.
+- Apache License는 [Jollybot 아바타](esp32/avatar)와 DB_ROBOT 시작 로고에
+  적용되지 않으며, Meta, Muse, Waveshare의 이름과 상표에도 적용되지 않습니다.
 
 전체 목록은 [`CREDITS.md`](CREDITS.md)(영어)에 있습니다. 각 출처와 그
 라이선스, 이 포크에서 추가하거나 변경한 파일, 이후 버전에서 지켜야 할 사항을

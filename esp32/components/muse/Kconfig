@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Modified by ledienbien-ai (2026): added the Waveshare ESP32-S3-Touch-LCD-1.85C
-# and the OSTB-3ST.
+# Modified by ledienbien-ai (2026): added the Waveshare ESP32-S3-Touch-LCD-1.85C,
+# the OSTB-3ST and the startup logo.
 
 menu "Muse"
 
@@ -102,6 +102,23 @@ menu "Muse"
             double-click camera preview. Camera buffers and tasks consume
             memory and preview decoding shares CPU time with voice and Link.
             Leave disabled to build without camera support.
+
+    config MUSE_BOOT_LOGO
+        bool "Show a logo while starting up"
+        depends on MUSE_ENABLED
+        default y
+        help
+            Shows the image in logo/logo.c on a black screen for the first
+            moments after power-on, then the usual UI. The image is an LVGL
+            image named "logo", as LVGL's image converter writes it; one
+            larger than the screen is scaled down to fit. It takes its size
+            in flash (170 KB for 240 x 240 in RGB565A8) and no RAM.
+
+    config MUSE_BOOT_LOGO_MS
+        int "How long the logo stays, in milliseconds"
+        depends on MUSE_BOOT_LOGO
+        range 500 10000
+        default 2500
 
     config MUSE_HATCH
         bool "Muse's own voice session"

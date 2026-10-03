@@ -160,6 +160,22 @@ ESP32 Device SDK 增加上游尚未支持的 ESP32-S3 开发板，SDK 的其余�
    `MuseGadget-XXXXXX` 的设备，并在提示时按下开发板的说话键（1.85C 是 BOOT，
    OSTB-3ST 是上键）。
 
+## 开机 logo
+
+<p align="center">
+  <img src="doc/image/boot-logo.png" width="560" alt="模拟器绘制的开机 logo：1.85C 的圆屏和 OSTB-3ST">
+</p>
+
+所有带完整界面的开发板在启动时都会显示 2.5 秒 logo，然后进入平常的界面。logo 是
+[`esp32/components/muse/logo/logo.c`](esp32/components/muse/logo)，一张
+240×240、带透明通道的图片，格式与
+[LVGL 图片转换工具](https://lvgl.io/tools/imageconverter)的输出一致：颜色格式
+RGB565A8，名称 `logo`。想换成自己的 logo，用同名的新导出文件替换它即可。比屏幕
+大的图片会缩小到刚好放下，比屏幕小的保持原尺寸。
+
+用 `idf.py -B build-muse-$P menuconfig`（Component config > Muse > Show a logo
+while starting up）可以关闭 logo 或修改显示时长。
+
 ## 添加其他设备
 
 一块带屏幕、扬声器和麦克风的开发板，只需要一个驱动文件和几行注册代码。本分支中
@@ -212,8 +228,8 @@ Settings > Devices。先在那里打开 Developer mode，再查找名称以 “M
   和电池表，这些文件本身没有许可证声明；xiaozhi-esp32 采用 MIT 许可。
 - 上游有两个文件保留各自的许可证：`minimp3.h`（CC0-1.0）和 `pixel_font.c`
   （BSD-2-Clause）。编译时下载的组件适用它们各自的许可证。
-- Apache 许可证不涵盖 [Jollybot 头像](esp32/avatar)，也不涵盖 Meta、Muse 和
-  Waveshare 的名称与商标。
+- Apache 许可证不涵盖 [Jollybot 头像](esp32/avatar)、DB_ROBOT 开机 logo，也不
+  涵盖 Meta、Muse 和 Waveshare 的名称与商标。
 
 完整清单见 [`CREDITS.md`](CREDITS.md)（英文）：每个来源及其许可证、本分支新增或
 修改的文件，以及后续版本需要保持的事项。
