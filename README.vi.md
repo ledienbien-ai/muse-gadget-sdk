@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-# Muse Gadgets cho Waveshare ESP32-S3-Touch-LCD-1.85C
+# Muse Gadgets cho Waveshare ESP32-S3-Touch-LCD-1.85C và OSTB-3ST
 
 [English](README.md) | **Tiếng Việt** | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
 
@@ -34,9 +34,10 @@ limitations under the License.
 Muse gadget là những thiết bị mã nguồn mở do bạn tự làm: nạp chương trình cho
 một bo ESP32 có sẵn trên thị trường hoặc cài đặt một chiếc Raspberry Pi, rồi
 kết nối Muse với màn hình, nút bấm, cảm biến và cơ cấu chấp hành của bạn. Bản
-fork này thêm vào ESP32 Device SDK một bo nữa là bo màn tròn
-[Waveshare ESP32-S3-Touch-LCD-1.85C](https://docs.waveshare.com/ESP32-S3-Touch-LCD-1.85C),
-còn phần còn lại của SDK giữ nguyên như bản gốc.
+fork này thêm vào ESP32 Device SDK hai bo: bo màn tròn
+[Waveshare ESP32-S3-Touch-LCD-1.85C](https://docs.waveshare.com/ESP32-S3-Touch-LCD-1.85C)
+và bo [OSTB-3ST](#bo-ostb-3st), còn phần còn lại của SDK giữ nguyên như bản
+gốc.
 
 Dự án do dân vọc vạch làm cho dân vọc vạch, chỉ để cho vui. Nạp firmware tùy
 biến có thể làm hỏng bo và mất bảo hành. Bạn tự chịu rủi ro!
@@ -115,6 +116,45 @@ còn cấu hình build nằm trong
 [`esp32/devices/AGENTS.md`](esp32/devices/AGENTS.md) giải thích cách thêm một bo
 mới (tiếng Anh).
 
+## Bo OSTB-3ST
+
+Bo thứ hai, port từ mã nguồn firmware xiaozhi-esp32 của chính nó
+(`ostb-xiaozhi-3st`). Bo chạy cùng giao diện đầy đủ, bố trí lại cho màn ngang
+296×240.
+
+| Thành phần | Chi tiết |
+|---|---|
+| Chip | ESP32-S3, flash 16 MB, PSRAM octal 8 MB, USB gốc |
+| Màn hình | LCD NV3023 1.83" 240×296 qua SPI, dùng theo chiều ngang, đèn nền PWM |
+| Cảm ứng | CST816, đọc bằng cách hỏi liên tục vì không có chân ngắt |
+| Âm thanh | DAC ES8311 và ADC ES7210 |
+| Phím | Phím trên (tăng âm lượng): giữ để nói. Phím dưới (giảm âm lượng): bấm để tắt màn hình, giữ để tắt nguồn |
+| Pin | Mức pin theo bảng ADC của firmware gốc, và chân trạng thái của mạch sạc |
+
+**Tình trạng:** biên dịch được với ESP-IDF v6.0.1. Chưa được kiểm chứng trên
+phần cứng. Chân, bảng khởi tạo và hướng của màn hình lấy từ mã nguồn firmware
+đó, không có tài liệu nào để đối chiếu. Nếu hình bị xoay hay lật, hoặc cảm ứng
+lệch chỗ, hãy sửa `LCD_MADCTL` hoặc `TP_SWAP_XY`, `TP_MIRROR_X` và
+`TP_MIRROR_Y` ở đầu file [`board_ostb_3st.c`](esp32/components/muse/boards/board_ostb_3st.c).
+
+Biên dịch và nạp giống bo 1.85C, thay `s3lcd` bằng `ostb` và
+`waveshare-s3-185c` bằng `ostb-3st`:
+
+```sh
+tools/muse/board.sh build ostb
+```
+
+```powershell
+idf.py -B build-muse-ostb-3st -DIDF_TARGET=esp32s3 `
+  -DSDKCONFIG=build-muse-ostb-3st/sdkconfig `
+  "-DSDKCONFIG_DEFAULTS=sdkconfig.defaults;devices/sdkconfig.muse;devices/sdkconfig.muse-ostb-3st" build
+```
+
+Giới hạn đã biết: modem 4G và đèn LED không được dùng. Pin chỉ hiện mức, không
+hiện điện áp. Tắt nguồn là kéo chân tắt nguồn của bo; khi cắm USB bo có thể vẫn
+chạy, màn hình tắt cho đến khi bấm phím trên. Khi pin đã đầy, bo chỉ biết mình
+đang cắm USB lúc được nối với máy tính.
+
 ## Phần còn lại của SDK
 
 | | |
@@ -144,6 +184,9 @@ repo này.
   [mã mẫu](https://github.com/waveshareteam/ESP32-S3-Touch-LCD-1.85C) của
   Waveshare (Apache-2.0) và trên phần board tương ứng của
   [xiaozhi-esp32](https://github.com/78/xiaozhi-esp32) (MIT).
+- Bản port OSTB-3ST lấy chân, bảng khởi tạo màn hình và bảng pin từ mã nguồn
+  firmware xiaozhi-esp32 của bo, vốn không ghi giấy phép riêng; xiaozhi-esp32
+  theo giấy phép MIT.
 - Hai file của bản gốc giữ giấy phép riêng: `minimp3.h` (CC0-1.0) và
   `pixel_font.c` (BSD-2-Clause). Các component tải về lúc build theo giấy phép
   của chính chúng.

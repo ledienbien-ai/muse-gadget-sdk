@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-<!-- Modified by ledienbien-ai (2026): added the Waveshare ESP32-S3-Touch-LCD-1.85C. -->
+<!-- Modified by ledienbien-ai (2026): added the Waveshare ESP32-S3-Touch-LCD-1.85C and the OSTB-3ST. -->
 
 # AGENTS.md
 
@@ -54,6 +54,7 @@ before adding a feature to one.
 | Waveshare ESP32-S3-Touch-AMOLED-1.75C | `esp32s3` | `devices/sdkconfig.muse;devices/sdkconfig.muse-waveshare-s3-175c` | manual (below) |
 | Waveshare ESP32-S3-Touch-AMOLED-1.75 | `esp32s3` | `devices/sdkconfig.muse;devices/sdkconfig.muse-waveshare-s3-175` | manual (below) |
 | Waveshare ESP32-S3-Touch-LCD-1.85C | `esp32s3` | `devices/sdkconfig.muse;devices/sdkconfig.muse-waveshare-s3-185c` | manual (below) |
+| OSTB-3ST | `esp32s3` | `devices/sdkconfig.muse;devices/sdkconfig.muse-ostb-3st` | manual (below) |
 | AIPI Lite | `esp32s3` | `devices/sdkconfig.muse;devices/sdkconfig.muse-aipi` | manual |
 | Waveshare ESP32-C6-Touch-AMOLED-1.8 | `esp32c6` | `devices/sdkconfig.muse;devices/sdkconfig.muse-waveshare-c6-18` | manual |
 | Seeed SenseCAP Watcher | `esp32s3` | `devices/sdkconfig.muse;devices/sdkconfig.muse-sensecap-watcher` | manual |
@@ -115,7 +116,7 @@ voice note that Muse answers in the app, and the dial sets the speaker volume
 
 ### Boards with the full UI, by hand
 
-`tools/muse/board.sh build|flash <s3|s3n|s3lcd|aipi|c6|watcher|sticks3|plus2> [SERIAL|PORT]`
+`tools/muse/board.sh build|flash <s3|s3n|s3lcd|ostb|aipi|c6|watcher|sticks3|plus2> [SERIAL|PORT]`
 builds one board in `build-muse-<profile>/`, logs to
 `/tmp/muse_build_<board>.log`, and clears `managed_components/` before and
 after so it doesn't clash with other boards. When flashing, it finds the
@@ -220,6 +221,7 @@ flash size and status backend.
    | `front` | M5Stack StickS3, or StickC Plus2 — tell them apart by the port: the StickS3 is native USB, the Plus2 is a CH9102 `usbserial` |
    | `top` | Waveshare ESP32-S3-Touch-AMOLED-1.75C |
    | `bottom right` | AIPI Lite |
+   | `upper` | OSTB-3ST |
    | `wheel` | Seeed SenseCAP Watcher |
    | `boot` | Waveshare ESP32-C6-Touch-AMOLED-1.8, ESP32-S3-Touch-AMOLED-1.75 or ESP32-S3-Touch-LCD-1.85C — the target (`esp32c6` or `esp32s3`) picks out the C6; step 1's board name tells the two S3 boards apart |
 

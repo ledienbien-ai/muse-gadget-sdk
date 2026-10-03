@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-# Waveshare ESP32-S3-Touch-LCD-1.85C 向け Muse Gadgets
+# Waveshare ESP32-S3-Touch-LCD-1.85C と OSTB-3ST 向け Muse Gadgets
 
 [English](README.md) | [Tiếng Việt](README.vi.md) | [简体中文](README.zh-CN.md) | **日本語** | [한국어](README.ko.md)
 
@@ -34,9 +34,9 @@ limitations under the License.
 Muse gadget は、自分で作るオープンソースのデバイスです。市販の ESP32 ボードに
 プログラムを書き込むか、Raspberry Pi をセットアップして、ディスプレイ、ボタン、
 センサー、アクチュエーターを Muse につなぎます。このフォークは ESP32 Device SDK
-にボードを 1 つ追加します。円形ディスプレイの
+にボードを 2 つ追加します。円形ディスプレイの
 [Waveshare ESP32-S3-Touch-LCD-1.85C](https://docs.waveshare.com/ESP32-S3-Touch-LCD-1.85C)
-です。SDK のそれ以外の部分は上流のままです。
+と [OSTB-3ST](#ostb-3st) です。SDK のそれ以外の部分は上流のままです。
 
 ハッカーがハッカーのために、楽しみで作ったものです。カスタムファームウェアの
 書き込みはボードを壊したり、保証を無効にしたりすることがあります。自己責任で
@@ -121,6 +121,45 @@ Settings の Power ページから行います（ボードはディープスリ�
 にあります。ボードの追加方法は
 [`esp32/devices/AGENTS.md`](esp32/devices/AGENTS.md)（英語）に書かれています。
 
+## OSTB-3ST
+
+2 つ目のボードです。このボード用の xiaozhi-esp32 ファームウェアのソース
+（`ostb-xiaozhi-3st`）をもとに移植しました。同じフル UI が、296×240 の横長画面
+に合わせたレイアウトで動きます。
+
+| 部品 | 内容 |
+|---|---|
+| チップ | ESP32-S3、フラッシュ 16 MB、オクタル PSRAM 8 MB、ネイティブ USB |
+| ディスプレイ | 1.83 インチ 240×296 NV3023 LCD（SPI）、横向きで使用、PWM バックライト |
+| タッチ | CST816。割り込み線がないため、ポーリングで読みます |
+| オーディオ | ES8311 DAC と ES7210 ADC |
+| キー | 上のキー（音量 +）：押している間話す。下のキー（音量 −）：押すと画面オフ、長押しで電源オフ |
+| バッテリー | 元のファームウェアの ADC テーブルによる残量と、充電状態のピン |
+
+**状況：** ESP-IDF v6.0.1 でビルドできます。実機ではまだ確認していません。
+ピン、パネルの初期化テーブルと向きは、そのファームウェアのソースによるもので、
+照らし合わせる資料はありません。画面が回転または反転している場合や、タッチの
+位置がずれる場合は、[`board_ostb_3st.c`](esp32/components/muse/boards/board_ostb_3st.c) の先頭にある `LCD_MADCTL`、または
+`TP_SWAP_XY`、`TP_MIRROR_X`、`TP_MIRROR_Y` を変えてください。
+
+ビルドと書き込みは 1.85C と同じです。`s3lcd` を `ostb` に、
+`waveshare-s3-185c` を `ostb-3st` に置き換えます。
+
+```sh
+tools/muse/board.sh build ostb
+```
+
+```powershell
+idf.py -B build-muse-ostb-3st -DIDF_TARGET=esp32s3 `
+  -DSDKCONFIG=build-muse-ostb-3st/sdkconfig `
+  "-DSDKCONFIG_DEFAULTS=sdkconfig.defaults;devices/sdkconfig.muse;devices/sdkconfig.muse-ostb-3st" build
+```
+
+既知の制限：4G モデムと LED は使いません。バッテリーは残量だけを表示し、電圧は
+表示しません。電源オフはボードの電源オフのピンを駆動します。USB 給電中は電源が
+切れないことがあり、その場合は上のキーを押すまで画面が消えたままになります。
+満充電になった後は、パソコンにつないでいる間だけ USB 給電中と判定します。
+
 ## SDK のそれ以外の部分
 
 | | |
@@ -151,6 +190,9 @@ Settings > Devices からペアリングします。先にそこで Developer mo
   （Apache-2.0）、および
   [xiaozhi-esp32](https://github.com/78/xiaozhi-esp32) の同ボード用コード（MIT）
   を参考にしています。
+- OSTB-3ST への移植では、ピン、パネルの初期化テーブル、バッテリーのテーブルを
+  このボードの xiaozhi-esp32 ファームウェアのソースから取っています。その
+  ファイル自体にライセンス表記はありません。xiaozhi-esp32 は MIT です。
 - 上流のファイルのうち 2 つは独自のライセンスのままです：`minimp3.h`
   （CC0-1.0）と `pixel_font.c`（BSD-2-Clause）。ビルド時に取得する
   コンポーネントには、それぞれのライセンスが適用されます。

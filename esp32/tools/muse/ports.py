@@ -13,7 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Modified by ledienbien-ai (2026): added the Waveshare ESP32-S3-Touch-LCD-1.85C.
+# Modified by ledienbien-ai (2026): added the Waveshare ESP32-S3-Touch-LCD-1.85C
+# and the OSTB-3ST.
 
 """Finds a board's serial port by the USB device behind it.
 
@@ -38,6 +39,7 @@ USB = {
     "s3": USJ,
     "s3n": USJ,
     "s3lcd": USJ,
+    "ostb": USJ,
     "aipi": USJ,
     "c6": USJ,
     "sticks3": USJ,
@@ -46,7 +48,7 @@ USB = {
 }
 # Boards whose console takes Muse's serial commands (tools/muse/chat.py). The
 # Watcher reads them on its CH342 port with MUSE_CONSOLE_UART.
-COMMANDS = ("s3", "s3n", "s3lcd", "aipi", "c6", "sticks3", "watcher", "plus2")
+COMMANDS = ("s3", "s3n", "s3lcd", "ostb", "aipi", "c6", "sticks3", "watcher", "plus2")
 # Bridges that drop bytes when a whole packet arrives at once, so writes to them
 # go 64 bytes at a time at the line rate (paced_esptool.py, chat.Board.write).
 PACED = (CH342,)

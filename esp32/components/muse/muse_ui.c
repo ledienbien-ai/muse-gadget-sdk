@@ -14,7 +14,9 @@
  * limitations under the License.
  *
  * Modified by ledienbien-ai (2026): on round screens smaller than 412 px, the speaker
- * button sits under the state word (for the Waveshare ESP32-S3-Touch-LCD-1.85C).
+ * button sits under the state word (for the Waveshare ESP32-S3-Touch-LCD-1.85C); on a
+ * rectangular screen under 300 px tall, a smaller Muse and a bar in place of the ring
+ * (for the OSTB-3ST).
  */
 
 #include "muse_ui.h"
@@ -89,6 +91,7 @@ static const char *TAG = "muse_ui";
 static int s_w, s_h;
 static bool s_small;
 static bool s_tall;         /* compact, with room above and below Muse (StickS3) */
+static bool s_short;        /* full layout on a rectangle under 300 px tall: no ring, a smaller Muse */
 static int s_canvas_px;     /* Muse's size on screen */
 static int s_dy;            /* full layout: offset from a 466 px tall screen */
 static lv_indev_t *s_indev;
@@ -591,7 +594,7 @@ static void set_answer(int which)
             lv_obj_add_flag(l->hides[i], LV_OBJ_FLAG_HIDDEN);
         }
     }
-    if (!muse_board->round) {
+    if (!muse_board->round && s_ring) {
         lv_obj_set_flag(s_ring, LV_OBJ_FLAG_HIDDEN, l != NULL);   /* the reply runs past a rectangle's ring */
     }
     if (l) {
@@ -600,6 +603,13 @@ static void set_answer(int which)
         lv_obj_set_style_text_align(s_reply_lbl, l->align, 0);
     }
     move_muse(l ? l->px : s_canvas_px, l ? l->y : s_big_y);
+}
+
+/* Where the captions end on a rectangle too short for the full layout's 179 px
+ * below the centre: just above the page dots. */
+static int short_cap_bottom(void)
+{
+    return s_h / 2 - 26;
 }
 
 /* Whether a reply `w` px wide fits across the screen `y` px from the centre. */
@@ -663,6 +673,13 @@ static void build_answer(lv_obj_t *face, int ring_in)
 {
     int spk_r = (SPEAKER_PX + SPEAKER_GROW_PX) / 2;
     int spk_x = -s_w / 2 + 8 + spk_r, spk_y = -s_h / 2 + 8 + spk_r;
+    /* The longest state word is nine characters of unscii_16 with its letter
+     * spacing. A rectangle too narrow to fit the button beside it puts the
+     * button just under it. */
+    int state_half_w = 9 * (lv_font_get_glyph_width(&lv_font_unscii_16, 'M', ' ') + 2) / 2;
+    if (!muse_board->round && s_w / 2 - state_half_w < 8 + 2 * spk_r) {
+        spk_y = 40 + s_dy + 16 - s_h / 2 + 4 + spk_r;
+    }
     if (muse_board->round) {
         spk_y = -ring_in * 5 / 8;
         /* On a circle smaller than the Watcher's, a button that high sits on
@@ -684,13 +701,14 @@ static void build_answer(lv_obj_t *face, int ring_in)
     l->px = MUSE_PX_W * cell;
     l->y = s_big_y;
     l->align = LV_TEXT_ALIGN_CENTER;
-    int h = 3 * pitch - CAPTION_LINE_SPACE;
+    int lines = s_short ? 2 : 3;   /* a third line would push Muse up into the state word */
+    int h = lines * pitch - CAPTION_LINE_SPACE;
     int art_bottom = l->y + l->px / 2 - ART_BLANK_ROWS * cell;
-    set_reply_box(l, CAPTION_W / cw, 3, reply_bottom(CAPTION_W, ring_in) - h, cw, pitch);
+    set_reply_box(l, CAPTION_W / cw, lines, reply_bottom(CAPTION_W, ring_in) - h, cw, pitch);
     for (int c = 24; c > l->cols; c--) {   /* wider if it still clears Muse */
         int top = reply_bottom(c * cw, ring_in) - h;
         if (top >= art_bottom + 6 && fits_across(c * cw, top, ring_in)) {
-            set_reply_box(l, c, 3, top, cw, pitch);
+            set_reply_box(l, c, lines, top, cw, pitch);
             break;
         }
     }
@@ -799,8 +817,9 @@ static void build_screen(void)
         face = s_face;
     }
 
-    if (!s_small) {
-        /* Progress ring around the bezel. */
+    if (!s_small && !s_short) {
+        /* Progress ring around the bezel. A short rectangle has no room for
+         * one between its labels: it gets the compact layout's bar. */
         int d = (s_w < s_h ? s_w : s_h) - 8;
         s_ring = lv_arc_create(face);
         lv_obj_set_size(s_ring, d, d);
@@ -828,6 +847,8 @@ static void build_screen(void)
     int cap_bottom = 179;                              /* a 466 px circle's; fine for rectangles */
     if (muse_board->round) {
         cap_bottom = (int)sqrtf((float)(ring_in * ring_in - CAPTION_W * CAPTION_W / 4)) - 3;
+    } else if (cap_bottom > short_cap_bottom()) {
+        cap_bottom = short_cap_bottom();               /* a short rectangle: above the page dots */
     }
     int cap_top = cap_bottom - cap_h;
     int meter_y = cap_top - 6 - METER_SEG_PX / 2;
@@ -915,6 +936,13 @@ static void build_screen(void)
         int x = -span / 2 + i * (METER_SEG_PX + METER_GAP_PX) + METER_SEG_PX / 2;
         lv_obj_align(seg, LV_ALIGN_CENTER, x, meter_y);
         s_meter[i] = seg;
+    }
+    if (s_short) {
+        s_bar = lv_obj_create(face);
+        lv_obj_remove_style_all(s_bar);
+        lv_obj_set_size(s_bar, 0, 3);
+        lv_obj_set_style_bg_opa(s_bar, LV_OPA_COVER, 0);
+        lv_obj_align(s_bar, LV_ALIGN_BOTTOM_LEFT, 0, 0);
     }
 
     build_answer(face, ring_in);
@@ -1512,6 +1540,21 @@ esp_err_t muse_ui_start(void)
          * are and shrink Muse to whole pixels that fit between them. */
         s_canvas_px = (MUSE_PX_W * 5 + 2 * s_dy) / MUSE_PX_W * MUSE_PX_W;
         s_dy = 0;
+    } else if (!s_small && !muse_board->round && 20 + s_dy < 1) {
+        /* A rectangle so short that the labels would leave by its top edge
+         * (296 x 240): they stop a pixel from it, as on the compact layout,
+         * and Muse shrinks to whole pixels that fit between the state word
+         * and the level meter over the captions. */
+        s_short = true;
+        s_dy = 1 - 20;
+        int cap_h = 2 * lv_font_get_line_height(&lv_font_unscii_16) + CAPTION_LINE_SPACE;
+        int art_bottom = short_cap_bottom() - cap_h - 6 - METER_SEG_PX / 2 - METER_SEG_PX / 2 - 4;
+        int room = s_h / 2 + art_bottom - (40 + s_dy + 16);
+        int cell = room / (MUSE_PX_H - ART_BLANK_ROWS);
+        cell = cell < 1 ? 1 : cell;
+        if (cell * MUSE_PX_W < s_canvas_px) {
+            s_canvas_px = cell * MUSE_PX_W;
+        }
     }
 
     lv_display_t *disp = muse_board->display_start(&s_indev);

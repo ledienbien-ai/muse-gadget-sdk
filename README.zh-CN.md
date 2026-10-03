@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-# 适用于 Waveshare ESP32-S3-Touch-LCD-1.85C 的 Muse Gadgets
+# 适用于 Waveshare ESP32-S3-Touch-LCD-1.85C 和 OSTB-3ST 的 Muse Gadgets
 
 [English](README.md) | [Tiếng Việt](README.vi.md) | **简体中文** | [日本語](README.ja.md) | [한국어](README.ko.md)
 
@@ -32,9 +32,9 @@ limitations under the License.
 
 Muse gadget 是可以自己动手制作的开源设备：给市面上现成的 ESP32 开发板烧录程序，
 或者配置一台树莓派，然后把 Muse 接到你的屏幕、按键、传感器和执行器上。本分支为
-ESP32 Device SDK 增加了一块开发板，即圆屏的
-[Waveshare ESP32-S3-Touch-LCD-1.85C](https://docs.waveshare.com/ESP32-S3-Touch-LCD-1.85C)，
-SDK 的其余部分与上游保持一致。
+ESP32 Device SDK 增加了两块开发板，即圆屏的
+[Waveshare ESP32-S3-Touch-LCD-1.85C](https://docs.waveshare.com/ESP32-S3-Touch-LCD-1.85C)
+和 [OSTB-3ST](#ostb-3st)，SDK 的其余部分与上游保持一致。
 
 这是极客为极客做的项目，纯属好玩。烧录自定义固件可能让开发板变砖并失去保修，
 风险自负！
@@ -108,6 +108,42 @@ SDK 的其余部分与上游保持一致。
 [`sdkconfig.muse-waveshare-s3-185c`](esp32/devices/sdkconfig.muse-waveshare-s3-185c)。
 [`esp32/devices/AGENTS.md`](esp32/devices/AGENTS.md)（英文）说明了如何添加新的开发板。
 
+## OSTB-3ST
+
+第二块开发板，根据它自带的 xiaozhi-esp32 固件源码（`ostb-xiaozhi-3st`）移植。
+它运行同样的完整界面，按 296×240 的横屏重新排版。
+
+| 部件 | 说明 |
+|---|---|
+| 芯片 | ESP32-S3，16 MB flash，8 MB 八线 PSRAM，原生 USB |
+| 屏幕 | 1.83" 240×296 NV3023 LCD，SPI 接口，横屏使用，PWM 背光 |
+| 触摸 | CST816，没有中断引脚，靠轮询读取 |
+| 音频 | ES8311 DAC 和 ES7210 ADC |
+| 按键 | 上键（音量加）：按住说话。下键（音量减）：短按息屏，长按关机 |
+| 电池 | 按原固件的 ADC 表换算电量，另有充电状态引脚 |
+
+**状态：** 可用 ESP-IDF v6.0.1 编译，尚未在实物上验证。引脚、屏幕初始化表和
+显示方向都来自该固件的源码，没有文档可以核对。如果画面旋转或镜像，或者触摸
+位置不对，请修改 [`board_ostb_3st.c`](esp32/components/muse/boards/board_ostb_3st.c) 开头的 `LCD_MADCTL`，或
+`TP_SWAP_XY`、`TP_MIRROR_X` 和 `TP_MIRROR_Y`。
+
+编译和烧录与 1.85C 相同，把 `s3lcd` 换成 `ostb`，把 `waveshare-s3-185c` 换成
+`ostb-3st`：
+
+```sh
+tools/muse/board.sh build ostb
+```
+
+```powershell
+idf.py -B build-muse-ostb-3st -DIDF_TARGET=esp32s3 `
+  -DSDKCONFIG=build-muse-ostb-3st/sdkconfig `
+  "-DSDKCONFIG_DEFAULTS=sdkconfig.defaults;devices/sdkconfig.muse;devices/sdkconfig.muse-ostb-3st" build
+```
+
+已知限制：4G 模块和 LED 没有用到。电池只显示电量，不显示电压。关机是拉高开发板
+的关机引脚；接着 USB 时开发板可能不会断电，屏幕保持熄灭，按上键后重新启动。
+电池充满后，只有连着电脑时开发板才知道自己接着 USB 电源。
+
 ## SDK 的其余部分
 
 | | |
@@ -134,6 +170,8 @@ Settings > Devices。先在那里打开 Developer mode，再查找名称以 “M
   [示例代码](https://github.com/waveshareteam/ESP32-S3-Touch-LCD-1.85C)
   （Apache-2.0），以及 [xiaozhi-esp32](https://github.com/78/xiaozhi-esp32)
   中对应的开发板代码（MIT）。
+- OSTB-3ST 的移植从该开发板的 xiaozhi-esp32 固件源码中取得引脚、屏幕初始化表
+  和电池表，这些文件本身没有许可证声明；xiaozhi-esp32 采用 MIT 许可。
 - 上游有两个文件保留各自的许可证：`minimp3.h`（CC0-1.0）和 `pixel_font.c`
   （BSD-2-Clause）。编译时下载的组件适用它们各自的许可证。
 - Apache 许可证不涵盖 [Jollybot 头像](esp32/avatar)，也不涵盖 Meta、Muse 和

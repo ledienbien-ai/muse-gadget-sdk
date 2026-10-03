@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-# Waveshare ESP32-S3-Touch-LCD-1.85C용 Muse Gadgets
+# Waveshare ESP32-S3-Touch-LCD-1.85C와 OSTB-3ST용 Muse Gadgets
 
 [English](README.md) | [Tiếng Việt](README.vi.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | **한국어**
 
@@ -33,10 +33,10 @@ limitations under the License.
 
 Muse gadget은 직접 만드는 오픈 소스 기기입니다. 시중에서 파는 ESP32 보드에
 프로그램을 올리거나 Raspberry Pi를 설정한 다음, 디스플레이, 버튼, 센서,
-액추에이터를 Muse에 연결합니다. 이 포크는 ESP32 Device SDK에 보드 하나를
+액추에이터를 Muse에 연결합니다. 이 포크는 ESP32 Device SDK에 보드 두 개를
 추가합니다. 원형 화면을 가진
-[Waveshare ESP32-S3-Touch-LCD-1.85C](https://docs.waveshare.com/ESP32-S3-Touch-LCD-1.85C)입니다.
-SDK의 나머지 부분은 업스트림과 같습니다.
+[Waveshare ESP32-S3-Touch-LCD-1.85C](https://docs.waveshare.com/ESP32-S3-Touch-LCD-1.85C)와
+[OSTB-3ST](#ostb-3st)입니다. SDK의 나머지 부분은 업스트림과 같습니다.
 
 해커가 해커를 위해 재미로 만든 프로젝트입니다. 커스텀 펌웨어를 올리면 보드가
 벽돌이 되거나 보증이 무효가 될 수 있습니다. 위험은 본인이 감수해야 합니다!
@@ -118,6 +118,46 @@ Settings의 Power 페이지에 있습니다(보드는 딥 슬립에 들어가며
 있습니다. 보드를 추가하는 방법은
 [`esp32/devices/AGENTS.md`](esp32/devices/AGENTS.md)(영어)에 설명되어 있습니다.
 
+## OSTB-3ST
+
+두 번째 보드입니다. 이 보드의 xiaozhi-esp32 펌웨어 소스
+(`ostb-xiaozhi-3st`)를 바탕으로 포팅했습니다. 같은 전체 UI가 296×240 가로
+화면에 맞춘 배치로 동작합니다.
+
+| 부품 | 내용 |
+|---|---|
+| 칩 | ESP32-S3, 플래시 16 MB, 옥탈 PSRAM 8 MB, 네이티브 USB |
+| 디스플레이 | 1.83인치 240×296 NV3023 LCD(SPI), 가로로 사용, PWM 백라이트 |
+| 터치 | CST816. 인터럽트 선이 없어 폴링으로 읽습니다 |
+| 오디오 | ES8311 DAC와 ES7210 ADC |
+| 키 | 위 키(볼륨 +): 누르고 있는 동안 말하기. 아래 키(볼륨 −): 누르면 화면 끄기, 길게 누르면 전원 끄기 |
+| 배터리 | 원래 펌웨어의 ADC 표로 계산한 잔량과 충전 상태 핀 |
+
+**상태:** ESP-IDF v6.0.1로 빌드됩니다. 실제 하드웨어에서는 아직 확인하지
+못했습니다. 핀, 패널 초기화 표와 화면 방향은 그 펌웨어의 소스에서 가져온
+것이며, 대조해 볼 문서가 없습니다. 화면이 돌아가거나 뒤집혀 나오거나 터치
+위치가 맞지 않으면 [`board_ostb_3st.c`](esp32/components/muse/boards/board_ostb_3st.c) 맨 위의 `LCD_MADCTL` 또는
+`TP_SWAP_XY`, `TP_MIRROR_X`, `TP_MIRROR_Y`를 바꾸세요.
+
+빌드와 플래시는 1.85C와 같습니다. `s3lcd` 대신 `ostb`, `waveshare-s3-185c`
+대신 `ostb-3st`를 씁니다.
+
+```sh
+tools/muse/board.sh build ostb
+```
+
+```powershell
+idf.py -B build-muse-ostb-3st -DIDF_TARGET=esp32s3 `
+  -DSDKCONFIG=build-muse-ostb-3st/sdkconfig `
+  "-DSDKCONFIG_DEFAULTS=sdkconfig.defaults;devices/sdkconfig.muse;devices/sdkconfig.muse-ostb-3st" build
+```
+
+알려진 제한: 4G 모뎀과 LED는 쓰지 않습니다. 배터리는 잔량만 표시하고 전압은
+표시하지 않습니다. 전원 끄기는 보드의 전원 차단 핀을 구동합니다. USB 전원에서는
+보드가 꺼지지 않을 수 있으며, 그때는 위 키를 누를 때까지 화면이 꺼진 상태로
+있습니다. 배터리가 가득 찬 뒤에는 컴퓨터에 연결되어 있는 동안에만 USB 전원으로
+인식합니다.
+
 ## SDK의 나머지 부분
 
 | | |
@@ -146,6 +186,9 @@ ESP32와 Linux gadget은 iOS와 Android의 Muse 앱에서 Settings > Devices를 
   [예제 코드](https://github.com/waveshareteam/ESP32-S3-Touch-LCD-1.85C)
   (Apache-2.0), 그리고 [xiaozhi-esp32](https://github.com/78/xiaozhi-esp32)의
   해당 보드 코드(MIT)를 참고했습니다.
+- OSTB-3ST 포팅은 핀, 패널 초기화 표, 배터리 표를 이 보드의 xiaozhi-esp32
+  펌웨어 소스에서 가져왔습니다. 그 파일 자체에는 라이선스 표기가 없습니다.
+  xiaozhi-esp32는 MIT입니다.
 - 업스트림 파일 중 두 개는 자체 라이선스를 유지합니다: `minimp3.h`(CC0-1.0)와
   `pixel_font.c`(BSD-2-Clause). 빌드할 때 내려받는 컴포넌트에는 각자의
   라이선스가 적용됩니다.

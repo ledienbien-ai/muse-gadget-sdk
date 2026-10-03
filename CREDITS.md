@@ -18,8 +18,9 @@ limitations under the License.
 
 This repository is a community fork of
 [facebookincubator/muse-gadget-sdk](https://github.com/facebookincubator/muse-gadget-sdk)
-that adds the Waveshare ESP32-S3-Touch-LCD-1.85C. It is not affiliated with or
-endorsed by Meta, Waveshare, Espressif or the xiaozhi-esp32 project.
+that adds the Waveshare ESP32-S3-Touch-LCD-1.85C and the OSTB-3ST. It is not
+affiliated with or endorsed by Meta, Waveshare, Espressif, the xiaozhi-esp32
+project or the OSTB-3ST's maker.
 
 This file records where the code came from and under which terms. It is a
 plain-language record, not legal advice.
@@ -57,9 +58,11 @@ Files added:
 
 | Path | What it is |
 |---|---|
-| [`esp32/components/muse/boards/board_waveshare_s3_185c.c`](esp32/components/muse/boards/board_waveshare_s3_185c.c) | The board: display, touch, both audio versions, button, battery, power |
+| [`esp32/components/muse/boards/board_waveshare_s3_185c.c`](esp32/components/muse/boards/board_waveshare_s3_185c.c) | The 1.85C: display, touch, both audio versions, button, battery, power |
 | [`esp32/components/muse/boards/waveshare_s3_185c_lcd_init.h`](esp32/components/muse/boards/waveshare_s3_185c_lcd_init.h) | ST77916 register table (see section 3) |
-| [`esp32/devices/sdkconfig.muse-waveshare-s3-185c`](esp32/devices/sdkconfig.muse-waveshare-s3-185c) | Build settings for the board |
+| [`esp32/devices/sdkconfig.muse-waveshare-s3-185c`](esp32/devices/sdkconfig.muse-waveshare-s3-185c) | Build settings for the 1.85C |
+| [`esp32/components/muse/boards/board_ostb_3st.c`](esp32/components/muse/boards/board_ostb_3st.c) | The OSTB-3ST: NV3023 display and its setup table (see section 3), touch, audio, keys, battery, power |
+| [`esp32/devices/sdkconfig.muse-ostb-3st`](esp32/devices/sdkconfig.muse-ostb-3st) | Build settings for the OSTB-3ST |
 | `CREDITS.md`, `README.vi.md`, `README.zh-CN.md`, `README.ja.md`, `README.ko.md` | This file and the translated READMEs |
 
 Upstream files modified, each marked "Modified by ledienbien-ai" under its
@@ -68,12 +71,15 @@ license header, as section 4(b) of the Apache License asks:
 | Path | Change |
 |---|---|
 | `README.md` | Describes this fork; links the translations and this file |
-| `esp32/README.md`, `esp32/AGENTS.md`, `esp32/devices/README.md`, `esp32/devices/AGENTS.md` | List the new board |
-| `esp32/components/muse/Kconfig`, `CMakeLists.txt`, `idf_component.yml` | Register the board and its `esp_lcd_st77916` dependency |
-| `esp32/components/muse/muse_ui.c` | On round screens smaller than 412 px, the speaker button sits under the state word |
-| `esp32/tools/muse/board.sh`, `ports.py`, `avatar.py` | Add the `s3lcd` board alias |
+| `esp32/README.md`, `esp32/AGENTS.md`, `esp32/devices/README.md`, `esp32/devices/AGENTS.md` | List the new boards |
+| `esp32/components/muse/Kconfig`, `CMakeLists.txt`, `idf_component.yml` | Register the boards and the 1.85C's `esp_lcd_st77916` dependency |
+| `esp32/components/muse/muse_ui.c` | On round screens smaller than 412 px, the speaker button sits under the state word. On a rectangular screen under 300 px tall (the OSTB-3ST's 296×240), a smaller Muse and a bar in place of the ring |
+| `esp32/components/muse/muse_settings_ui.c` | Settings pages that fit a screen that short |
+| `esp32/tools/muse/board.sh`, `ports.py`, `avatar.py` | Add the `s3lcd` and `ostb` board aliases |
 
-## 3. Sources used for the Waveshare ESP32-S3-Touch-LCD-1.85C port
+## 3. Sources used for the board ports
+
+### Waveshare ESP32-S3-Touch-LCD-1.85C
 
 | Source | Used for | License |
 |---|---|---|
@@ -82,7 +88,15 @@ license header, as section 4(b) of the Apache License asks:
 | [78/xiaozhi-esp32](https://github.com/78/xiaozhi-esp32) (`main/boards/waveshare/esp32-s3-touch-lcd-1.85c`) | The same ST77916 register table; V1 and V2 audio pin maps and the V1 mic format, as reference | MIT (notice below) |
 | [waveshareteam/Waveshare-ESP32-components](https://github.com/waveshareteam/Waveshare-ESP32-components) (`bsp/esp32_s3_touch_amoled_1_75c`) | How the ES8311 and ES7210 pair is set up, as reference for V2 | Apache-2.0 |
 
-Notice for xiaozhi-esp32, as its license requires:
+### OSTB-3ST
+
+| Source | Used for | License |
+|---|---|---|
+| The board's xiaozhi-esp32 board directory, `ostb-xiaozhi-3st` (`config.h`, `ostb-xiaozhi-3st.cc`, `power_manager.h`), supplied by this fork's owner. It is not in the xiaozhi-esp32 repository. | The NV3023 setup table and the battery's ADC table in `board_ostb_3st.c`, copied as data; pins, panel orientation, touch and power-off handling, as reference | The files carry no copyright or license notice. They are written against [78/xiaozhi-esp32](https://github.com/78/xiaozhi-esp32), which is MIT (notice below). If the board's maker publishes them under other terms, record those here. |
+
+### Notice for xiaozhi-esp32
+
+As its license requires:
 
 ```
 MIT License
@@ -113,12 +127,12 @@ SOFTWARE.
 
 The firmware links components that the ESP-IDF Component Manager downloads
 into `esp32/managed_components/`. They are not stored in this repository and
-each keeps its own license. For this board they include:
+each keeps its own license. For these boards they include:
 
 | Component | License |
 |---|---|
 | [ESP-IDF](https://github.com/espressif/esp-idf) v6.0.1 | Apache-2.0 |
-| `espressif/esp_lcd_st77916`, `esp_lvgl_adapter`, `esp_lcd_touch`, `esp_codec_dev`, `esp_websocket_client`, `led_strip`, `button`, `knob`, `esp_lv_fs`, `esp_lv_decoder`, `esp_mmap_assets`, `cmake_utilities` | Apache-2.0 |
+| `espressif/esp_lcd_st77916` (1.85C only), `esp_lvgl_adapter`, `esp_lcd_touch`, `esp_codec_dev`, `esp_websocket_client`, `led_strip`, `button`, `knob`, `esp_lv_fs`, `esp_lv_decoder`, `esp_mmap_assets`, `cmake_utilities` | Apache-2.0 |
 | `lvgl/lvgl` 9.5.0 | MIT |
 | `espressif/cjson` (cJSON) | MIT |
 | `espressif/esp_new_jpeg` | Espressif MIT |

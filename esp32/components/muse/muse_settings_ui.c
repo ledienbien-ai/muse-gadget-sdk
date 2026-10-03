@@ -12,6 +12,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modified by ledienbien-ai (2026): pages that fit a rectangular screen under 300 px
+ * tall (for the OSTB-3ST).
  */
 
 #include "muse_settings_ui.h"
@@ -58,6 +61,10 @@ typedef void (*text_done_cb_t)(const char *text);
 
 /* The screen size the text page is scaled to (see text_px). */
 static int s_text_scale = 466;
+/* A rectangle too short for pages laid out about the centre of a 466 px
+ * screen (296 x 240): titles and lists start at its top edge, lists are as
+ * wide as it is, and the text page stacks down from the top. */
+static bool s_short;
 static lv_obj_t *s_tile;
 static lv_obj_t *s_current;
 static lv_obj_t *s_home, *s_wifi, *s_hatch, *s_ble, *s_sound, *s_sleep, *s_battery, *s_power, *s_text;
@@ -183,7 +190,7 @@ static lv_obj_t *back_button(lv_obj_t *p)
     lv_obj_t *b = lv_button_create(p);
     lv_obj_remove_style_all(b);
     lv_obj_set_size(b, 56, 48);
-    lv_obj_align(b, LV_ALIGN_TOP_MID, -112, 28);
+    lv_obj_align(b, LV_ALIGN_TOP_MID, -112, s_short ? -2 : 28);
     lv_obj_add_event_cb(b, on_back, LV_EVENT_CLICKED, NULL);
     lv_obj_t *arrow = label(b, &lv_font_montserrat_20, COLOR_ACCENT, LV_SYMBOL_LEFT);
     lv_obj_center(arrow);
@@ -202,7 +209,7 @@ static lv_obj_t *page(lv_obj_t *tile, const char *title, bool back, lv_obj_t **l
 
     lv_obj_t *t = label(p, &lv_font_unscii_16, COLOR_ACCENT, title);
     lv_obj_set_style_text_letter_space(t, 2, 0);
-    lv_obj_align(t, LV_ALIGN_TOP_MID, 0, 44);
+    lv_obj_align(t, LV_ALIGN_TOP_MID, 0, s_short ? 14 : 44);
 
     if (back) {
         back_button(p);
@@ -210,12 +217,14 @@ static lv_obj_t *page(lv_obj_t *tile, const char *title, bool back, lv_obj_t **l
 
     lv_obj_t *list = lv_obj_create(p);
     lv_obj_remove_style_all(list);
-    lv_obj_set_size(list, LIST_W, muse_board->height - LIST_TOP);
-    lv_obj_align(list, LV_ALIGN_TOP_MID, 0, LIST_TOP);
+    int top = s_short ? 44 : LIST_TOP;
+    lv_obj_set_size(list, LV_MIN(LIST_W, muse_board->width - 12), muse_board->height - top);
+    lv_obj_align(list, LV_ALIGN_TOP_MID, 0, top);
     lv_obj_set_flex_flow(list, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(list, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_set_style_pad_row(list, 10, 0);
-    lv_obj_set_style_pad_bottom(list, 110, 0);   /* lets the last row scroll up out of the bottom curve */
+    /* Lets the last row scroll up out of the bottom curve. */
+    lv_obj_set_style_pad_bottom(list, s_short ? 24 : 110, 0);
     lv_obj_set_scroll_dir(list, LV_DIR_VER);
     lv_obj_set_scrollbar_mode(list, LV_SCROLLBAR_MODE_OFF);
     *list_out = list;
@@ -541,7 +550,7 @@ static void build_text_page(lv_obj_t *tile)
     lv_obj_align(s_text_ta, LV_ALIGN_TOP_MID, 0, text_y(76));
 
     /* A full keyboard's keys are too small to hit on a screen under 2". */
-    if (muse_board->diagonal_in >= 2.0f) {
+    if (muse_board->diagonal_in >= 2.0f && !s_short) {
         build_keyboard();
         return;
     }
@@ -556,6 +565,12 @@ static void build_text_page(lv_obj_t *tile)
     lv_obj_align(back, LV_ALIGN_TOP_MID, -text_px(140), text_y(44));
     s_text_kp = muse_keypad_create(s_text, s_text_ta, muse_board->round);
     int top = text_y(98);
+    if (s_short) {
+        lv_obj_align(s_text_title, LV_ALIGN_TOP_MID, 0, 3);
+        lv_obj_align(s_text_ta, LV_ALIGN_TOP_MID, 0, 28);
+        lv_obj_align(back, LV_ALIGN_TOP_MID, -text_px(140), 28);
+        top = 28 + h + 4;
+    }
     lv_obj_set_size(s_text_kp, muse_board->width, muse_board->height - top);
     lv_obj_align(s_text_kp, LV_ALIGN_TOP_MID, 0, top);
     if (muse_board->round) {
@@ -1292,6 +1307,11 @@ void muse_settings_ui_build(lv_obj_t *tile)
 {
     if (muse_board->round && muse_board->height < 466) {
         s_text_scale = muse_board->height;
+    }
+    /* The text page's title is 217 px above the centre. */
+    s_short = !muse_board->round && muse_board->height / 2 < 217;
+    if (s_short) {
+        s_text_scale = LV_MIN(466, muse_board->width * 5 / 4);
     }
     s_tile = tile;
     build_home(tile);

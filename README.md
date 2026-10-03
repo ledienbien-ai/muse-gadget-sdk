@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-<!-- Modified by ledienbien-ai (2026): describes this fork, which adds the Waveshare ESP32-S3-Touch-LCD-1.85C. -->
+<!-- Modified by ledienbien-ai (2026): describes this fork, which adds the Waveshare ESP32-S3-Touch-LCD-1.85C and the OSTB-3ST. -->
 
 # Muse Gadgets for the ESP32-S3 Device
 
@@ -32,17 +32,18 @@ limitations under the License.
 
 Muse gadgets are open source devices you build yourself: program an
 off-the-shelf ESP32 board or set up a Raspberry Pi, then connect Muse to your
-displays, buttons, sensors and actuators. This fork adds one more board to the
+displays, buttons, sensors and actuators. This fork adds two boards to the
 ESP32 Device SDK, the round
-[Waveshare ESP32-S3-Touch-LCD-1.85C](https://docs.waveshare.com/ESP32-S3-Touch-LCD-1.85C),
-and leaves the rest of the SDK as it is upstream.
+[Waveshare ESP32-S3-Touch-LCD-1.85C](https://docs.waveshare.com/ESP32-S3-Touch-LCD-1.85C)
+and the [OSTB-3ST](#the-ostb-3st), and leaves the rest of the SDK as it is
+upstream.
 
 Built by hackers, for hackers, just for fun. Flashing custom firmware can brick
 boards and void warranties. Proceed at your own risk!
 
 ## What this fork adds
 
-The board runs the full on-screen UI: the animated avatar, push-to-talk,
+The 1.85C runs the full on-screen UI: the animated avatar, push-to-talk,
 settings by touch, and images from Muse.
 
 | Part | Details |
@@ -112,6 +113,47 @@ and its build settings in
 [`sdkconfig.muse-waveshare-s3-185c`](esp32/devices/sdkconfig.muse-waveshare-s3-185c).
 [`esp32/devices/AGENTS.md`](esp32/devices/AGENTS.md) explains how a board is added.
 
+## The OSTB-3ST
+
+A second board, ported from the source of its xiaozhi-esp32 firmware
+(`ostb-xiaozhi-3st`). It runs the same full UI, laid out for a 296×240
+landscape screen.
+
+| Part | Details |
+|---|---|
+| Chip | ESP32-S3, 16 MB flash, 8 MB octal PSRAM, native USB |
+| Display | 1.83" 240×296 NV3023 LCD on SPI, used in landscape, PWM backlight |
+| Touch | CST816, read by polling: it has no interrupt line |
+| Audio | ES8311 DAC and ES7210 ADC |
+| Keys | Upper (volume up): hold to talk. Lower (volume down): press to sleep the screen, hold to power off |
+| Battery | Level from the firmware's ADC table, and the charger's status pin |
+
+**Status:** builds with ESP-IDF v6.0.1. It has not been verified on hardware.
+The pins, the panel's setup and its orientation come from that firmware's
+source, with no documentation to check them against. If the picture comes out
+rotated or mirrored, or touches land in the wrong place, change `LCD_MADCTL`
+or `TP_SWAP_XY`, `TP_MIRROR_X` and `TP_MIRROR_Y` at the top of
+[`board_ostb_3st.c`](esp32/components/muse/boards/board_ostb_3st.c).
+
+Build and flash it like the 1.85C, with `ostb` for `s3lcd` and `ostb-3st` for
+`waveshare-s3-185c`:
+
+```sh
+tools/muse/board.sh build ostb
+```
+
+```powershell
+idf.py -B build-muse-ostb-3st -DIDF_TARGET=esp32s3 `
+  -DSDKCONFIG=build-muse-ostb-3st/sdkconfig `
+  "-DSDKCONFIG_DEFAULTS=sdkconfig.defaults;devices/sdkconfig.muse;devices/sdkconfig.muse-ostb-3st" build
+```
+
+Known limits: the 4G modem and the LED aren't used. The battery shows a level
+but no voltage. Powering off drives the board's power-off pin; on USB power the
+board may stay up, with the screen off until the upper key is pressed. Once
+the battery is full, the board knows it's on USB power only while a computer
+is attached.
+
 ## The rest of the SDK
 
 | | |
@@ -127,7 +169,7 @@ an `AGENTS.md` for coding agents.
 ## Community
 
 The upstream project's community meets on
-[Discord](https://discord.gg/3bhjCkZdd6). For this board, open an issue on this
+[Discord](https://discord.gg/3bhjCkZdd6). For these boards, open an issue on this
 repository.
 
 ## License and credits
@@ -140,6 +182,9 @@ repository.
   [example code](https://github.com/waveshareteam/ESP32-S3-Touch-LCD-1.85C)
   (Apache-2.0) and on
   [xiaozhi-esp32](https://github.com/78/xiaozhi-esp32)'s board for it (MIT).
+- The OSTB-3ST port takes its pins, panel setup table and battery table from
+  the board's xiaozhi-esp32 firmware source, which carries no license notice of
+  its own; xiaozhi-esp32 is MIT.
 - Two upstream files keep their own licenses: `minimp3.h` (CC0-1.0) and
   `pixel_font.c` (BSD-2-Clause). Components fetched at build time are under
   their own licenses.
