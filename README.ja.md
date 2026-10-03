@@ -15,14 +15,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-# Waveshare ESP32-S3-Touch-LCD-1.85C と OSTB-3ST 向け Muse Gadgets
+# ESP32-S3 デバイス向け Muse Gadgets
 
 [English](README.md) | [Tiếng Việt](README.vi.md) | [简体中文](README.zh-CN.md) | **日本語** | [한국어](README.ko.md)
 
 > これは [facebookincubator/muse-gadget-sdk](https://github.com/facebookincubator/muse-gadget-sdk)
-> の非公式なコミュニティフォークです。Meta および Waveshare とは関係がなく、
-> 両社の承認を受けたものでもありません。翻訳と[英語版](README.md)に違いがある
-> 場合は、英語版が正となります。
+> の非公式なコミュニティフォークです。Meta、Waveshare、その他のボードメーカーとは
+> 関係がなく、各社の承認を受けたものでもありません。翻訳と[英語版](README.md)に
+> 違いがある場合は、英語版が正となります。
 
 <p align="center">
   <picture>
@@ -33,19 +33,33 @@ limitations under the License.
 
 Muse gadget は、自分で作るオープンソースのデバイスです。市販の ESP32 ボードに
 プログラムを書き込むか、Raspberry Pi をセットアップして、ディスプレイ、ボタン、
-センサー、アクチュエーターを Muse につなぎます。このフォークは ESP32 Device SDK
-にボードを 2 つ追加します。円形ディスプレイの
-[Waveshare ESP32-S3-Touch-LCD-1.85C](https://docs.waveshare.com/ESP32-S3-Touch-LCD-1.85C)
-と [OSTB-3ST](#ostb-3st) です。SDK のそれ以外の部分は上流のままです。
+センサー、アクチュエーターを Muse につなぎます。このフォークは、上流の
+ESP32 Device SDK がまだ対応していない ESP32-S3 ボードを追加します。SDK の
+それ以外の部分は上流のままです。
 
 ハッカーがハッカーのために、楽しみで作ったものです。カスタムファームウェアの
 書き込みはボードを壊したり、保証を無効にしたりすることがあります。自己責任で
 どうぞ。
 
-## このフォークで追加したもの
+## このフォークのボード
 
-このボードでは画面 UI がすべて動きます。アニメーションするアバター、
+どのボードでも画面 UI がすべて動きます。アニメーションするアバター、
 プッシュトゥトーク、タッチでの設定、Muse から届く画像の表示です。
+
+| ボード | 画面 | 名前 | プロファイル | 状況 |
+|---|---|---|---|---|
+| [Waveshare ESP32-S3-Touch-LCD-1.85C](#waveshare-esp32-s3-touch-lcd-185c) | 1.85 インチ円形 360×360、タッチ | `s3lcd` | `waveshare-s3-185c` | 実機に書き込み済み：起動して UI が表示されます。Muse との会話は未確認です |
+| [OSTB-3ST](#ostb-3st) | 1.83 インチ 296×240、タッチ | `ostb` | `ostb-3st` | ビルドできます。実機ではまだ動かしていません |
+
+名前は `tools/muse/board.sh` でのボードの呼び名、プロファイルはビルド設定と
+ビルドディレクトリの名前です。上流が対応しているボードもそのまま残っていて、
+[`esp32/devices/README.md`](esp32/devices/README.md)（英語）に一覧があります。
+
+## Waveshare ESP32-S3-Touch-LCD-1.85C
+
+<p align="center">
+  <img src="doc/image/Wareshare%20Touch%20LCD%201.85C.png" width="720" alt="シミュレーターで描いた 360 px 円形画面の Muse UI：待機、ペアリング、聞き取り、考え中、エラー、発話">
+</p>
 
 | 項目 | 内容 |
 |---|---|
@@ -60,7 +74,8 @@ Muse gadget は、自分で作るオープンソースのデバイスです。�
 1 つのファームウェアで両方のオーディオ版に対応します。起動時に ES8311 の有無を
 調べます。
 
-**状況：** ESP-IDF v6.0.1 でビルドできます。実機での動作はまだ確認していません。
+**状況：** ESP-IDF v6.0.1 でビルドでき、実機に書き込んで、起動して UI が表示
+されることを確認しています。このボードで Muse との会話はまだ試していません。
 V2 のオーディオ部分は Waveshare のサンプルコードをもとに書いたもので、V2 ボード
 では試していません。
 
@@ -70,62 +85,21 @@ Settings の Power ページから行います（ボードはディープスリ�
 どのピンにもつながっていないため、「充電中」と表示されるのはパソコンに接続して
 いる間だけです。
 
-## ビルドと書き込み
-
-1. [SDK トークン](https://gadgets.muse.ai/settings/sdk-tokens)を取得し、
-   [Gadget SDK 規約](https://gadgets.muse.ai/sdk-terms)を読みます。ペアリング
-   にはどの gadget でもトークンが必要です。
-2. ESP-IDF **v6.0.1** をインストールします（[`esp32/README.md`](esp32/README.md)
-   を参照）。
-3. `esp32/` でビルドします。macOS または Linux：
-
-   ```sh
-   tools/muse/board.sh build s3lcd
-   ```
-
-   Windows では ESP-IDF PowerShell で：
-
-   ```powershell
-   idf.py -B build-muse-waveshare-s3-185c -DIDF_TARGET=esp32s3 `
-     -DSDKCONFIG=build-muse-waveshare-s3-185c/sdkconfig `
-     "-DSDKCONFIG_DEFAULTS=sdkconfig.defaults;devices/sdkconfig.muse;devices/sdkconfig.muse-waveshare-s3-185c" build
-   ```
-
-   トークンは `idf.py -B build-muse-waveshare-s3-185c menuconfig`
-   （ESP32 Device SDK > Muse Gadgets SDK token）で設定し、もう一度ビルドします。
-4. USB-C で書き込みます。`PORT` はボードのポートに置き換えてください。接続
-   できない場合は、**BOOT** を押したまま **RESET** を押して離し、**BOOT** を
-   離してから、もう一度試します。
-
-   ```sh
-   idf.py -B build-muse-waveshare-s3-185c -p PORT flash
-   ```
-
-   Web の書き込みツールを使う場合は、1 つのファイルにまとめてアドレス `0x0` に
-   書き込みます。
-
-   ```sh
-   idf.py -B build-muse-waveshare-s3-185c merge-bin -o muse-gadget-185c-merged.bin
-   ```
-
-   自分の SDK トークンでビルドしたファームウェアにはそのトークンが含まれます。
-   ファイルを公開する前によく考えてください。
-5. Muse アプリで **Settings > Devices > Developer mode** をオンにし、
-   `MuseGadget-XXXXXX` という名前のデバイスを追加して、求められたら **BOOT** を
-   押します。
-
-ボードのコードは
-[`board_waveshare_s3_185c.c`](esp32/components/muse/boards/board_waveshare_s3_185c.c)、
-ビルド設定は
-[`sdkconfig.muse-waveshare-s3-185c`](esp32/devices/sdkconfig.muse-waveshare-s3-185c)
-にあります。ボードの追加方法は
-[`esp32/devices/AGENTS.md`](esp32/devices/AGENTS.md)（英語）に書かれています。
+コード：[`board_waveshare_s3_185c.c`](esp32/components/muse/boards/board_waveshare_s3_185c.c)、
+ビルド設定：[`sdkconfig.muse-waveshare-s3-185c`](esp32/devices/sdkconfig.muse-waveshare-s3-185c)。
+ハードウェアの資料：[Waveshare のドキュメント](https://docs.waveshare.com/ESP32-S3-Touch-LCD-1.85C)。
 
 ## OSTB-3ST
 
-2 つ目のボードです。このボード用の xiaozhi-esp32 ファームウェアのソース
-（`ostb-xiaozhi-3st`）をもとに移植しました。同じフル UI が、296×240 の横長画面
-に合わせたレイアウトで動きます。
+<p align="center">
+  <img src="doc/image/ostb-3st.png" width="720" alt="シミュレーターで描いた 296×240 の Muse UI：待機、ペアリング、聞き取り、考え中、エラー、発話">
+</p>
+<p align="center">
+  <img src="doc/image/ostb-3st-settings.png" width="720" alt="シミュレーターで描いた 296×240 の設定ページ">
+</p>
+
+このボード用の xiaozhi-esp32 ファームウェアのソース（`ostb-xiaozhi-3st`）を
+もとに移植しました。UI は 296×240 の横長画面に合わせたレイアウトです。
 
 | 部品 | 内容 |
 |---|---|
@@ -136,29 +110,93 @@ Settings の Power ページから行います（ボードはディープスリ�
 | キー | 上のキー（音量 +）：押している間話す。下のキー（音量 −）：押すと画面オフ、長押しで電源オフ |
 | バッテリー | 元のファームウェアの ADC テーブルによる残量と、充電状態のピン |
 
-**状況：** ESP-IDF v6.0.1 でビルドできます。実機ではまだ確認していません。
+**状況：** ESP-IDF v6.0.1 でビルドできます。実機ではまだ動かしていません。
 ピン、パネルの初期化テーブルと向きは、そのファームウェアのソースによるもので、
 照らし合わせる資料はありません。画面が回転または反転している場合や、タッチの
-位置がずれる場合は、[`board_ostb_3st.c`](esp32/components/muse/boards/board_ostb_3st.c) の先頭にある `LCD_MADCTL`、または
+位置がずれる場合は、ボードのコードの先頭にある `LCD_MADCTL`、または
 `TP_SWAP_XY`、`TP_MIRROR_X`、`TP_MIRROR_Y` を変えてください。
-
-ビルドと書き込みは 1.85C と同じです。`s3lcd` を `ostb` に、
-`waveshare-s3-185c` を `ostb-3st` に置き換えます。
-
-```sh
-tools/muse/board.sh build ostb
-```
-
-```powershell
-idf.py -B build-muse-ostb-3st -DIDF_TARGET=esp32s3 `
-  -DSDKCONFIG=build-muse-ostb-3st/sdkconfig `
-  "-DSDKCONFIG_DEFAULTS=sdkconfig.defaults;devices/sdkconfig.muse;devices/sdkconfig.muse-ostb-3st" build
-```
 
 既知の制限：4G モデムと LED は使いません。バッテリーは残量だけを表示し、電圧は
 表示しません。電源オフはボードの電源オフのピンを駆動します。USB 給電中は電源が
 切れないことがあり、その場合は上のキーを押すまで画面が消えたままになります。
 満充電になった後は、パソコンにつないでいる間だけ USB 給電中と判定します。
+
+コード：[`board_ostb_3st.c`](esp32/components/muse/boards/board_ostb_3st.c)、
+ビルド設定：[`sdkconfig.muse-ostb-3st`](esp32/devices/sdkconfig.muse-ostb-3st)。
+
+## ビルドと書き込み
+
+手順はどのボードでも同じです。名前とプロファイルは
+[上の表](#このフォークのボード)を見てください。
+
+1. [SDK トークン](https://gadgets.muse.ai/settings/sdk-tokens)を取得し、
+   [Gadget SDK 規約](https://gadgets.muse.ai/sdk-terms)を読みます。ペアリング
+   にはどの gadget でもトークンが必要です。
+2. ESP-IDF **v6.0.1** をインストールします（[`esp32/README.md`](esp32/README.md)
+   を参照）。
+3. `esp32/` でビルドします。macOS または Linux では、ボードの名前を使います。
+
+   ```sh
+   tools/muse/board.sh build ostb
+   ```
+
+   Windows では ESP-IDF PowerShell で、ボードのプロファイルを使います。
+
+   ```powershell
+   $P = "ostb-3st"
+   idf.py -B build-muse-$P -DIDF_TARGET=esp32s3 `
+     "-DSDKCONFIG=build-muse-$P/sdkconfig" `
+     "-DSDKCONFIG_DEFAULTS=sdkconfig.defaults;devices/sdkconfig.muse;devices/sdkconfig.muse-$P" build
+   ```
+
+   トークンは `idf.py -B build-muse-$P menuconfig`
+   （ESP32 Device SDK > Muse Gadgets SDK token）で設定し、もう一度ビルドします。
+4. USB-C で書き込みます。`PORT` はボードのポートに置き換えてください。
+
+   ```powershell
+   idf.py -B build-muse-$P -p PORT flash
+   ```
+
+   接続できない場合は、ボードをダウンロードモードにしてからもう一度試します。
+   **BOOT** を押したまま **RESET** を押して離し、**BOOT** を離します。RESET
+   ボタンのないボードでは、BOOT を押したままケーブルを差し込みます。
+
+   Web の書き込みツールを使う場合は、1 つのファイルにまとめてアドレス `0x0` に
+   書き込みます。
+
+   ```powershell
+   idf.py -B build-muse-$P merge-bin -o muse-gadget-$P-merged.bin
+   ```
+
+   自分の SDK トークンでビルドしたファームウェアにはそのトークンが含まれます。
+   ファイルを公開する前によく考えてください。
+5. Muse アプリで **Settings > Devices > Developer mode** をオンにし、
+   `MuseGadget-XXXXXX` という名前のデバイスを追加して、求められたらボードの
+   トークボタンを押します（1.85C では BOOT、OSTB-3ST では上のキー）。
+
+## ほかのデバイスを追加する
+
+画面、スピーカー、マイクのあるボードなら、ドライバーのファイル 1 つと数行の登録で
+足ります。このフォークの各ボードは次のものでできています。
+
+1. `esp32/components/muse/boards/board_<id>.c` が `muse_board_t`
+   （`muse_board.h`）を埋めます。ディスプレイ、タッチ、オーディオ、ボタン、
+   バッテリー、電源です。自分のボードにいちばん近いボードから始めてください。
+2. `esp32/devices/sdkconfig.muse-<profile>` にビルド設定を置きます。チップ、
+   フラッシュ、PSRAM です。
+3. `esp32/components/muse/Kconfig`、`CMakeLists.txt`、`idf_component.yml` に
+   ボードと、必要なドライバーコンポーネントを登録します。
+4. `esp32/tools/muse/board.sh`、`ports.py`、`avatar.py` に短い名前を加えます。
+5. ドキュメントにも加えます。各 README の表の行とセクション、
+   [`esp32/devices/README.md`](esp32/devices/README.md) の行、`doc/image/` の
+   画像、そして [`CREDITS.md`](CREDITS.md) に参考にしたソースとそのライセンス
+   です。
+
+UI は円形の画面にも長方形の画面にも合わせて配置されます。上の画像は
+`esp32/simulator` のシミュレーターで、`src/sim_board.c` の画面サイズをボードの
+サイズに変えて描いたものです。ボードが手元に届く前に、新しいサイズでの見え方を
+確かめられます。ボードの情報集めから結果の確認までの手順は
+[`esp32/devices/AGENTS.md`](esp32/devices/AGENTS.md)（英語）にあります。
 
 ## SDK のそれ以外の部分
 
@@ -176,7 +214,8 @@ Settings > Devices からペアリングします。先にそこで Developer mo
 ## コミュニティ
 
 上流プロジェクトのコミュニティは [Discord](https://discord.gg/3bhjCkZdd6)
-にあります。このボードについては、このリポジトリに issue を立ててください。
+にあります。このフォークで追加したボードについては、このリポジトリに issue を
+立ててください。
 
 ## ライセンスとクレジット
 

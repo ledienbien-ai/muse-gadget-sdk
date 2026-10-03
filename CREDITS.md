@@ -18,9 +18,9 @@ limitations under the License.
 
 This repository is a community fork of
 [facebookincubator/muse-gadget-sdk](https://github.com/facebookincubator/muse-gadget-sdk)
-that adds the Waveshare ESP32-S3-Touch-LCD-1.85C and the OSTB-3ST. It is not
-affiliated with or endorsed by Meta, Waveshare, Espressif, the xiaozhi-esp32
-project or the OSTB-3ST's maker.
+that adds ESP32-S3 boards: so far the Waveshare ESP32-S3-Touch-LCD-1.85C and
+the OSTB-3ST. It is not affiliated with or endorsed by Meta, Waveshare,
+Espressif, the xiaozhi-esp32 project or the OSTB-3ST's maker.
 
 This file records where the code came from and under which terms. It is a
 plain-language record, not legal advice.
@@ -63,6 +63,7 @@ Files added:
 | [`esp32/devices/sdkconfig.muse-waveshare-s3-185c`](esp32/devices/sdkconfig.muse-waveshare-s3-185c) | Build settings for the 1.85C |
 | [`esp32/components/muse/boards/board_ostb_3st.c`](esp32/components/muse/boards/board_ostb_3st.c) | The OSTB-3ST: NV3023 display and its setup table (see section 3), touch, audio, keys, battery, power |
 | [`esp32/devices/sdkconfig.muse-ostb-3st`](esp32/devices/sdkconfig.muse-ostb-3st) | Build settings for the OSTB-3ST |
+| `doc/image/` | Pictures for the READMEs: the UI at each added board's screen size, drawn by the simulator. They show the default Jollybot avatar, which the Apache License does not cover (section 1) |
 | `CREDITS.md`, `README.vi.md`, `README.zh-CN.md`, `README.ja.md`, `README.ko.md` | This file and the translated READMEs |
 
 Upstream files modified, each marked "Modified by ledienbien-ai" under its
