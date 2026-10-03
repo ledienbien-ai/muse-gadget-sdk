@@ -15,7 +15,7 @@ limitations under the License.
 -->
 <!-- Modified by ledienbien-ai (2026): describes this fork, which adds the Waveshare ESP32-S3-Touch-LCD-1.85C. -->
 
-# Muse Gadgets for the Waveshare ESP32-S3-Touch-LCD-1.85C
+# Muse Gadgets for the ESP32-S3 Device
 
 **English** | [Tiếng Việt](README.vi.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
 
