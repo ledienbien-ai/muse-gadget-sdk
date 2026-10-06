@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# Modified by ledienbien-ai (2026): the Vietnamese texts and fonts.
 
 cmake_minimum_required(VERSION 3.24)
 
@@ -154,6 +156,13 @@ add_executable(muse_simulator
     "${MUSE_COMPONENT_DIR}/muse_ui.c"
     "${MUSE_COMPONENT_DIR}/muse_state.c"
     "${MUSE_COMPONENT_DIR}/muse_text.c"
+    "${MUSE_COMPONENT_DIR}/muse_lang.c"
+    "${MUSE_COMPONENT_DIR}/muse_fonts.c"
+    "${MUSE_COMPONENT_DIR}/fonts/muse_font_montserrat_vi_14.c"
+    "${MUSE_COMPONENT_DIR}/fonts/muse_font_montserrat_vi_16.c"
+    "${MUSE_COMPONENT_DIR}/fonts/muse_font_montserrat_vi_20.c"
+    "${MUSE_COMPONENT_DIR}/fonts/muse_font_mono_vi_16.c"
+    "${MUSE_COMPONENT_DIR}/fonts/muse_font_mono_vi_20.c"
     "${MUSE_COMPONENT_DIR}/../../avatar/muse_pixel.c"
 )
 

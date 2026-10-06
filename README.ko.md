@@ -62,6 +62,47 @@ Muse gadget은 직접 만드는 오픈 소스 기기입니다. 시중에서 파�
 빌드 디렉터리의 이름입니다. 업스트림이 지원하는 보드도 그대로 남아 있으며,
 [`esp32/devices/README.md`](esp32/devices/README.md)(영어)에 정리되어 있습니다.
 
+## 베트남어 화면과 음성 응답
+
+위의 세 보드는 화면 UI에 두 가지 기능이 추가되었습니다.
+
+<p align="center">
+  <img src="doc/image/vietnamese-ui.png" width="720" alt="시뮬레이터로 그린 360×360 베트남어 UI: 준비, 응답을 읽는 중, 스피커를 껐을 때의 응답, 오류, 설정, 언어 페이지, 소리 페이지, 페어링 코드">
+</p>
+
+**베트남어 또는 영어 화면.** 보드는 베트남어로 시작합니다. Muse에서 왼쪽으로
+밀어 **Settings > Language**(Cài đặt > Ngôn ngữ)를 열고 **English** 또는
+**Tiếng Việt**를 고릅니다. Muse가 다시 시작하면서 그 언어로 바뀌고, 선택은
+저장됩니다. 터치가 없는 보드에서는 시리얼 콘솔로 `>lang=en` 또는 `>lang=vi`를
+보내거나 [`esp32/tools/muse/ble_setup.html`](esp32/tools/muse/ble_setup.html)에서
+고릅니다. 베트남어에서는 응답과 말한 내용이 성조 부호와 함께 표시됩니다.
+영어에서는 부호 없이 표시됩니다. 영어 글꼴에는 그 글자가 없기 때문입니다.
+
+**응답을 소리 내어 읽기.** Muse는 기기에 텍스트로 응답합니다. 스피커가 켜져
+있으면 보드는 각 응답을 Google 번역의 텍스트 음성 변환으로 보내고, 돌아온 음성을
+재생하며 자막이 그에 맞춰 넘어갑니다. 응답이 베트남어로 쓰여 있으면 베트남어
+목소리로, 그렇지 않으면 화면 언어의 목소리로 읽습니다. 스피커가 꺼져 있으면(메인
+화면의 스피커 버튼을 길게 누르거나 Settings > Sound) 응답은 글자로만 표시되고
+아무것도 전송되지 않습니다.
+
+> 음성은 Google 번역의 "듣기" 버튼 뒤에 있는 주소에서 가져옵니다. 키는 필요
+> 없지만 공개된 서비스가 아닙니다. Google이 언제든 바꾸거나 제한하거나 막을 수
+> 있고, 읽어 주는 모든 응답의 텍스트가 Google로 전송됩니다. 응답이 없으면
+> 이전처럼 글자로 표시됩니다. `CONFIG_MUSE_TTS_GOOGLE=n`으로 빌드하면 이 기능을
+> 뺄 수 있고, 직접 고른 서비스는
+> [`muse_tts.c`](esp32/components/muse/muse_tts.c)에 넣으면 됩니다.
+> `CONFIG_MUSE_LANG_DEFAULT_VI=n`이면 보드가 영어로 시작합니다.
+
+**상태:** ESP-IDF v6.0.1로 빌드됩니다. 화면은 두 언어 모두 시뮬레이터에서
+확인했고, 음성 주소는 PC에서 요청하면 MP3를 돌려줍니다. 실제 보드에서는 아직
+실행하지 않았습니다.
+
+코드: [`muse_lang.c`](esp32/components/muse/muse_lang.c)(화면 문구),
+[`muse_fonts.c`](esp32/components/muse/muse_fonts.c)와
+[`fonts/`](esp32/components/muse/fonts)(베트남어 글자),
+[`muse_tts.c`](esp32/components/muse/muse_tts.c)와
+[`muse_tts_text.c`](esp32/components/muse/muse_tts_text.c)(음성).
+
 ## Waveshare ESP32-S3-Touch-LCD-1.85C
 
 <p align="center">

@@ -12,6 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modified by ledienbien-ai (2026): the "lang" setup command.
  */
 
 #include "muse_ble.h"
@@ -23,6 +25,9 @@
 #include "esp_app_desc.h"
 #include "esp_log.h"
 #include "esp_random.h"
+#include "esp_system.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "host/ble_hs.h"
 #include "host/ble_store.h"
 
@@ -95,14 +100,15 @@ static int build_status(char *out, size_t len)
                     "\"wifi\":{\"on\":%s,\"state\":\"%s\",\"ssid\":\"%s\",\"ip\":\"%s\",\"rssi\":%d},"
                     "\"hatch\":{\"host\":\"%s\",\"vm\":\"%s\",\"token\":%s,\"state\":\"%s\"},"
                     "\"link\":{\"paired\":%s,\"state\":\"%s\"},"
-                    "\"volume\":%d,\"speaker\":%s,\"mic_gain\":%d,\"brightness\":%d,\"sleep\":%d,\"last\":\"%s\"}",
+                    "\"volume\":%d,\"speaker\":%s,\"mic_gain\":%d,\"brightness\":%d,\"sleep\":%d,\"lang\":\"%s\","
+                    "\"last\":\"%s\"}",
                     s_name, esp_app_get_description()->version, p.battery_pct,
                     muse_settings_wifi_on() ? "true" : "false", wifi_state_name(w.state), ssid_e, w.ip, w.rssi,
                     host_e, vm_e, muse_settings_hatch_token_len() ? "true" : "false", muse_hatch_state_name(h.state),
                     muse_link_hatch_linked() ? "true" : "false", muse_link_state_name(muse_link_state()),
                     muse_settings_volume(), muse_settings_speaker_on() ? "true" : "false",
                     muse_settings_mic_gain(), muse_settings_brightness(),
-                    muse_settings_sleep_s(), last_e);
+                    muse_settings_sleep_s(), muse_lang_code(muse_settings_lang()), last_e);
 }
 
 static bool parse_int(const char *v, int lo, int hi, int *out)
@@ -129,6 +135,8 @@ static void run_command(char *cmd)
         v = "";
     }
     int n;
+    muse_lang_t lang;
+    bool restart = false;
     const char *res = "ok";
 
     if (!strcmp(cmd, "wifi.ssid")) {
@@ -171,6 +179,14 @@ static void run_command(char *cmd)
         muse_settings_set_brightness(n);
     } else if (!strcmp(cmd, "sleep") && parse_int(v, 0, 3600, &n)) {
         muse_settings_set_sleep_s(n);
+    } else if (!strcmp(cmd, "lang") && muse_lang_from_code(v, &lang)) {
+        /* "en" or "vi". The screen is built in one language, so a new one
+         * takes a restart, once the answer below has gone out. */
+        restart = lang != muse_settings_lang();
+        muse_settings_set_lang(lang);
+        if (restart) {
+            res = "ok, restarting";
+        }
     } else {
         res = "error: unknown command or bad value";
     }
@@ -186,6 +202,10 @@ static void run_command(char *cmd)
         if (om) {
             ble_gatts_notify_custom(s_conn, s_status_handle, om);
         }
+    }
+    if (restart) {
+        vTaskDelay(pdMS_TO_TICKS(500));
+        esp_restart();
     }
 }
 

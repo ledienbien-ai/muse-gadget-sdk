@@ -63,6 +63,48 @@ Tên là cách `tools/muse/board.sh` gọi bo; profile là tên của cấu hìn
 thư mục build. Các bo mà bản gốc hỗ trợ vẫn còn nguyên, liệt kê trong
 [`esp32/devices/README.md`](esp32/devices/README.md) (tiếng Anh).
 
+## Màn hình tiếng Việt và trả lời bằng giọng nói
+
+Ba bo ở trên có thêm hai thứ trong giao diện.
+
+<p align="center">
+  <img src="doc/image/vietnamese-ui.png" width="720" alt="Giao diện tiếng Việt ở 360×360, vẽ bằng trình mô phỏng: sẵn sàng, đang đọc câu trả lời, câu trả lời khi tắt loa, báo lỗi, cài đặt, trang Ngôn ngữ, trang Âm thanh và mã ghép đôi">
+</p>
+
+**Màn hình tiếng Việt hoặc tiếng Anh.** Các bo khởi động bằng tiếng Việt. Vuốt
+sang trái từ Muse rồi mở **Cài đặt > Ngôn ngữ** (Settings > Language) để chọn
+**English** hoặc **Tiếng Việt**; Muse khởi động lại sang ngôn ngữ đó và nhớ lựa
+chọn. Với bo không có cảm ứng, gửi `>lang=en` hoặc `>lang=vi` qua cổng serial,
+hoặc chọn trên trang
+[`esp32/tools/muse/ble_setup.html`](esp32/tools/muse/ble_setup.html). Ở tiếng
+Việt, câu trả lời và lời bạn nói hiện có dấu đầy đủ. Ở tiếng Anh chúng hiện
+không dấu, vì phông chữ tiếng Anh không có chữ có dấu.
+
+**Đọc câu trả lời thành tiếng.** Muse trả lời thiết bị bằng văn bản. Khi bật
+loa, bo gửi từng câu trả lời tới dịch vụ đọc văn bản của Google Dịch rồi phát
+âm thanh nhận về, phụ đề chạy theo lời đọc: giọng tiếng Việt nếu câu trả lời
+viết bằng tiếng Việt, còn lại đọc bằng giọng của ngôn ngữ màn hình. Khi tắt loa
+(giữ nút loa trên màn hình chính, hoặc Cài đặt > Âm thanh), câu trả lời chỉ
+hiện chữ và không có gì được gửi đi.
+
+> Giọng đọc lấy từ địa chỉ đứng sau nút "nghe" của Google Dịch. Nó không cần
+> khóa API, nhưng không phải dịch vụ được công bố chính thức: Google có thể
+> thay đổi, giới hạn hoặc chặn bất cứ lúc nào, và văn bản của mỗi câu trả lời
+> được đọc sẽ gửi tới Google. Khi nó không trả lời, câu trả lời hiện bằng chữ
+> như trước. Build với `CONFIG_MUSE_TTS_GOOGLE=n` để bỏ tính năng này, hoặc đặt
+> dịch vụ của riêng bạn vào [`muse_tts.c`](esp32/components/muse/muse_tts.c).
+> `CONFIG_MUSE_LANG_DEFAULT_VI=n` cho bo khởi động bằng tiếng Anh.
+
+**Tình trạng:** biên dịch được với ESP-IDF v6.0.1. Giao diện đã kiểm tra trên
+trình mô phỏng ở cả hai ngôn ngữ, và địa chỉ đọc giọng nói trả về MP3 khi gọi
+từ máy tính. Chưa chạy trên bo thật.
+
+Mã nguồn: [`muse_lang.c`](esp32/components/muse/muse_lang.c) (các câu chữ),
+[`muse_fonts.c`](esp32/components/muse/muse_fonts.c) và
+[`fonts/`](esp32/components/muse/fonts) (chữ tiếng Việt),
+[`muse_tts.c`](esp32/components/muse/muse_tts.c) và
+[`muse_tts_text.c`](esp32/components/muse/muse_tts_text.c) (giọng nói).
+
 ## Waveshare ESP32-S3-Touch-LCD-1.85C
 
 <p align="center">

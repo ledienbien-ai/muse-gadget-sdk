@@ -12,10 +12,13 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modified by ledienbien-ai (2026): the Vietnamese letters, kept or made plain.
  */
 
 #include "muse_text.h"
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -174,11 +177,75 @@ static const char *stand_in(int32_t cp)
     return NULL;
 }
 
+/*
+ * The letters Vietnamese writes with accents: the ones in Latin-1 and Latin
+ * Extended-A that it shares with other languages, o and u with a horn, and the
+ * block of letters with a tone mark, which is all Vietnamese up to U+1EF9.
+ */
+static bool is_vietnamese(int32_t cp)
+{
+    static const uint16_t SHARED[] = {
+        0xC0, 0xC1, 0xC2, 0xC3, 0xC8, 0xC9, 0xCA, 0xCC, 0xCD, 0xD2, 0xD3, 0xD4, 0xD5, 0xD9, 0xDA, 0xDD,
+        0xE0, 0xE1, 0xE2, 0xE3, 0xE8, 0xE9, 0xEA, 0xEC, 0xED, 0xF2, 0xF3, 0xF4, 0xF5, 0xF9, 0xFA, 0xFD,
+        0x102, 0x103, 0x110, 0x111, 0x128, 0x129, 0x168, 0x169, 0x1A0, 0x1A1, 0x1AF, 0x1B0,
+    };
+    if (cp >= 0x1EA0 && cp <= 0x1EF9) {
+        return true;
+    }
+    for (size_t i = 0; i < sizeof(SHARED) / sizeof(SHARED[0]); i++) {
+        if (SHARED[i] == cp) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/* The plain letter of a Vietnamese one past Latin Extended-A, or 0. The block
+ * runs A, E, I, O, U, Y, each with its capital first. */
+static char vietnamese_plain(int32_t cp)
+{
+    static const struct {
+        uint16_t last;
+        char upper;
+    } RUNS[] = { { 0x1EB7, 'A' }, { 0x1EC7, 'E' }, { 0x1ECB, 'I' }, { 0x1EE3, 'O' }, { 0x1EF1, 'U' }, { 0x1EF9, 'Y' } };
+    if (cp == 0x1A0 || cp == 0x1A1) {
+        return cp & 1 ? 'o' : 'O';
+    }
+    if (cp == 0x1AF || cp == 0x1B0) {
+        return cp & 1 ? 'U' : 'u';
+    }
+    if (cp < 0x1EA0 || cp > 0x1EF9) {
+        return 0;
+    }
+    for (size_t i = 0; i < sizeof(RUNS) / sizeof(RUNS[0]); i++) {
+        if (cp <= RUNS[i].last) {
+            return cp & 1 ? (char)(RUNS[i].upper + ('a' - 'A')) : RUNS[i].upper;
+        }
+    }
+    return 0;
+}
+
+static bool s_keep_vietnamese;
+
+void muse_text_keep_vietnamese(bool keep)
+{
+    s_keep_vietnamese = keep;
+}
+
 int muse_text_ascii(const char *s, size_t *len, char out[4])
 {
     int32_t cp = decode((const unsigned char *)s, len);
     if (cp < 0x80) {
         return -1;   /* ASCII, or broken */
+    }
+    if (s_keep_vietnamese && is_vietnamese(cp)) {
+        return -1;
+    }
+    char plain = vietnamese_plain(cp);
+    if (plain) {
+        out[0] = plain;
+        out[1] = '\0';
+        return 1;
     }
     if (cp >= 0xC0 && cp <= 0x17F && LATIN[cp - 0xC0] != '_') {
         out[0] = LATIN[cp - 0xC0];

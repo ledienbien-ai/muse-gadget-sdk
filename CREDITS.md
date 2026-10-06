@@ -68,6 +68,11 @@ Files added:
 | [`esp32/devices/sdkconfig.muse-lcdwiki-s3-28`](esp32/devices/sdkconfig.muse-lcdwiki-s3-28) | Build settings for the LCDWIKI board |
 | [`esp32/components/muse/logo/logo.c`](esp32/components/muse/logo) | The DB_ROBOT startup logo, as LVGL's image converter exported it. Copyright (c) 2026 ledienbien-ai, free to use under the Apache License like the rest of this section |
 | `doc/image/` | Pictures for the READMEs: the UI at each added board's screen size, drawn by the simulator. They show the default Jollybot avatar, which the Apache License does not cover (section 1) |
+| [`esp32/components/muse/muse_lang.c`](esp32/components/muse/muse_lang.c), `muse_lang.h` | The screen's language, and its texts in Vietnamese |
+| [`esp32/components/muse/muse_fonts.c`](esp32/components/muse/muse_fonts.c), `muse_fonts.h` | The fonts each language uses |
+| [`esp32/components/muse/fonts/README.md`](esp32/components/muse/fonts/README.md) | How the Vietnamese font files were made. The font files beside it are not under the Apache License: see the table below |
+| [`esp32/components/muse/muse_tts.c`](esp32/components/muse/muse_tts.c), `muse_tts_text.c`, `muse_tts.h` | Replies read aloud through Google Translate's text-to-speech (section 5) |
+| `esp32/tests/test_muse_lang.py`, `muse_lang_harness.c` | Host tests for the two above |
 | `CREDITS.md`, `README.vi.md`, `README.zh-CN.md`, `README.ja.md`, `README.ko.md` | This file and the translated READMEs |
 
 `doc/image/db-robot-logo.png` is the same logo as a picture, for the READMEs.
@@ -79,16 +84,32 @@ fork's owner and look to be the makers' or sellers' product pictures: they are
 here to show which hardware is meant, belong to their owners, and are not
 under the Apache License.
 
+Fonts added, under their own license, for the Vietnamese letters that LVGL's
+built-in fonts lack. Each file is a subset of the font converted to LVGL's
+format with [lv_font_conv](https://github.com/lvgl/lv_font_conv), and names
+its source and license at the top:
+
+| Path | Font | License |
+|---|---|---|
+| `esp32/components/muse/fonts/muse_font_montserrat_vi_14.c`, `_16.c`, `_20.c` | [Montserrat](https://github.com/JulietaUla/Montserrat) Medium, Copyright 2011 The Montserrat Project Authors | SIL Open Font License 1.1, in [`OFL-Montserrat.txt`](esp32/components/muse/fonts/OFL-Montserrat.txt) |
+| `esp32/components/muse/fonts/muse_font_mono_vi_16.c`, `_20.c` | [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono) ExtraBold, Copyright 2020 The JetBrains Mono Project Authors | SIL Open Font License 1.1, in [`OFL-JetBrainsMono.txt`](esp32/components/muse/fonts/OFL-JetBrainsMono.txt) |
+
 Upstream files modified, each marked "Modified by ledienbien-ai" under its
 license header, as section 4(b) of the Apache License asks:
 
 | Path | Change |
 |---|---|
 | `README.md` | Describes this fork; links the translations and this file |
-| `esp32/README.md`, `esp32/AGENTS.md`, `esp32/devices/README.md`, `esp32/devices/AGENTS.md` | List the new boards |
-| `esp32/components/muse/Kconfig`, `CMakeLists.txt`, `idf_component.yml` | Register the boards, the 1.85C's `esp_lcd_st77916` dependency and the LCDWIKI board's `esp_lcd_ili9341`; the startup logo's options |
-| `esp32/components/muse/muse_ui.c` | On round screens smaller than 412 px, the speaker button sits under the state word. On a rectangular screen under 300 px tall (the OSTB-3ST's 296×240), a smaller Muse and a bar in place of the ring. The startup logo |
-| `esp32/components/muse/muse_settings_ui.c` | Settings pages that fit a screen that short; a "Muse AI by DB-robot" line under the settings list |
+| `esp32/README.md`, `esp32/AGENTS.md`, `esp32/devices/README.md`, `esp32/devices/AGENTS.md` | List the new boards; `AGENTS.md` also says how on-screen text gets its Vietnamese |
+| `esp32/components/muse/Kconfig`, `CMakeLists.txt`, `idf_component.yml` | Register the boards, the 1.85C's `esp_lcd_st77916` dependency and the LCDWIKI board's `esp_lcd_ili9341`; the startup logo's options; the starting language and spoken replies |
+| `esp32/components/muse/muse_ui.c` | On round screens smaller than 412 px, the speaker button sits under the state word. On a rectangular screen under 300 px tall (the OSTB-3ST's 296×240), a smaller Muse and a bar in place of the ring. The startup logo. The screen in Vietnamese: its texts, its fonts and the room their taller lines need |
+| `esp32/components/muse/muse_settings_ui.c` | Settings pages that fit a screen that short; a "Muse AI by DB-robot" line under the settings list; the pages in Vietnamese and a Language page |
+| `esp32/components/muse/muse_settings.c`, `muse_settings.h`, `muse_app.c`, `muse_ble.c` | The language setting: kept in NVS, applied at startup, set with the `lang` setup command |
+| `esp32/components/muse/muse_text.c`, `muse_text.h`, `muse_chat_text.c` | Vietnamese letters kept in Vietnamese and made plain in English; the transcript's tail counted in characters |
+| `esp32/components/muse/muse_state.c`, `muse_state.h`, `muse_input.c`, `muse_voice.c`, `muse_keypad.c` | Captions and keys in the screen's language |
+| `esp32/components/muse/muse_chat_session.cpp` | Sends each reply to `muse_tts.c` and plays the speech it fetches |
+| `esp32/simulator/CMakeLists.txt`, `src/main.c`, `README.md` | Build the Vietnamese texts and fonts; a `--lang` option |
+| `esp32/tools/muse/ble_setup.html` | A Language setting |
 | `esp32/tools/muse/board.sh`, `ports.py`, `avatar.py` | Add the `s3lcd`, `ostb` and `lcd28` board aliases |
 
 ## 3. Sources used for the board ports
@@ -173,6 +194,11 @@ The simulator's LVGL and SDL are listed in
 - **The Muse service.** Pairing a gadget needs an SDK token and is governed by
   the [Gadget SDK Terms](https://gadgets.muse.ai/sdk-terms), not by this
   repository's license.
+- **Google's text-to-speech.** Spoken replies come from the address behind
+  Google Translate's "listen" button (`translate.google.com/translate_tts`).
+  It is not a published API and nothing here gives a right to use it: Google's
+  terms apply, Google can change or block it at any time, and the text of each
+  spoken reply is sent to Google. `CONFIG_MUSE_TTS_GOOGLE=n` builds without it.
 - **Warranty.** Everything here is provided "as is". Flashing firmware can
   brick a board.
 

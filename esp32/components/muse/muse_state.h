@@ -12,6 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modified by ledienbien-ai (2026): captions in the screen's language (muse_lang.h).
  */
 
 #pragma once
@@ -59,6 +61,8 @@ float muse_state_progress(void);
 /* Room for a page of reply text; longer captions are cut short. */
 #define MUSE_CAPTION_MAX 400
 
+/* A caption the code writes in English is shown in the screen's language if
+ * muse_lang.h has it, whether it's the format or what the format makes. */
 void muse_state_set_caption(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 /* Copies the caption if it changed since *version; returns true on change. */
 bool muse_state_caption(char *out, size_t out_len, uint32_t *version);

@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
+<!-- Modified by ledienbien-ai (2026): the --lang option. -->
 
 # UI simulator
 
@@ -173,6 +174,9 @@ display as a binary PPM image:
   --run-ms 250 \
   --screenshot thinking.ppm
 ```
+
+Add `--lang vi` to draw the screen in Vietnamese (`--lang en`, the default,
+is English), as a board set to it in Settings > Language would.
 
 Supported scenario keys are:
 

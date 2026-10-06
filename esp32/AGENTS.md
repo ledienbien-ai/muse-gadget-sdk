@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-<!-- Modified by ledienbien-ai (2026): added the Waveshare ESP32-S3-Touch-LCD-1.85C, the OSTB-3ST and the LCDWIKI 2.8inch ESP32-S3 Display. -->
+<!-- Modified by ledienbien-ai (2026): added the Waveshare ESP32-S3-Touch-LCD-1.85C, the OSTB-3ST and the LCDWIKI 2.8inch ESP32-S3 Display; screen text in two languages. -->
 
 # AGENTS.md
 
@@ -444,6 +444,29 @@ Users never see the name Hatch.
 - Some older identifiers still carry the name (`muse_hatch_*`,
   `MUSE_HATCH_*`, `CONFIG_MUSE_HATCH`). Leave them unless you're asked to
   rename them. Don't copy the name into new code.
+
+## Screen text comes in two languages
+
+A board with the full UI shows its screen in English or Vietnamese
+(`muse_settings_lang()`, picked in Settings > Language or with the `lang` setup
+command; a new one takes a restart, since the screen is built once).
+
+- Write on-screen text in English, as before, and add its Vietnamese to the
+  table in `components/muse/muse_lang.c`. `muse_tr()` looks it up by the exact
+  English string, so a format keeps its conversions in the same order.
+  `tests/test_muse_lang.py` checks that, and that the Vietnamese uses only
+  letters the fonts have.
+- A caption passed to `muse_state_set_caption()` is translated there. In
+  `muse_ui.c` and `muse_settings_ui.c`, wrap a fixed text in `T()`; the
+  settings helpers `page()`, `note()`, `button()`, `switch_row()`, `slider()`
+  and `info_row()` do it themselves, and `row()` doesn't, because it also
+  shows network names.
+- Take fonts from `muse_fonts.h` (`muse_font(20)`, `muse_font_pixel()`), not
+  `&lv_font_montserrat_20`: LVGL's own stop at ASCII. Vietnamese lines are
+  taller, so check a changed layout in both languages with the simulator's
+  `--lang vi`.
+- A screen under 200 px (the compact layout) and the button menu
+  (`muse_menu.c`) stay in English.
 
 ## Tests
 

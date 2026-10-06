@@ -13,7 +13,8 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License.
+ * limitations under the License. *
+ * Modified by ledienbien-ai (2026): the --lang option.
  */
 
 #include <SDL.h>
@@ -31,6 +32,7 @@
 #include "lvgl.h"
 #include "src/drivers/sdl/lv_sdl_window.h"
 
+#include "muse_lang.h"
 #include "muse_state.h"
 #include "muse_ui.h"
 #include "sim_board.h"
@@ -57,7 +59,7 @@ static void usage(FILE *out, const char *argv0)
 {
     fprintf(out,
             "Usage: %s [--headless] [--scenario FILE] [--run-ms N] "
-            "[--screenshot FILE.ppm]\n"
+            "[--screenshot FILE.ppm] [--lang en|vi]\n"
             "\n"
             "Scenario lines are key=value. Supported keys:\n"
             "  face=boot|idle|listening|thinking|speaking|error|off|happy\n"
@@ -473,6 +475,7 @@ int main(int argc, char **argv)
     const char *screenshot = NULL;
     uint32_t run_ms = 1000;
     bool headless = false;
+    muse_lang_t lang = MUSE_LANG_EN;
     for (int i = 1; i < argc; i++) {
         if (!strcmp(argv[i], "--headless")) {
             headless = true;
@@ -487,6 +490,11 @@ int main(int argc, char **argv)
                 return 2;
             }
             run_ms = (uint32_t)value;
+        } else if (!strcmp(argv[i], "--lang") && i + 1 < argc) {
+            if (!muse_lang_from_code(argv[++i], &lang)) {
+                fprintf(stderr, "invalid --lang value\n");
+                return 2;
+            }
         } else if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
             usage(stdout, argv[0]);
             return 0;
@@ -507,6 +515,7 @@ int main(int argc, char **argv)
     sim_time_reset();
     sim_services_reset();
     lv_init();
+    muse_lang_set(lang);   /* before the screen is built, as muse_app.c does */
     muse_state_init();
     muse_state_set_power(&s_power);
     muse_board = sim_board_get();

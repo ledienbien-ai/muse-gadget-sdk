@@ -12,6 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modified by ledienbien-ai (2026): the transcript's tail is counted in characters.
  */
 
 /* Shared by both chat backends: the voice note's encoding, and reply and
@@ -78,22 +80,30 @@ size_t muse_hatch_base64(const uint8_t *in, size_t n, char *out)
 /* Last CAPTION_CHARS characters of `src`, starting on a word boundary when possible. */
 void muse_hatch_tail_words(const char *src, char *out, size_t cap)
 {
-    size_t len = strlen(src);
-    const char *p = src;
-    if (len > CAPTION_CHARS) {
-        p = src + len - CAPTION_CHARS;
+    /* Characters, not bytes: a Vietnamese letter takes two or three. */
+    const char *p = src + strlen(src);
+    for (int chars = 0; p > src && chars < CAPTION_CHARS;) {
+        p--;
+        chars += (*p & 0xC0) != 0x80;
+    }
+    if (p > src) {
         const char *sp = strchr(p, ' ');
         if (sp && sp[1] && sp - p < 12) {
             p = sp + 1;
-        }
-        while ((*p & 0xC0) == 0x80) {
-            p++;
         }
     }
     while (*p == ' ') {
         p++;
     }
-    strlcpy(out, p, cap);
+    size_t n = strlcpy(out, p, cap);
+    if (cap && n >= cap) {
+        /* Cut short: not in the middle of a character. */
+        n = cap - 1;
+        while (n && (p[n] & 0xC0) == 0x80) {
+            n--;
+        }
+        out[n] = '\0';
+    }
 }
 
 /*

@@ -12,6 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modified by ledienbien-ai (2026): captions in the screen's language (muse_lang.h).
  */
 
 #include "muse_state.h"
@@ -25,6 +27,7 @@
 #include "freertos/event_groups.h"
 #include "freertos/semphr.h"
 
+#include "muse_lang.h"
 #include "muse_text.h"
 
 #define HAPPY_SECS 1.6f
@@ -113,8 +116,13 @@ void muse_state_set_caption(const char *fmt, ...)
     xSemaphoreTake(s_format_lock, portMAX_DELAY);
     va_list ap;
     va_start(ap, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, ap);
+    vsnprintf(buf, sizeof(buf), muse_tr(fmt), ap);
     va_end(ap);
+    /* A fixed caption that came as "%s" and its text, such as why a turn failed. */
+    const char *shown = muse_tr(buf);
+    if (shown != buf) {
+        strlcpy(buf, shown, sizeof(buf));
+    }
     muse_text_to_ascii(buf, sizeof(buf));   /* replies have curly quotes and dashes */
 
     portENTER_CRITICAL(&s_lock);

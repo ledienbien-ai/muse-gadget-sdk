@@ -13,7 +13,9 @@
 # limitations under the License.
 #
 # Modified by ledienbien-ai (2026): added the Waveshare ESP32-S3-Touch-LCD-1.85C,
-# the OSTB-3ST, the LCDWIKI 2.8inch ESP32-S3 Display and the startup logo.
+# the OSTB-3ST, the LCDWIKI 2.8inch ESP32-S3 Display, the startup logo, the
+# Vietnamese screen (muse_lang.c, muse_fonts.c, fonts/) and spoken replies
+# (muse_tts.c).
 
 # Muse: the voice companion UI that runs beside Home Link on boards with a
 # display (CONFIG_MUSE_BOARD_*). Link-only builds register an empty component,
@@ -41,6 +43,13 @@ if(CONFIG_MUSE_ENABLED)
         "muse_settings.c"
         "muse_settings_ui.c"
         "muse_text.c"
+        "muse_lang.c"
+        "muse_fonts.c"
+        "fonts/muse_font_montserrat_vi_14.c"
+        "fonts/muse_font_montserrat_vi_16.c"
+        "fonts/muse_font_montserrat_vi_20.c"
+        "fonts/muse_font_mono_vi_16.c"
+        "fonts/muse_font_mono_vi_20.c"
         "muse_keypad.c"
         "muse_lv_mem.c"
         "muse_link.c"
@@ -48,6 +57,9 @@ if(CONFIG_MUSE_ENABLED)
     if(CONFIG_MUSE_HATCH)
         list(APPEND srcs "muse_chat.c" "muse_account_api.c" "muse_chat_session.cpp")
         list(APPEND embed "test_reply.mp3")   # muse_hatch_mp3_selftest
+        if(CONFIG_MUSE_TTS_GOOGLE)
+            list(APPEND srcs "muse_tts.c" "muse_tts_text.c")   # replies spoken
+        endif()
     else()
         list(APPEND srcs "muse_chat_link.c")   # text replies over Link's session
     endif()

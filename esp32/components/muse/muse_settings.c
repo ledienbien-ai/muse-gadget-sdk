@@ -12,6 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modified by ledienbien-ai (2026): the language setting.
  */
 
 #include "muse_settings.h"
@@ -19,6 +21,7 @@
 #include <string.h>
 
 #include "esp_log.h"
+#include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #include "nvs.h"
@@ -39,6 +42,7 @@ static struct {
     uint16_t sleep_s;
     bool wifi_on;
     bool ble_on;
+    uint8_t lang;
     char ssid[MUSE_SSID_MAX + 1];
     char pass[MUSE_PASS_MAX + 1];
     char host[MUSE_HOST_MAX + 1];
@@ -51,6 +55,9 @@ static struct {
     .brightness = 100,
     .sleep_s = 120,
     .wifi_on = true,
+#if CONFIG_MUSE_LANG_DEFAULT_VI
+    .lang = MUSE_LANG_VI,
+#endif
     .host = DEFAULT_HOST,
 };
 
@@ -127,6 +134,7 @@ esp_err_t muse_settings_init(void)
     if (nvs_get_u8(s_nvs, "ble_on", &b) == ESP_OK) {
         s.ble_on = b;
     }
+    load_u8("lang", &s.lang);
     load_str("ssid", s.ssid, sizeof(s.ssid));
     load_str("pass", s.pass, sizeof(s.pass));
     load_str("host", s.host, sizeof(s.host));
@@ -136,9 +144,13 @@ esp_err_t muse_settings_init(void)
     s.volume = clampi(s.volume, 0, 100);
     s.mic_gain = clampi(s.mic_gain, 0, MUSE_MIC_GAIN_MAX);
     s.brightness = clampi(s.brightness, 10, 100);
-    ESP_LOGI(TAG, "vol %d%s, mic %d dB, bright %d, sleep %ds, wifi %s (%s), ble %s, muse %s",
+    if (s.lang >= MUSE_LANG_COUNT) {
+        s.lang = MUSE_LANG_EN;
+    }
+    ESP_LOGI(TAG, "vol %d%s, mic %d dB, bright %d, sleep %ds, wifi %s (%s), ble %s, muse %s, language %s",
              s.volume, s.speaker_on ? "" : " (speaker off)", s.mic_gain, s.brightness, s.sleep_s, s.wifi_on ? "on" : "off",
-             "network saved by Link", s.ble_on ? "on" : "off", s.token[0] ? "token set" : "no token");
+             "network saved by Link", s.ble_on ? "on" : "off", s.token[0] ? "token set" : "no token",
+             muse_lang_code((muse_lang_t)s.lang));
     return ESP_OK;
 }
 
@@ -154,6 +166,7 @@ int muse_settings_brightness(void) { return s.brightness; }
 int muse_settings_sleep_s(void) { return s.sleep_s; }
 bool muse_settings_wifi_on(void) { return s.wifi_on; }
 bool muse_settings_ble_on(void) { return s.ble_on; }
+muse_lang_t muse_settings_lang(void) { return (muse_lang_t)s.lang; }
 
 /* Home Link owns the saved networks (this is the first); the local copy is only a fallback. */
 void muse_settings_wifi(char ssid[MUSE_SSID_MAX + 1], char pass[MUSE_PASS_MAX + 1])
@@ -239,6 +252,12 @@ void muse_settings_set_ble_on(bool on)
     s.ble_on = on;
     save_u8("ble_on", on);
     notify(MUSE_SETTING_BLE);
+}
+
+void muse_settings_set_lang(muse_lang_t lang)
+{
+    s.lang = lang < MUSE_LANG_COUNT ? lang : MUSE_LANG_EN;
+    save_u8("lang", s.lang);
 }
 
 void muse_settings_set_wifi(const char *ssid, const char *pass)

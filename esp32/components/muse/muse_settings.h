@@ -12,6 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modified by ledienbien-ai (2026): the language setting.
  */
 
 #pragma once
@@ -22,10 +24,13 @@
 
 #include "esp_err.h"
 
+#include "muse_lang.h"
+
 /*
  * User settings, persisted in NVS. Setters save immediately and then notify the
  * change listener (from the caller's task), which applies the setting to the
  * hardware. Brightness, auto-sleep and the speaker are polled where they're used.
+ * The language is read once at startup, so changing it takes a restart.
  */
 
 #define MUSE_SSID_MAX 32
@@ -59,6 +64,7 @@ int muse_settings_brightness(void);     /* 10..100 */
 int muse_settings_sleep_s(void);        /* 0 = never */
 bool muse_settings_wifi_on(void);
 bool muse_settings_ble_on(void);
+muse_lang_t muse_settings_lang(void);    /* the screen's, and the voice's for replies not in Vietnamese */
 
 void muse_settings_wifi(char ssid[MUSE_SSID_MAX + 1], char pass[MUSE_PASS_MAX + 1]);
 void muse_settings_hatch_host(char out[MUSE_HOST_MAX + 1]);
@@ -73,6 +79,8 @@ void muse_settings_set_brightness(int pct);
 void muse_settings_set_sleep_s(int secs);
 void muse_settings_set_wifi_on(bool on);
 void muse_settings_set_ble_on(bool on);
+/* Saved now; the screen changes at the next start. */
+void muse_settings_set_lang(muse_lang_t lang);
 /* A network name is remembered first among the saved ones and joined now;
  * an empty ssid forgets every saved network. */
 void muse_settings_set_wifi(const char *ssid, const char *pass);

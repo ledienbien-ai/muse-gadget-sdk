@@ -12,6 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modified by ledienbien-ai (2026): the screen's language is set at startup.
  */
 
 #include "esp_heap_caps.h"
@@ -26,6 +28,7 @@
 #include "muse_ble.h"
 #include "muse_chat.h"
 #include "muse_input.h"
+#include "muse_lang.h"
 #include "muse_settings.h"
 #include "muse_state.h"
 #include "muse_ui.h"
@@ -67,6 +70,10 @@ void muse_app_run(const muse_board_t *board)
     ESP_ERROR_CHECK(board->init());
     ESP_ERROR_CHECK(muse_settings_init());
     muse_settings_set_listener(on_setting);
+    /* The screen's language, before anything is written on it. The compact
+     * layout's fonts stop at ASCII, so a screen under 200 px stays in English. */
+    bool compact = board->width < 200 || board->height < 200;
+    muse_lang_set(compact ? MUSE_LANG_EN : muse_settings_lang());
     muse_state_init();
     muse_battery_init();
     muse_state_set_caption("WAKING UP...");

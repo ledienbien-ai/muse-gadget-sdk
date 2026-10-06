@@ -13,6 +13,8 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
+
+  Modified by ledienbien-ai (2026): the Language setting.
 -->
 <!--
   Muse phone setup over Bluetooth LE (Web Bluetooth).
@@ -107,6 +109,10 @@
         <option value="0">Never</option><option value="30">30 seconds</option><option value="60">1 minute</option>
         <option value="120">2 minutes</option><option value="300">5 minutes</option><option value="600">10 minutes</option>
       </select>
+      <label for="lang">Language <span class="dim">(of the screen; Muse restarts to change it)</span></label>
+      <select id="lang">
+        <option value="en">English</option><option value="vi">Tiếng Việt</option>
+      </select>
     </section>
   </fieldset>
 
@@ -156,6 +162,7 @@ async function refresh() {
   setRange('mic', s.mic_gain, v => `${v} dB`);
   setRange('bright', s.brightness, v => `${v}%`);
   $('sleep').value = String(s.sleep);
+  if (s.lang) $('lang').value = s.lang;   // firmware without the setting leaves it out
 }
 
 function setRange(id, v, fmt) {
@@ -229,6 +236,7 @@ for (const [id, cmd, fmt] of [['volume', 'volume', v => `${v}%`], ['mic', 'mic_g
 }
 $('speaker').onchange = () => send('speaker', $('speaker').checked ? 1 : 0);
 $('sleep').onchange = () => send('sleep', $('sleep').value);
+$('lang').onchange = () => send('lang', $('lang').value);
 
 // Keep Wi-Fi/Muse state fresh while connected.
 setInterval(() => { if (device?.gatt.connected && !$('controls').disabled) refresh().catch(() => {}); }, 3000);

@@ -60,6 +60,43 @@ ESP32 Device SDK 增加上游尚未支持的 ESP32-S3 开发板，SDK 的其余�
 名字。上游支持的开发板仍然保留，见
 [`esp32/devices/README.md`](esp32/devices/README.md)（英文）。
 
+## 越南语界面与语音回复
+
+上面三块开发板的界面增加了两项功能。
+
+<p align="center">
+  <img src="doc/image/vietnamese-ui.png" width="720" alt="模拟器绘制的 360×360 越南语界面：就绪、正在朗读回复、关闭扬声器时的回复、错误、设置、语言页面、声音页面和配对码">
+</p>
+
+**越南语或英语界面。** 开发板默认以越南语启动。从 Muse 向左滑动，打开
+**Settings > Language**（Cài đặt > Ngôn ngữ），选择 **English** 或
+**Tiếng Việt**；Muse 会重启并切换到所选语言，之后一直保留。没有触摸屏的板子，
+可通过串口发送 `>lang=en` 或 `>lang=vi`，或在
+[`esp32/tools/muse/ble_setup.html`](esp32/tools/muse/ble_setup.html) 页面上选择。
+越南语界面下，回复和你说的话会带声调符号显示；英语界面下则不带，因为英语字体
+没有这些字母。
+
+**朗读回复。** Muse 以文本回复设备。扬声器打开时，开发板把每条回复发送到
+Google 翻译的文本转语音，并播放返回的音频，字幕随语音滚动：回复是越南语时用
+越南语语音，否则用界面语言的语音。扬声器关闭时（长按主界面上的扬声器按钮，或
+Settings > Sound），回复只以文字显示，不发送任何内容。
+
+> 语音来自 Google 翻译“朗读”按钮背后的地址。它不需要密钥，但不是公开发布的
+> 服务：Google 随时可能更改、限制或屏蔽它，而且每条被朗读的回复文本都会发送给
+> Google。它没有响应时，回复会像以前一样以文字显示。用
+> `CONFIG_MUSE_TTS_GOOGLE=n` 构建可去掉此功能，或在
+> [`muse_tts.c`](esp32/components/muse/muse_tts.c) 中接入你自己的服务。
+> `CONFIG_MUSE_LANG_DEFAULT_VI=n` 让开发板以英语启动。
+
+**状态：** 可用 ESP-IDF v6.0.1 构建。两种语言的界面已在模拟器中检查，从电脑访问
+语音地址可得到 MP3。尚未在真实开发板上运行。
+
+代码：[`muse_lang.c`](esp32/components/muse/muse_lang.c)（界面文字），
+[`muse_fonts.c`](esp32/components/muse/muse_fonts.c) 和
+[`fonts/`](esp32/components/muse/fonts)（越南语字母），
+[`muse_tts.c`](esp32/components/muse/muse_tts.c) 和
+[`muse_tts_text.c`](esp32/components/muse/muse_tts_text.c)（语音）。
+
 ## Waveshare ESP32-S3-Touch-LCD-1.85C
 
 <p align="center">

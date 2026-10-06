@@ -12,10 +12,13 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modified by ledienbien-ai (2026): the Vietnamese letters, kept or made plain.
  */
 
 #pragma once
 
+#include <stdbool.h>
 #include <stddef.h>
 
 #ifdef __cplusplus
@@ -27,7 +30,14 @@ extern "C" {
  * Montserrat's symbols. Text from elsewhere (replies, network names) gets
  * ASCII stand-ins for what they lack: curly quotes become straight ones, an em
  * dash "--", accented letters their plain ones. Emoji go; anything else stays.
+ *
+ * With the screen in Vietnamese its fonts have the Vietnamese letters too
+ * (muse_fonts.h), so those are kept as they are.
  */
+
+/* Whether the Vietnamese letters stay (the fonts have them) or become plain
+ * ones. Off to begin with. */
+void muse_text_keep_vietnamese(bool keep);
 
 /* The stand-in for the UTF-8 character at s into out, and its length (0 drops
  * the character); -1 to keep it. *len is the character's length in bytes. */

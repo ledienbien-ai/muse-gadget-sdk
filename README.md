@@ -62,6 +62,47 @@ The name is what `tools/muse/board.sh` calls the board; the profile names its
 build settings and build directory. The boards upstream supports are still
 here, listed in [`esp32/devices/README.md`](esp32/devices/README.md).
 
+## Vietnamese screen and spoken replies
+
+The three boards above add two things to the on-screen UI.
+
+<p align="center">
+  <img src="doc/image/vietnamese-ui.png" width="720" alt="The UI in Vietnamese at 360×360, drawn by the simulator: ready, a reply being spoken, a reply read with the speaker off, an error, settings, the Language page, the Sound page and the pairing code">
+</p>
+
+**A screen in Vietnamese or English.** The boards start in Vietnamese. Swipe
+left from Muse and open **Settings > Language** (Cài đặt > Ngôn ngữ) to pick
+**English** or **Tiếng Việt**; Muse restarts into it and keeps the choice. On
+a board without touch, send `>lang=en` or `>lang=vi` on the serial console, or
+pick it on [`esp32/tools/muse/ble_setup.html`](esp32/tools/muse/ble_setup.html).
+In Vietnamese, replies and the words you spoke are shown with their accents. In
+English they're shown without them, since the English fonts have none.
+
+**Replies read aloud.** Muse answers gadgets in text. With the speaker on, the
+board sends each reply to Google Translate's text-to-speech and plays what
+comes back while the captions follow it: in a Vietnamese voice when the reply
+is written in Vietnamese, otherwise in the voice of the screen's language. With
+the speaker off (hold the speaker button on the face, or Settings > Sound),
+replies are shown as text and nothing is sent.
+
+> The voice comes from the address behind the "listen" button of Google
+> Translate. It needs no key, but it isn't a published service: Google can
+> change, limit or block it at any time, and the text of every spoken reply
+> goes to Google. When it doesn't answer, the reply is shown as text, as before.
+> Build with `CONFIG_MUSE_TTS_GOOGLE=n` to leave it out, or put a service of
+> your own in [`muse_tts.c`](esp32/components/muse/muse_tts.c).
+> `CONFIG_MUSE_LANG_DEFAULT_VI=n` makes a board start in English.
+
+**Status:** builds with ESP-IDF v6.0.1. The screens are checked in the
+simulator in both languages, and the speech address answers with MP3 from a PC.
+Not run on a real board yet.
+
+Code: [`muse_lang.c`](esp32/components/muse/muse_lang.c) (the texts),
+[`muse_fonts.c`](esp32/components/muse/muse_fonts.c) and
+[`fonts/`](esp32/components/muse/fonts) (Vietnamese letters),
+[`muse_tts.c`](esp32/components/muse/muse_tts.c) and
+[`muse_tts_text.c`](esp32/components/muse/muse_tts_text.c) (speech).
+
 ## Waveshare ESP32-S3-Touch-LCD-1.85C
 
 <p align="center">

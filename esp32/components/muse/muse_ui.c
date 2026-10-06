@@ -16,7 +16,8 @@
  * Modified by ledienbien-ai (2026): on round screens smaller than 412 px, the speaker
  * button sits under the state word (for the Waveshare ESP32-S3-Touch-LCD-1.85C); on a
  * rectangular screen under 300 px tall, a smaller Muse and a bar in place of the ring
- * (for the OSTB-3ST); a logo while starting up (CONFIG_MUSE_BOOT_LOGO).
+ * (for the OSTB-3ST); a logo while starting up (CONFIG_MUSE_BOOT_LOGO); the screen
+ * in Vietnamese (muse_lang.h), in fonts with its letters (muse_fonts.h).
  */
 
 #include "muse_ui.h"
@@ -40,6 +41,8 @@
 #include "muse_board.h"
 #include "muse_chat.h"
 #include "muse_console.h"
+#include "muse_fonts.h"
+#include "muse_lang.h"
 #include "muse_link.h"
 #include "muse_mem.h"
 #include "muse_menu.h"
@@ -58,9 +61,11 @@ static const char *TAG = "muse_ui";
 #define METER_SEG_PX 9
 #define METER_GAP_PX 4
 #define RING_RANGE 1000
-#define CAPTION_W 256           /* 16 columns of unscii_16, the width reply captions wrap to */
+#define CAPTION_W 256           /* 16 columns of unscii_16, the width reply captions wrap to in English */
+#define T(s) muse_tr(s)          /* the text in the screen's language */
 #define CAPTION_LINE_SPACE 2
 #define ART_BLANK_ROWS 3        /* Muse's art never reaches the grid's bottom rows */
+#define ART_TOP_SPARE_ROWS 5    /* and only its sparkles and rings reach the top ones */
 #define MINI_CELL_PX 2          /* Muse's grid cells over a reply that's read */
 #define ANSWER_MS 300           /* Muse making room for a reply, and back */
 #define SPEAKER_PX 64
@@ -93,6 +98,12 @@ static bool s_small;
 static bool s_tall;         /* compact, with room above and below Muse (StickS3) */
 static bool s_short;        /* full layout on a rectangle under 300 px tall: no ring, a smaller Muse */
 static int s_canvas_px;     /* Muse's size on screen */
+/* The full layout's column font (muse_fonts.h) and what follows from it. */
+static const lv_font_t *s_px_font;
+static int s_cap_w;         /* the width captions wrap to */
+static int s_line_space;    /* the gap between a caption's lines */
+static int s_state_h;       /* the state word's height */
+static int s_state_space;   /* and its letter spacing */
 static int s_dy;            /* full layout: offset from a 466 px tall screen */
 static lv_indev_t *s_indev;
 static lv_obj_t *s_tv;
@@ -448,6 +459,16 @@ static void on_canvas_clicked(lv_event_t *e)
     muse_state_make_happy();
 }
 
+/* The gadget's own name under the state word. Under the taller Vietnamese
+ * word there's less room before Muse, and the name is ASCII: a smaller font. */
+static const lv_font_t *name_font(void)
+{
+    if (s_small) {
+        return &lv_font_unscii_8;
+    }
+    return muse_lang() == MUSE_LANG_VI ? muse_font(14) : s_px_font;
+}
+
 static const lv_font_t *font_pick(const lv_font_t *full, const lv_font_t *compact)
 {
     return s_small ? compact : full;
@@ -639,7 +660,7 @@ static void set_reply_box(answer_layout_t *l, int cols, int lines, int top, int 
     l->cols = cols;
     l->lines = lines;
     l->w = cols * cw;
-    l->h = lines * pitch - CAPTION_LINE_SPACE;
+    l->h = lines * pitch - s_line_space;
     l->top = top;
 }
 
@@ -674,26 +695,33 @@ static void build_answer(lv_obj_t *face, int ring_in)
     int spk_r = (SPEAKER_PX + SPEAKER_GROW_PX) / 2;
     int spk_x = -s_w / 2 + 8 + spk_r, spk_y = -s_h / 2 + 8 + spk_r;
     /* The longest state word is nine characters of unscii_16 with its letter
-     * spacing. A rectangle too narrow to fit the button beside it puts the
-     * button just under it. */
-    int state_half_w = 9 * (lv_font_get_glyph_width(&lv_font_unscii_16, 'M', ' ') + 2) / 2;
+     * spacing (in Vietnamese, fourteen of a narrower font). A rectangle too
+     * narrow to fit the button beside it puts the button just under it. */
+    int state_chars = muse_lang() == MUSE_LANG_VI ? 14 : 9;
+    int state_half_w = state_chars * (lv_font_get_glyph_width(s_px_font, 'M', ' ') + s_state_space) / 2;
     if (!muse_board->round && s_w / 2 - state_half_w < 8 + 2 * spk_r) {
-        spk_y = 40 + s_dy + 16 - s_h / 2 + 4 + spk_r;
+        spk_y = 40 + s_dy + s_state_h - s_h / 2 + 4 + spk_r;
     }
     if (muse_board->round) {
         spk_y = -ring_in * 5 / 8;
         /* On a circle smaller than the Watcher's, a button that high sits on
          * the ends of the longer state words: it goes just under them. */
-        int state_bottom = 40 + s_dy + 16 - s_h / 2;
+        int state_bottom = 40 + s_dy + s_state_h - s_h / 2;
         if (s_h < 412 && spk_y - spk_r < state_bottom + 4) {
             spk_y = state_bottom + 4 + spk_r;
         }
         int d = ring_in - spk_r - 4;   /* just inside the ring, even when swollen */
         spk_x = -(int)sqrtf((float)(d * d - spk_y * spk_y));
     }
-    const lv_font_t *font = &lv_font_unscii_16;
+    const lv_font_t *font = s_px_font;
     int cw = lv_font_get_glyph_width(font, 'M', ' ');
-    int pitch = lv_font_get_line_height(font) + CAPTION_LINE_SPACE;
+    int pitch = lv_font_get_line_height(font) + s_line_space;
+    /* The pages are sized in pixels, counted in columns of unscii_16 (16 px):
+     * a narrower font gets more columns in the same room. */
+    int min_cols = 12 * 16 / cw, max_cols = 24 * 16 / cw;
+    /* A third of the caption spare for characters wider than a byte; half
+     * where most words have one, as in Vietnamese. */
+    int page_chars = muse_lang() == MUSE_LANG_VI ? MUSE_CAPTION_MAX / 2 : MUSE_CAPTION_MAX * 2 / 3;
 
     answer_layout_t *l = &s_answers[ANSWER_HEARD];
     int cell = s_canvas_px / MUSE_PX_W - 1;
@@ -702,10 +730,10 @@ static void build_answer(lv_obj_t *face, int ring_in)
     l->y = s_big_y;
     l->align = LV_TEXT_ALIGN_CENTER;
     int lines = s_short ? 2 : 3;   /* a third line would push Muse up into the state word */
-    int h = lines * pitch - CAPTION_LINE_SPACE;
+    int h = lines * pitch - s_line_space;
     int art_bottom = l->y + l->px / 2 - ART_BLANK_ROWS * cell;
-    set_reply_box(l, CAPTION_W / cw, lines, reply_bottom(CAPTION_W, ring_in) - h, cw, pitch);
-    for (int c = 24; c > l->cols; c--) {   /* wider if it still clears Muse */
+    set_reply_box(l, s_cap_w / cw, lines, reply_bottom(s_cap_w, ring_in) - h, cw, pitch);
+    for (int c = max_cols; c > l->cols; c--) {   /* wider if it still clears Muse */
         int top = reply_bottom(c * cw, ring_in) - h;
         if (top >= art_bottom + 6 && fits_across(c * cw, top, ring_in)) {
             set_reply_box(l, c, lines, top, cw, pitch);
@@ -723,12 +751,11 @@ static void build_answer(lv_obj_t *face, int ring_in)
     l->align = LV_TEXT_ALIGN_LEFT;
     art_bottom = l->y + l->px / 2 - ART_BLANK_ROWS * MINI_CELL_PX;
     int top = (art_bottom > spk_y + spk_r ? art_bottom : spk_y + spk_r) + 8;
-    set_reply_box(l, 16, 2, top, cw, pitch);
+    set_reply_box(l, s_cap_w / cw, 2, top, cw, pitch);
     /* The widest page isn't the biggest: a round screen narrows towards the bottom. */
-    for (int c = 12; c <= 24 && fits_across(c * cw, top, ring_in); c++) {
-        int n = (reply_bottom(c * cw, ring_in) - top + CAPTION_LINE_SPACE) / pitch;
-        /* A third of the caption spare for characters wider than a byte. */
-        while ((c + 1) * n > MUSE_CAPTION_MAX * 2 / 3) {
+    for (int c = min_cols; c <= max_cols && fits_across(c * cw, top, ring_in); c++) {
+        int n = (reply_bottom(c * cw, ring_in) - top + s_line_space) / pitch;
+        while ((c + 1) * n > page_chars) {
             n--;
         }
         if (c * n > l->cols * l->lines) {
@@ -739,7 +766,7 @@ static void build_answer(lv_obj_t *face, int ring_in)
              s_answers[ANSWER_HEARD].lines, l->cols, l->lines);
 
     s_reply_lbl = make_label(face, font, COLOR_CAPTION);
-    lv_obj_set_style_text_line_space(s_reply_lbl, CAPTION_LINE_SPACE, 0);
+    lv_obj_set_style_text_line_space(s_reply_lbl, s_line_space, 0);
     /* Pages come wrapped to fit; the transcript while thinking doesn't. */
     lv_label_set_long_mode(s_reply_lbl, LV_LABEL_LONG_MODE_WRAP);
     lv_obj_remove_flag(s_reply_lbl, LV_OBJ_FLAG_SCROLLABLE);
@@ -843,10 +870,10 @@ static void build_screen(void)
      * whose blank bottom rows can tuck in behind the meter.
      */
     int ring_in = (s_w < s_h ? s_w : s_h) / 2 - 10;   /* the ring's inner edge */
-    int cap_h = 2 * lv_font_get_line_height(&lv_font_unscii_16) + CAPTION_LINE_SPACE;
+    int cap_h = 2 * lv_font_get_line_height(s_px_font) + s_line_space;
     int cap_bottom = 179;                              /* a 466 px circle's; fine for rectangles */
     if (muse_board->round) {
-        cap_bottom = (int)sqrtf((float)(ring_in * ring_in - CAPTION_W * CAPTION_W / 4)) - 3;
+        cap_bottom = (int)sqrtf((float)(ring_in * ring_in - s_cap_w * s_cap_w / 4)) - 3;
     } else if (cap_bottom > short_cap_bottom()) {
         cap_bottom = short_cap_bottom();               /* a short rectangle: above the page dots */
     }
@@ -880,12 +907,13 @@ static void build_screen(void)
     lv_obj_align(status, LV_ALIGN_TOP_MID, 0, s_small ? 1 : 20 + s_dy);
     s_wifi_icon = make_label(status, &lv_font_montserrat_14, COLOR_DIM);
     s_ble_icon = make_label(status, &lv_font_montserrat_14, COLOR_DIM);
-    s_power_lbl = make_label(status, &lv_font_unscii_8, COLOR_DIM);
+    /* unscii_8 has no Vietnamese letters, and 8 px is no room for their accents. */
+    s_power_lbl = make_label(status, muse_lang() == MUSE_LANG_VI ? muse_font(14) : &lv_font_unscii_8, COLOR_DIM);
 
     /* The compact layout leaves the state to the avatar and the caption,
      * unless the screen is tall enough to fit it in small type above Muse. */
-    s_state_lbl = make_label(face, s_small ? &lv_font_unscii_8 : &lv_font_unscii_16, 0xffffff);
-    lv_obj_set_style_text_letter_space(s_state_lbl, s_small ? 1 : 2, 0);
+    s_state_lbl = make_label(face, s_small ? &lv_font_unscii_8 : s_px_font, 0xffffff);
+    lv_obj_set_style_text_letter_space(s_state_lbl, s_small ? 1 : s_state_space, 0);
     lv_obj_align(s_state_lbl, LV_ALIGN_TOP_MID, 0, s_small ? 22 : 40 + s_dy);
     lv_obj_set_flag(s_state_lbl, LV_OBJ_FLAG_HIDDEN, s_small && !s_tall);
 
@@ -893,13 +921,13 @@ static void build_screen(void)
      * more than one on the bench, the screen says which one to pick in the
      * Muse app. update_chrome() fills it in, shortens it to the hex tail on a
      * screen too narrow for the whole thing, and empties it once paired. */
-    s_name_lbl = make_label(face, s_small ? &lv_font_unscii_8 : &lv_font_unscii_16, COLOR_DIM);
-    lv_obj_align(s_name_lbl, LV_ALIGN_TOP_MID, 0, s_small ? 32 : 60 + s_dy);
+    s_name_lbl = make_label(face, name_font(), COLOR_DIM);
+    lv_obj_align(s_name_lbl, LV_ALIGN_TOP_MID, 0, s_small ? 32 : 40 + s_dy + s_state_h + (s_state_h > 16 ? 0 : 4));
     /* Same rule as the state label: a square 128 px screen centres Muse over
      * these rows, so there's nowhere to put this without covering the face. */
     lv_obj_set_flag(s_name_lbl, LV_OBJ_FLAG_HIDDEN, s_small && !s_tall);
 
-    s_caption_lbl = make_label(face, font_pick(&lv_font_unscii_16, &lv_font_unscii_8), COLOR_CAPTION);
+    s_caption_lbl = make_label(face, font_pick(s_px_font, &lv_font_unscii_8), COLOR_CAPTION);
     if (s_small) {
         /* Two lines over the bottom of the face, on a dark band so they stay
          * legible. A tall screen has room to keep them above the mic icon. */
@@ -919,8 +947,8 @@ static void build_screen(void)
         return;
     }
     /* Fixed height: a longer caption ends in dots rather than growing into the ring. */
-    lv_obj_set_size(s_caption_lbl, CAPTION_W, cap_h);
-    lv_obj_set_style_text_line_space(s_caption_lbl, CAPTION_LINE_SPACE, 0);
+    lv_obj_set_size(s_caption_lbl, s_cap_w, cap_h);
+    lv_obj_set_style_text_line_space(s_caption_lbl, s_line_space, 0);
     lv_label_set_long_mode(s_caption_lbl, LV_LABEL_LONG_MODE_DOTS);
     lv_obj_align(s_caption_lbl, LV_ALIGN_CENTER, 0, cap_top + cap_h / 2);
 
@@ -1083,12 +1111,12 @@ static void build_overlays(void)
     lv_obj_set_style_border_width(s_pair, 2, 0);
     lv_obj_remove_flag(s_pair, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_flag(s_pair, LV_OBJ_FLAG_HIDDEN);
-    s_pair_title = make_label(s_pair, font_pick(&lv_font_montserrat_20, FONT_COMPACT), COLOR_LIT);
-    lv_label_set_text(s_pair_title, "Pairing code");
+    s_pair_title = make_label(s_pair, font_pick(muse_font(20), FONT_COMPACT), COLOR_LIT);
+    lv_label_set_text(s_pair_title, T("Pairing code"));
     s_pair_code = make_label(s_pair, font_pick(&lv_font_montserrat_28, &lv_font_montserrat_20), COLOR_ACCENT);
     lv_obj_set_style_text_letter_space(s_pair_code, s_small ? 2 : 6, 0);
-    s_pair_hint = make_label(s_pair, font_pick(&lv_font_montserrat_14, FONT_COMPACT), COLOR_DIM);
-    lv_label_set_text(s_pair_hint, s_small ? "Enter on phone" : "Enter it on your phone");
+    s_pair_hint = make_label(s_pair, font_pick(muse_font(14), FONT_COMPACT), COLOR_DIM);
+    lv_label_set_text(s_pair_hint, s_small ? "Enter on phone" : T("Enter it on your phone"));
     /* Wraps: "bottom right button" is wider than the AIPI's card. */
     lv_obj_set_width(s_pair_hint, lv_pct(100));
     lv_label_set_long_mode(s_pair_hint, LV_LABEL_LONG_MODE_WRAP);
@@ -1267,8 +1295,7 @@ static void update_chrome(float now)
      * read layout unhides it on the way out. A narrow screen gets the hex tail
      * on its own, which is the part that differs between two of them, rather
      * than a head that ends in dots before it gets there. */
-    const lv_font_t *name_font = s_small ? &lv_font_unscii_8 : &lv_font_unscii_16;
-    int name_cw = lv_font_get_glyph_width(name_font, 'M', ' ');
+    int name_cw = lv_font_get_glyph_width(name_font(), 'M', ' ');
     const char *shown = paired ? "" : b.name;
     if (name_cw > 0 && (int)strlen(shown) * name_cw > s_w) {
         const char *tail = strrchr(shown, '-');
@@ -1283,15 +1310,19 @@ static void update_chrome(float now)
     /* The same card asks for the talk button when the Muse app pairs. */
     bool confirm = !b.passkey && muse_link_state() == MUSE_LINK_CONFIRM;
     if (b.passkey || confirm) {
-        char code[24], hint[40];
+        char code[24], hint[48];
         if (confirm) {
-            strlcpy(code, s_small ? "Press" : "Press button", sizeof(code));
-            snprintf(hint, sizeof(hint), s_small ? "%s button" : "Press the %s button", muse_board->talk_button);
+            strlcpy(code, s_small ? "Press" : T("Press button"), sizeof(code));
+            if (s_small) {
+                snprintf(hint, sizeof(hint), "%s button", muse_board->talk_button);
+            } else {
+                snprintf(hint, sizeof(hint), T("Press the %s button"), muse_board->talk_button);
+            }
         } else {
             snprintf(code, sizeof(code), "%06lu", (unsigned long)b.passkey);
-            strlcpy(hint, s_small ? "Enter on phone" : "Enter it on your phone", sizeof(hint));
+            strlcpy(hint, s_small ? "Enter on phone" : T("Enter it on your phone"), sizeof(hint));
         }
-        const char *title = confirm ? (s_small ? "Muse app" : "Pair with Muse app") : "Pairing code";
+        const char *title = confirm ? (s_small ? "Muse app" : T("Pair with Muse app")) : T("Pairing code");
         if (strcmp(code, lv_label_get_text(s_pair_code)) != 0) {
             lv_label_set_text(s_pair_code, code);
             lv_label_set_text(s_pair_title, title);
@@ -1353,13 +1384,13 @@ static void update_power(float now)
     muse_power_t p = muse_state_power();
     char buf[32];
     if (p.battery_pct < 0) {
-        strlcpy(buf, p.usb ? (s_small ? "USB" : "USB POWER") : "", sizeof(buf));
+        strlcpy(buf, p.usb ? (s_small ? "USB" : T("USB POWER")) : "", sizeof(buf));
     } else if (s_small) {
         snprintf(buf, sizeof(buf), "%s%d%%", p.charging ? "+" : "", p.battery_pct);
     } else if (p.charging) {
-        snprintf(buf, sizeof(buf), "CHARGING %d%%", p.battery_pct);
+        snprintf(buf, sizeof(buf), T("CHARGING %d%%"), p.battery_pct);
     } else {
-        snprintf(buf, sizeof(buf), "BATTERY %d%%", p.battery_pct);
+        snprintf(buf, sizeof(buf), T("BATTERY %d%%"), p.battery_pct);
     }
     if (strcmp(buf, lv_label_get_text(s_power_lbl)) != 0) {
         lv_label_set_text(s_power_lbl, buf);
@@ -1372,7 +1403,7 @@ static void update_status(muse_mode_t mode, float now)
     const char *name = mode == MUSE_MODE_IDLE ? s_idle_name : MODE_NAMES[mode];
 
     if (name != s_shown_name) {
-        lv_label_set_text(s_state_lbl, name);
+        lv_label_set_text(s_state_lbl, T(name));
         s_shown_name = name;
     }
     if ((int)mode != s_shown_state) {
@@ -1565,6 +1596,27 @@ esp_err_t muse_ui_start(void)
     s_h = muse_board->height;
     s_small = s_h < 200 || s_w < 200;
     s_tall = s_small && s_h >= s_w + 64;
+    if (s_small) {
+        muse_lang_set(MUSE_LANG_EN);   /* the compact layout's fonts stop at ASCII */
+    }
+    bool vietnamese = muse_lang() == MUSE_LANG_VI;
+    /* Too short for the full layout as it stands (see s_short below). */
+    bool short_screen = !s_small && !muse_board->round && 20 + (s_h - 466) / 2 < 1;
+    muse_fonts_init(vietnamese, short_screen);
+    s_px_font = muse_font_pixel();
+    /* unscii_16's letters fill 16 px and sit 2 px apart; the Vietnamese font's
+     * lines are taller for the accents, and its letters carry their own gaps. */
+    s_state_h = vietnamese ? lv_font_get_line_height(s_px_font) : 16;
+    s_state_space = vietnamese ? 1 : 2;
+    /* The taller lines would push the captions' top up into Muse. On a round
+     * screen, three columns narrower lets them sit as much lower in the circle. */
+    s_cap_w = CAPTION_W;
+    s_line_space = CAPTION_LINE_SPACE;
+    if (vietnamese) {
+        int cw = lv_font_get_glyph_width(s_px_font, 'M', ' ');
+        s_cap_w = (CAPTION_W / cw - (muse_board->round ? 3 : 0)) * cw;
+        s_line_space = 0;   /* the room for accents already keeps its lines apart */
+    }
     /* Small screens keep room for the status line and button icons. A narrow
      * one is as wide as Muse gets, in whole pixels. */
     s_canvas_px = s_small ? s_h * 3 / 4 : MUSE_PX_W * 5;
@@ -1585,10 +1637,15 @@ esp_err_t muse_ui_start(void)
          * and the level meter over the captions. */
         s_short = true;
         s_dy = 1 - 20;
-        int cap_h = 2 * lv_font_get_line_height(&lv_font_unscii_16) + CAPTION_LINE_SPACE;
+        int cap_h = 2 * lv_font_get_line_height(s_px_font) + s_line_space;
         int art_bottom = short_cap_bottom() - cap_h - 6 - METER_SEG_PX / 2 - METER_SEG_PX / 2 - 4;
-        int room = s_h / 2 + art_bottom - (40 + s_dy + 16);
-        int cell = room / (MUSE_PX_H - ART_BLANK_ROWS);
+        int room = s_h / 2 + art_bottom - (40 + s_dy + s_state_h);
+        /* The taller Vietnamese lines, even in the smaller font, would leave
+         * room for a Muse half the size. Its top rows hold only the odd
+         * sparkle, so those may sit under the state word, which is drawn over
+         * them. */
+        int rows = MUSE_PX_H - ART_BLANK_ROWS - (vietnamese ? ART_TOP_SPARE_ROWS : 0);
+        int cell = room / rows;
         cell = cell < 1 ? 1 : cell;
         if (cell * MUSE_PX_W < s_canvas_px) {
             s_canvas_px = cell * MUSE_PX_W;

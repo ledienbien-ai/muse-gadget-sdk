@@ -63,6 +63,47 @@ ESP32 Device SDK がまだ対応していない ESP32-S3 ボードを追加し�
 ビルドディレクトリの名前です。上流が対応しているボードもそのまま残っていて、
 [`esp32/devices/README.md`](esp32/devices/README.md)（英語）に一覧があります。
 
+## ベトナム語の画面と音声での返答
+
+上の 3 つのボードでは、画面の UI に 2 つの機能が加わっています。
+
+<p align="center">
+  <img src="doc/image/vietnamese-ui.png" width="720" alt="シミュレーターで描いた 360×360 のベトナム語 UI：待機、返答の読み上げ中、スピーカーをオフにしたときの返答、エラー、設定、言語ページ、サウンドページ、ペアリングコード">
+</p>
+
+**ベトナム語または英語の画面。** ボードはベトナム語で起動します。Muse から左に
+スワイプして **Settings > Language**（Cài đặt > Ngôn ngữ）を開き、**English**
+か **Tiếng Việt** を選びます。Muse は再起動してその言語に切り替わり、選択は保存
+されます。タッチのないボードでは、シリアルコンソールで `>lang=en` か `>lang=vi`
+を送るか、[`esp32/tools/muse/ble_setup.html`](esp32/tools/muse/ble_setup.html)
+で選びます。ベトナム語では、返答と話した言葉が声調記号付きで表示されます。英語
+では記号なしで表示されます。英語用のフォントにその文字がないためです。
+
+**返答の読み上げ。** Muse はガジェットにテキストで返答します。スピーカーがオンの
+とき、ボードは返答を Google 翻訳のテキスト読み上げに送り、返ってきた音声を再生
+し、字幕がそれに合わせて進みます。返答がベトナム語で書かれていればベトナム語の
+声、そうでなければ画面の言語の声です。スピーカーがオフのとき（メイン画面の
+スピーカーボタンを長押し、または Settings > Sound）は、返答は文字で表示される
+だけで、何も送信されません。
+
+> 音声は Google 翻訳の「聞く」ボタンの裏にあるアドレスから取得します。キーは
+> 不要ですが、公開されたサービスではありません。Google はいつでも変更、制限、
+> 遮断でき、読み上げる返答のテキストはすべて Google に送られます。応答がない
+> ときは、これまでどおり文字で表示されます。`CONFIG_MUSE_TTS_GOOGLE=n` で
+> ビルドすればこの機能を外せます。独自のサービスを使うなら
+> [`muse_tts.c`](esp32/components/muse/muse_tts.c) に組み込みます。
+> `CONFIG_MUSE_LANG_DEFAULT_VI=n` でボードは英語で起動します。
+
+**状態：** ESP-IDF v6.0.1 でビルドできます。画面は両方の言語でシミュレーターで
+確認済みで、音声のアドレスは PC からの要求に MP3 を返します。実機ではまだ動かして
+いません。
+
+コード：[`muse_lang.c`](esp32/components/muse/muse_lang.c)（画面の文言）、
+[`muse_fonts.c`](esp32/components/muse/muse_fonts.c) と
+[`fonts/`](esp32/components/muse/fonts)（ベトナム語の文字）、
+[`muse_tts.c`](esp32/components/muse/muse_tts.c) と
+[`muse_tts_text.c`](esp32/components/muse/muse_tts_text.c)（音声）。
+
 ## Waveshare ESP32-S3-Touch-LCD-1.85C
 
 <p align="center">
