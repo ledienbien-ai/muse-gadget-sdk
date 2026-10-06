@@ -50,7 +50,7 @@ ESP32 Device SDK 增加上游尚未支持的 ESP32-S3 开发板，SDK 的其余�
 每块板子都运行完整的屏幕界面：动态头像、按住说话、触摸设置，以及显示 Muse 发来
 的图片。
 
-| 开发板 | 屏幕 | 名称 | Profile | 状态 |
+| 开发板 | 屏幕 | 名称 | Profile | 固件 |
 |---|---|---|---|---|
 | [Waveshare ESP32-S3-Touch-LCD-1.85C](#waveshare-esp32-s3-touch-lcd-185c) | 1.85 英寸圆形 360×360，触摸 | `s3lcd` | `waveshare-s3-185c` | 在线烧录固件：https://dbrobot.vn/firmware.html |
 | [OSTB-3ST](#ostb-3st) | 1.83 英寸 296×240，触摸 | `ostb` | `ostb-3st` | 在线烧录固件：https://dbrobot.vn/firmware.html |
@@ -60,6 +60,9 @@ ESP32 Device SDK 增加上游尚未支持的 ESP32-S3 开发板，SDK 的其余�
 名称是 `tools/muse/board.sh` 对开发板的叫法；profile 是它的编译配置和编译目录的
 名字。上游支持的开发板仍然保留，见
 [`esp32/devices/README.md`](esp32/devices/README.md)（英文）。
+
+在你的开发板上遇到问题？请在本仓库的
+[Issues](https://github.com/ledienbien-ai/muse-gadget-sdk/issues) 中反馈。
 
 ## 越南语界面与语音回复
 
@@ -89,9 +92,6 @@ Settings > Sound），回复只以文字显示，不发送任何内容。
 > [`muse_tts.c`](esp32/components/muse/muse_tts.c) 中接入你自己的服务。
 > `CONFIG_MUSE_LANG_DEFAULT_VI=n` 让开发板以英语启动。
 
-**状态：** 可用 ESP-IDF v6.0.1 构建。两种语言的界面已在模拟器中检查，从电脑访问
-语音地址可得到 MP3。尚未在真实开发板上运行。
-
 代码：[`muse_lang.c`](esp32/components/muse/muse_lang.c)（界面文字），
 [`muse_fonts.c`](esp32/components/muse/muse_fonts.c) 和
 [`fonts/`](esp32/components/muse/fonts)（越南语字母），
@@ -119,10 +119,6 @@ Settings > Sound），回复只以文字显示，不发送任何内容。
 | 电池 | 通过 GPIO8 上的分压电路测量电压 |
 
 同一个固件支持两种音频版本：启动时会检测是否存在 ES8311。
-
-**状态：** 可以用 ESP-IDF v6.0.1 编译通过，并已烧录到实物上：能启动并显示界面。
-尚未在这块板子上试过与 Muse 对话；V2 音频部分是参照 Waveshare 的示例代码编写的，
-没有 V2 板可供测试。
 
 已知限制：BOOT 是唯一的按键，所以屏幕按定时器熄屏，关机在 Settings 的 Power
 页面里（开发板进入深度睡眠，按 BOOT 唤醒；真正断电要用拨动开关）。充电芯片的状态
@@ -156,11 +152,6 @@ Settings > Sound），回复只以文字显示，不发送任何内容。
 | 按键 | 位于顶部。**+**（音量加）：按住说话。**−**（音量减）：短按息屏，长按关机。中间的按键没有用到 |
 | 电池 | 按原固件的 ADC 表换算电量，另有充电状态引脚 |
 
-**状态：** 可用 ESP-IDF v6.0.1 编译，尚未在实物上运行。引脚、屏幕初始化表和
-显示方向都来自该固件的源码，没有文档可以核对。如果画面旋转或镜像，或者触摸
-位置不对，请修改开发板代码文件开头的 `LCD_MADCTL`，或 `TP_SWAP_XY`、
-`TP_MIRROR_X` 和 `TP_MIRROR_Y`。
-
 已知限制：4G 模块和 LED 没有用到。电池只显示电量，不显示电压。关机是拉高开发板
 的关机引脚；接着 USB 时开发板可能不会断电，屏幕保持熄灭，按 + 键后重新启动。
 电池充满后，只有连着电脑时开发板才知道自己接着 USB 电源。
@@ -190,11 +181,6 @@ Settings > Sound），回复只以文字显示，不发送任何内容。
 | 音频 | ES8311 编解码器，一个麦克风，FM8002E 功放 |
 | 按键 | BOOT：按住说话 |
 | 电池 | 按原固件的 ADC 范围换算电量，接在 GPIO9 |
-
-**状态：** 可用 ESP-IDF v6.0.1 编译，尚未在实物上运行。引脚来自
-[LCDWIKI 的页面](https://www.lcdwiki.com/2.8inch_ESP32-S3_Display)和该开发板的 xiaozhi-esp32 文件；触摸面板的方向和 40 MHz 的
-SPI 上限采用 [esphome-es3c28p-light-panel](https://github.com/jvduuren/esphome-es3c28p-light-panel) 在实物上测得的结果。如果触摸位置
-不对，请修改开发板代码文件开头的 `TP_SWAP_XY`、`TP_MIRROR_X` 和 `TP_MIRROR_Y`。
 
 已知限制：BOOT 是唯一的按键，所以屏幕按定时器熄屏，关机在 Settings 的 Power
 页面里（开发板进入深度睡眠，按 BOOT 唤醒）。ES3N28P 没有触摸，又只有一个按键，
@@ -232,14 +218,6 @@ SPI 上限采用 [esphome-es3c28p-light-panel](https://github.com/jvduuren/espho
 | 音频 | ES8311 编解码器，NS4150B 功放，ES7210 接两个麦克风（使用其中一个） |
 | 按键 | BOOT，在背面磁吸连接器旁；外壳下的触摸片（v1.2 两个，v1.0 一个）：按住任意一个说话 |
 | 电池 | BQ27220 电量计：电量、电压和充电状态 |
-
-**状态：** 可用 ESP-IDF v6.0.1 构建。尚未在开发板上运行。v1.2 的引脚以及显示屏、
-触摸和编解码器的初始化，取自乐鑫自己的
-[板级支持包](https://github.com/espressif/esp-bsp/tree/master/bsp/esp_vocat)
-和这块板的 xiaozhi-esp32 文件；v1.0 的引脚只来自 xiaozhi 文件，因此 v1.0 的把握
-较小。触摸片按乐鑫支持包的方式配置，读数上升 1.5 % 即视为触摸；实物上手的触摸
-会让读数变化多少还没有测过，所以这个数值（板级文件里的 `PAD_THRESH`）可能需要
-调整。日志会给出每次触摸的读数。
 
 已知限制：BOOT 是固件能读取的唯一按键，所以屏幕按定时器熄屏，在 Settings 的 Power
 页面关机只是让开发板进入深度睡眠，按 BOOT 唤醒；真正断电要用板上的电源键。触摸片

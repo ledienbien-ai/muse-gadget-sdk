@@ -53,7 +53,7 @@ biến có thể làm hỏng bo và mất bảo hành. Bạn tự chịu rủi r
 Mỗi bo chạy đầy đủ giao diện trên màn hình: avatar động, nhấn giữ để nói, cài
 đặt bằng cảm ứng và hiển thị ảnh do Muse gửi.
 
-| Bo | Màn hình | Tên | Profile | Tình trạng |
+| Bo | Màn hình | Tên | Profile | Firmware |
 |---|---|---|---|---|
 | [Waveshare ESP32-S3-Touch-LCD-1.85C](#waveshare-esp32-s3-touch-lcd-185c) | Tròn 1,85" 360×360, cảm ứng | `s3lcd` | `waveshare-s3-185c` | Nạp firmware online tại: https://dbrobot.vn/firmware.html |
 | [OSTB-3ST](#ostb-3st) | 1,83" 296×240, cảm ứng | `ostb` | `ostb-3st` | Nạp firmware online tại: https://dbrobot.vn/firmware.html |
@@ -63,6 +63,9 @@ Mỗi bo chạy đầy đủ giao diện trên màn hình: avatar động, nhấ
 Tên là cách `tools/muse/board.sh` gọi bo; profile là tên của cấu hình build và
 thư mục build. Các bo mà bản gốc hỗ trợ vẫn còn nguyên, liệt kê trong
 [`esp32/devices/README.md`](esp32/devices/README.md) (tiếng Anh).
+
+Gặp lỗi trên bo của bạn? Hãy báo trong mục
+[Issues](https://github.com/ledienbien-ai/muse-gadget-sdk/issues) của repo này.
 
 ## Màn hình tiếng Việt và trả lời bằng giọng nói
 
@@ -96,10 +99,6 @@ hiện chữ và không có gì được gửi đi.
 > dịch vụ của riêng bạn vào [`muse_tts.c`](esp32/components/muse/muse_tts.c).
 > `CONFIG_MUSE_LANG_DEFAULT_VI=n` cho bo khởi động bằng tiếng Anh.
 
-**Tình trạng:** biên dịch được với ESP-IDF v6.0.1. Giao diện đã kiểm tra trên
-trình mô phỏng ở cả hai ngôn ngữ, và địa chỉ đọc giọng nói trả về MP3 khi gọi
-từ máy tính. Chưa chạy trên bo thật.
-
 Mã nguồn: [`muse_lang.c`](esp32/components/muse/muse_lang.c) (các câu chữ),
 [`muse_fonts.c`](esp32/components/muse/muse_fonts.c) và
 [`fonts/`](esp32/components/muse/fonts) (chữ tiếng Việt),
@@ -128,10 +127,6 @@ Mã nguồn: [`muse_lang.c`](esp32/components/muse/muse_lang.c) (các câu chữ
 
 Một firmware dùng cho cả hai phiên bản âm thanh: lúc khởi động nó dò xem có
 ES8311 hay không.
-
-**Tình trạng:** biên dịch được với ESP-IDF v6.0.1 và đã nạp lên bo thật: bo
-khởi động và hiện giao diện. Chưa thử trò chuyện với Muse trên bo này, và đường
-âm thanh V2 được viết theo mã mẫu của Waveshare khi chưa có bo V2 để thử.
 
 Giới hạn đã biết: BOOT là nút duy nhất, nên màn hình tự tắt theo hẹn giờ và
 việc tắt máy nằm ở trang Power trong Settings (bo vào deep sleep cho tới khi
@@ -166,12 +161,6 @@ Giao diện được bố trí cho màn ngang 296×240.
 | Phím | Nằm ở cạnh trên. **+** (tăng âm lượng): giữ để nói. **−** (giảm âm lượng): bấm để tắt màn hình, giữ để tắt nguồn. Phím ở giữa không được dùng |
 | Pin | Mức pin theo bảng ADC của firmware gốc, và chân trạng thái của mạch sạc |
 
-**Tình trạng:** biên dịch được với ESP-IDF v6.0.1. Chưa chạy trên bo thật.
-Chân, bảng khởi tạo và hướng của màn hình lấy từ mã nguồn firmware đó, không có
-tài liệu nào để đối chiếu. Nếu hình bị xoay hay lật, hoặc cảm ứng lệch chỗ, hãy
-sửa `LCD_MADCTL` hoặc `TP_SWAP_XY`, `TP_MIRROR_X` và `TP_MIRROR_Y` ở đầu file
-mã của bo.
-
 Giới hạn đã biết: modem 4G và đèn LED không được dùng. Pin chỉ hiện mức, không
 hiện điện áp. Tắt nguồn là kéo chân tắt nguồn của bo; khi cắm USB bo có thể vẫn
 chạy, màn hình tắt cho đến khi bấm phím +. Khi pin đã đầy, bo chỉ biết mình
@@ -202,12 +191,6 @@ dùng cho cả hai: lúc khởi động nó dò xem có chip cảm ứng hay kh�
 | Âm thanh | Codec ES8311 với một micro, ampli loa FM8002E |
 | Nút | BOOT: nhấn giữ để nói |
 | Pin | Mức pin theo dải ADC của firmware gốc, trên GPIO9 |
-
-**Tình trạng:** biên dịch được với ESP-IDF v6.0.1. Chưa chạy trên bo thật.
-Chân lấy từ [trang của LCDWIKI](https://www.lcdwiki.com/2.8inch_ESP32-S3_Display) và các file xiaozhi-esp32 của bo; hướng
-của tấm cảm ứng và giới hạn SPI 40 MHz lấy theo kết quả đo trên bo thật trong
-[esphome-es3c28p-light-panel](https://github.com/jvduuren/esphome-es3c28p-light-panel). Nếu cảm ứng lệch chỗ, hãy sửa `TP_SWAP_XY`,
-`TP_MIRROR_X` và `TP_MIRROR_Y` ở đầu file mã của bo.
 
 Giới hạn đã biết: BOOT là nút duy nhất, nên màn hình tự tắt theo hẹn giờ và
 việc tắt máy nằm ở trang Power trong Settings (bo vào deep sleep cho tới khi
@@ -248,15 +231,6 @@ firmware dùng cho cả hai: nó tự nhận phiên bản lúc khởi động v�
 | Âm thanh | Codec ES8311, ampli loa NS4150B, ES7210 với hai micro (dùng một) |
 | Nút | BOOT, ở mặt sau cạnh đầu nối nam châm, và các miếng cảm ứng dưới vỏ (v1.2 có hai, v1.0 có một): giữ cái nào cũng để nói |
 | Pin | IC đo pin BQ27220: mức pin, điện áp và trạng thái sạc |
-
-**Tình trạng:** biên dịch được với ESP-IDF v6.0.1. Chưa chạy trên bo thật. Các
-chân của v1.2 và cách khởi tạo màn hình, cảm ứng, codec lấy theo
-[gói hỗ trợ bo](https://github.com/espressif/esp-bsp/tree/master/bsp/esp_vocat)
-của chính Espressif và các file xiaozhi-esp32 của bo; các chân của v1.0 chỉ dựa
-vào file xiaozhi, nên v1.0 là bản kém chắc chắn hơn. Các miếng cảm ứng được
-cấu hình theo gói của Espressif, và tính là đang chạm khi số đọc tăng 1,5 %;
-trên bo thật bàn tay làm số đọc đổi bao nhiêu thì chưa đo, nên có thể phải chỉnh
-con số đó (`PAD_THRESH` trong file của bo). Log ghi số đọc của mỗi lần chạm.
 
 Giới hạn đã biết: BOOT là phím duy nhất firmware đọc được, nên màn hình tắt theo
 hẹn giờ, và "tắt nguồn" ở trang Power trong Settings chỉ đưa bo vào ngủ sâu cho

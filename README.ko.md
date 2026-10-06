@@ -52,7 +52,7 @@ Muse gadget은 직접 만드는 오픈 소스 기기입니다. 시중에서 파�
 모든 보드가 화면 UI 전체를 실행합니다. 움직이는 아바타, 눌러서 말하기, 터치로
 하는 설정, Muse가 보내는 이미지 표시입니다.
 
-| 보드 | 화면 | 이름 | 프로필 | 상태 |
+| 보드 | 화면 | 이름 | 프로필 | 펌웨어 |
 |---|---|---|---|---|
 | [Waveshare ESP32-S3-Touch-LCD-1.85C](#waveshare-esp32-s3-touch-lcd-185c) | 1.85인치 원형 360×360, 터치 | `s3lcd` | `waveshare-s3-185c` | 펌웨어 온라인 플래시: https://dbrobot.vn/firmware.html |
 | [OSTB-3ST](#ostb-3st) | 1.83인치 296×240, 터치 | `ostb` | `ostb-3st` | 펌웨어 온라인 플래시: https://dbrobot.vn/firmware.html |
@@ -62,6 +62,9 @@ Muse gadget은 직접 만드는 오픈 소스 기기입니다. 시중에서 파�
 이름은 `tools/muse/board.sh`가 보드를 부르는 이름이고, 프로필은 빌드 설정과
 빌드 디렉터리의 이름입니다. 업스트림이 지원하는 보드도 그대로 남아 있으며,
 [`esp32/devices/README.md`](esp32/devices/README.md)(영어)에 정리되어 있습니다.
+
+보드에서 문제가 생기면 이 저장소의
+[Issues](https://github.com/ledienbien-ai/muse-gadget-sdk/issues)에 알려 주세요.
 
 ## 베트남어 화면과 음성 응답
 
@@ -94,10 +97,6 @@ Muse gadget은 직접 만드는 오픈 소스 기기입니다. 시중에서 파�
 > [`muse_tts.c`](esp32/components/muse/muse_tts.c)에 넣으면 됩니다.
 > `CONFIG_MUSE_LANG_DEFAULT_VI=n`이면 보드가 영어로 시작합니다.
 
-**상태:** ESP-IDF v6.0.1로 빌드됩니다. 화면은 두 언어 모두 시뮬레이터에서
-확인했고, 음성 주소는 PC에서 요청하면 MP3를 돌려줍니다. 실제 보드에서는 아직
-실행하지 않았습니다.
-
 코드: [`muse_lang.c`](esp32/components/muse/muse_lang.c)(화면 문구),
 [`muse_fonts.c`](esp32/components/muse/muse_fonts.c)와
 [`fonts/`](esp32/components/muse/fonts)(베트남어 글자),
@@ -126,10 +125,6 @@ Muse gadget은 직접 만드는 오픈 소스 기기입니다. 시중에서 파�
 
 펌웨어 하나로 두 오디오 버전을 모두 지원합니다. 부팅할 때 ES8311이 있는지
 확인합니다.
-
-**상태:** ESP-IDF v6.0.1로 빌드되며, 실제 보드에 플래시해서 부팅되고 UI가
-표시되는 것을 확인했습니다. 이 보드에서 Muse와의 대화는 아직 해 보지 않았으며,
-V2 오디오 부분은 V2 보드 없이 Waveshare의 예제 코드를 바탕으로 작성했습니다.
 
 알려진 제한: 버튼이 BOOT 하나뿐이어서 화면은 타이머에 따라 꺼지고, 전원 끄기는
 Settings의 Power 페이지에 있습니다(보드는 딥 슬립에 들어가며 BOOT를 누르면
@@ -165,12 +160,6 @@ Settings의 Power 페이지에 있습니다(보드는 딥 슬립에 들어가며
 | 키 | 윗면에 있습니다. **+**(볼륨 +): 누르고 있는 동안 말하기. **−**(볼륨 −): 누르면 화면 끄기, 길게 누르면 전원 끄기. 가운데 키는 쓰지 않습니다 |
 | 배터리 | 원래 펌웨어의 ADC 표로 계산한 잔량과 충전 상태 핀 |
 
-**상태:** ESP-IDF v6.0.1로 빌드됩니다. 실제 보드에서는 아직 실행하지
-못했습니다. 핀, 패널 초기화 표와 화면 방향은 그 펌웨어의 소스에서 가져온
-것이며, 대조해 볼 문서가 없습니다. 화면이 돌아가거나 뒤집혀 나오거나 터치
-위치가 맞지 않으면 보드 코드 파일 맨 위의 `LCD_MADCTL` 또는 `TP_SWAP_XY`,
-`TP_MIRROR_X`, `TP_MIRROR_Y`를 바꾸세요.
-
 알려진 제한: 4G 모뎀과 LED는 쓰지 않습니다. 배터리는 잔량만 표시하고 전압은
 표시하지 않습니다. 전원 끄기는 보드의 전원 차단 핀을 구동합니다. USB 전원에서는
 보드가 꺼지지 않을 수 있으며, 그때는 + 키를 누를 때까지 화면이 꺼진 상태로
@@ -202,13 +191,6 @@ Settings의 Power 페이지에 있습니다(보드는 딥 슬립에 들어가며
 | 오디오 | ES8311 코덱과 마이크 1개, FM8002E 스피커 앰프 |
 | 버튼 | BOOT: 누르고 있는 동안 말하기 |
 | 배터리 | 원래 펌웨어의 ADC 범위로 계산한 잔량(GPIO9) |
-
-**상태:** ESP-IDF v6.0.1로 빌드됩니다. 실제 보드에서는 아직 실행하지
-못했습니다. 핀은 [LCDWIKI의 페이지](https://www.lcdwiki.com/2.8inch_ESP32-S3_Display)와 이 보드의 xiaozhi-esp32 파일에서
-가져왔고, 터치 패널의 방향과 SPI 40 MHz 한계는
-[esphome-es3c28p-light-panel](https://github.com/jvduuren/esphome-es3c28p-light-panel)이 실제 보드에서 측정한 결과를 따랐습니다.
-터치 위치가 맞지 않으면 보드 코드 파일 맨 위의 `TP_SWAP_XY`, `TP_MIRROR_X`,
-`TP_MIRROR_Y`를 바꾸세요.
 
 알려진 제한: 버튼이 BOOT 하나뿐이어서 화면은 타이머에 따라 꺼지고, 전원 끄기는
 Settings의 Power 페이지에 있습니다(보드는 딥 슬립에 들어가며 BOOT를 누르면
@@ -249,15 +231,6 @@ Espressif의 고양이 모양 음성 개발 키트로, ESP-VoCat이라는 이름
 | 오디오 | ES8311 코덱, NS4150B 스피커 앰프, ES7210과 마이크 2개(1개 사용) |
 | 버튼 | BOOT(뒷면, 자석 커넥터 옆)와 케이스 아래의 터치 패드(v1.2는 두 개, v1.0은 한 개): 어느 것이든 누르고 있는 동안 말하기 |
 | 배터리 | BQ27220 잔량 게이지: 잔량, 전압, 충전 상태 |
-
-**상태:** ESP-IDF v6.0.1로 빌드됩니다. 실제 보드에서는 아직 실행하지 않았습니다.
-v1.2의 핀과 디스플레이, 터치, 코덱 설정은 Espressif의
-[보드 지원 패키지](https://github.com/espressif/esp-bsp/tree/master/bsp/esp_vocat)와
-이 보드의 xiaozhi-esp32 파일을 따랐습니다. v1.0의 핀은 xiaozhi 파일에만 근거하므로
-v1.0 쪽이 덜 확실합니다. 터치 패드는 Espressif 패키지와 같은 설정이며, 읽은 값이
-1.5 % 올라가면 터치로 판정합니다. 실제 보드에서 손이 값을 얼마나 움직이는지는
-측정하지 않았으므로 이 값(보드 파일의 `PAD_THRESH`)은 조정이 필요할 수 있습니다.
-로그에 터치할 때마다 읽은 값이 나옵니다.
 
 알려진 제한: 펌웨어가 읽는 버튼은 BOOT 하나뿐이어서 화면은 타이머에 따라 꺼지고,
 Settings의 Power 페이지에서 전원을 끄면 보드는 딥 슬립에 들어갈 뿐이며 BOOT를

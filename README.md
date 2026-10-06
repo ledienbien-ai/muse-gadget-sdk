@@ -52,7 +52,7 @@ boards and void warranties. Proceed at your own risk!
 Each board runs the full on-screen UI: the animated avatar, push-to-talk,
 settings by touch, and images from Muse.
 
-| Board | Screen | Name | Profile | Status |
+| Board | Screen | Name | Profile | Firmware |
 |---|---|---|---|---|
 | [Waveshare ESP32-S3-Touch-LCD-1.85C](#waveshare-esp32-s3-touch-lcd-185c) | 1.85" round 360×360, touch | `s3lcd` | `waveshare-s3-185c` | Flash the firmware online at: https://dbrobot.vn/firmware.html |
 | [OSTB-3ST](#ostb-3st) | 1.83" 296×240, touch | `ostb` | `ostb-3st` | Flash the firmware online at: https://dbrobot.vn/firmware.html |
@@ -62,6 +62,9 @@ settings by touch, and images from Muse.
 The name is what `tools/muse/board.sh` calls the board; the profile names its
 build settings and build directory. The boards upstream supports are still
 here, listed in [`esp32/devices/README.md`](esp32/devices/README.md).
+
+Found a problem on your board? Please report it in this repository's
+[Issues](https://github.com/ledienbien-ai/muse-gadget-sdk/issues).
 
 ## Vietnamese screen and spoken replies
 
@@ -94,10 +97,6 @@ replies are shown as text and nothing is sent.
 > your own in [`muse_tts.c`](esp32/components/muse/muse_tts.c).
 > `CONFIG_MUSE_LANG_DEFAULT_VI=n` makes a board start in English.
 
-**Status:** builds with ESP-IDF v6.0.1. The screens are checked in the
-simulator in both languages, and the speech address answers with MP3 from a PC.
-Not run on a real board yet.
-
 Code: [`muse_lang.c`](esp32/components/muse/muse_lang.c) (the texts),
 [`muse_fonts.c`](esp32/components/muse/muse_fonts.c) and
 [`fonts/`](esp32/components/muse/fonts) (Vietnamese letters),
@@ -125,11 +124,6 @@ Code: [`muse_lang.c`](esp32/components/muse/muse_lang.c) (the texts),
 | Battery | Voltage through a divider on GPIO8 |
 
 One firmware serves both audio versions: it checks for the ES8311 at boot.
-
-**Status:** builds with ESP-IDF v6.0.1 and has been flashed on a board, where
-it boots and shows the UI. Talking to Muse hasn't been tried on it yet, and the
-V2 audio path is written from Waveshare's example code without a V2 board to
-try it on.
 
 Known limits: BOOT is the only button, so the screen sleeps on its timer and
 powering off is on the Power page in Settings (the board deep-sleeps until BOOT
@@ -164,12 +158,6 @@ Ported from the source of the board's xiaozhi-esp32 firmware
 | Keys | On the top edge. **+** (volume up): hold to talk. **−** (volume down): press to sleep the screen, hold to power off. The key between them isn't used |
 | Battery | Level from the firmware's ADC table, and the charger's status pin |
 
-**Status:** builds with ESP-IDF v6.0.1. It has not been run on the board. The
-pins, the panel's setup and its orientation come from that firmware's source,
-with no documentation to check them against. If the picture comes out rotated
-or mirrored, or touches land in the wrong place, change `LCD_MADCTL` or
-`TP_SWAP_XY`, `TP_MIRROR_X` and `TP_MIRROR_Y` at the top of the board's code.
-
 Known limits: the 4G modem and the LED aren't used. The battery shows a level
 but no voltage. Powering off drives the board's power-off pin; on USB power the
 board may stay up, with the screen off until the + key is pressed. Once
@@ -201,13 +189,6 @@ firmware serves both: it looks for the touch controller at boot.
 | Audio | ES8311 codec with one microphone, FM8002E speaker amp |
 | Button | BOOT: hold to talk |
 | Battery | Level from the board firmware's ADC range, on GPIO9 |
-
-**Status:** builds with ESP-IDF v6.0.1. It has not been run on the board. The
-pins come from [LCDWIKI's page](https://www.lcdwiki.com/2.8inch_ESP32-S3_Display) and the board's xiaozhi-esp32 files; the
-touch panel's orientation and the 40 MHz SPI limit are as measured on the
-board in [esphome-es3c28p-light-panel](https://github.com/jvduuren/esphome-es3c28p-light-panel). If touches land in the wrong
-place, change `TP_SWAP_XY`, `TP_MIRROR_X` and `TP_MIRROR_Y` at the top of the
-board's code.
 
 Known limits: BOOT is the only button, so the screen sleeps on its timer and
 powering off is on the Power page in Settings (the board deep-sleeps until BOOT
@@ -249,16 +230,6 @@ found.
 | Audio | ES8311 codec, NS4150B speaker amp, ES7210 with two microphones (one is used) |
 | Buttons | BOOT, on the back beside the magnetic connector, and the touch pads under the shell (two on v1.2, one on v1.0): hold either to talk |
 | Battery | BQ27220 gauge: level, voltage and charging |
-
-**Status:** builds with ESP-IDF v6.0.1. It has not been run on the board. The
-v1.2 pins and the display, touch and codec setup are those of Espressif's own
-[board support package](https://github.com/espressif/esp-bsp/tree/master/bsp/esp_vocat)
-and of the board's xiaozhi-esp32 files; the v1.0 pins come from the xiaozhi
-files alone, so v1.0 is the less certain of the two. The touch pads are set up
-as Espressif's package sets them up, and count as touched when their reading
-rises by 1.5 %; how far a hand moves it on a real board hasn't been measured,
-so that figure (`PAD_THRESH` in the board file) may need changing. The log
-gives each touch's reading.
 
 Known limits: BOOT is the only key the firmware reads, so the screen sleeps
 on its timer, and powering off on the Power page in Settings puts the board in
