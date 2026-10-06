@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 # Modified by ledienbien-ai (2026): added the Waveshare ESP32-S3-Touch-LCD-1.85C,
-# the OSTB-3ST and the LCDWIKI 2.8inch ESP32-S3 Display.
+# the OSTB-3ST, the LCDWIKI 2.8inch ESP32-S3 Display and the Espressif EchoEar.
 
 """Put your avatar on your board: ask Muse for it, build it and flash it.
 
@@ -66,13 +66,14 @@ BOARDS = {
     "Waveshare ESP32-S3-Touch-LCD-1.85C": "s3lcd",
     "OSTB-3ST": "ostb",
     "LCDWIKI 2.8inch ESP32-S3 Display": "lcd28",
+    "Espressif EchoEar": "echoear",
     "AIPI Lite": "aipi",
     "Waveshare ESP32-C6-Touch-AMOLED-1.8": "c6",
     "Seeed SenseCAP Watcher": "watcher",
     "M5Stack StickS3": "sticks3",
     "M5Stack StickC Plus2": "plus2",
 }
-CHAT_BOARDS = ("s3", "s3n", "s3lcd", "ostb", "lcd28", "aipi", "sticks3", "watcher")
+CHAT_BOARDS = ("s3", "s3n", "s3lcd", "ostb", "lcd28", "echoear", "aipi", "sticks3", "watcher")
 
 
 class Stop(Exception):

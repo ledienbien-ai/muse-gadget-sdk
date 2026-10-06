@@ -58,6 +58,7 @@ Mỗi bo chạy đầy đủ giao diện trên màn hình: avatar động, nhấ
 | [Waveshare ESP32-S3-Touch-LCD-1.85C](#waveshare-esp32-s3-touch-lcd-185c) | Tròn 1,85" 360×360, cảm ứng | `s3lcd` | `waveshare-s3-185c` | Nạp firmware online tại: https://dbrobot.vn/firmware.html |
 | [OSTB-3ST](#ostb-3st) | 1,83" 296×240, cảm ứng | `ostb` | `ostb-3st` | Nạp firmware online tại: https://dbrobot.vn/firmware.html |
 | [LCDWIKI 2.8inch ESP32-S3 Display](#lcdwiki-28inch-esp32-s3-display) | 2,8" 320×240, bản ES3C28P có cảm ứng | `lcd28` | `lcdwiki-s3-28` | Nạp firmware online tại: https://dbrobot.vn/firmware.html |
+| [Espressif EchoEar](#espressif-echoear) | Tròn 1,85" 360×360, cảm ứng | `echoear` | `echoear` | Nạp firmware online tại: https://dbrobot.vn/firmware.html |
 
 Tên là cách `tools/muse/board.sh` gọi bo; profile là tên của cấu hình build và
 thư mục build. Các bo mà bản gốc hỗ trợ vẫn còn nguyên, liệt kê trong
@@ -65,7 +66,7 @@ thư mục build. Các bo mà bản gốc hỗ trợ vẫn còn nguyên, liệt 
 
 ## Màn hình tiếng Việt và trả lời bằng giọng nói
 
-Ba bo ở trên có thêm hai thứ trong giao diện.
+Các bo ở trên có thêm hai thứ trong giao diện.
 
 <p align="center">
   <img src="doc/image/vietnamese-ui.png" width="720" alt="Giao diện tiếng Việt ở 360×360, vẽ bằng trình mô phỏng: sẵn sàng, đang đọc câu trả lời, câu trả lời khi tắt loa, báo lỗi, cài đặt, trang Ngôn ngữ, trang Âm thanh và mã ghép đôi">
@@ -219,6 +220,42 @@ thẻ SD và đèn LED RGB không được dùng.
 Mã của bo: [`board_lcdwiki_s3_28.c`](esp32/components/muse/boards/board_lcdwiki_s3_28.c),
 cấu hình build: [`sdkconfig.muse-lcdwiki-s3-28`](esp32/devices/sdkconfig.muse-lcdwiki-s3-28).
 
+## Espressif EchoEar
+
+<p align="center">
+  <img src="doc/image/echoear.png" width="720" alt="Giao diện Muse ở 360×360, vẽ bằng trình mô phỏng">
+</p>
+
+Bộ kit giọng nói hình chú mèo của Espressif, còn được bán với tên ESP-VoCat.
+Bo có hai phiên bản đang lưu hành, v1.0 và v1.2, khác nhau ở một số chân. Một
+firmware dùng cho cả hai: nó tự nhận phiên bản lúc khởi động và ghi vào log.
+
+| Thành phần | Chi tiết |
+|---|---|
+| Chip | ESP32-S3-WROOM-1-N16R16VA trên v1.2 (flash 16 MB), ESP32-S3-WROOM-2-N32R16V trên v1.0 (flash 32 MB); PSRAM 16 MB octal, USB gốc |
+| Màn hình | LCD tròn 1,85" 360×360 ST77916 qua QSPI, đèn nền PWM |
+| Cảm ứng | CST816S |
+| Âm thanh | Codec ES8311, ampli loa NS4150B, ES7210 với hai micro (dùng một) |
+| Nút | BOOT: giữ để nói |
+| Pin | IC đo pin BQ27220: mức pin, điện áp và trạng thái sạc |
+
+**Tình trạng:** biên dịch được với ESP-IDF v6.0.1. Chưa chạy trên bo thật. Các
+chân của v1.2 và cách khởi tạo màn hình, cảm ứng, codec lấy theo
+[gói hỗ trợ bo](https://github.com/espressif/esp-bsp/tree/master/bsp/esp_vocat)
+của chính Espressif và các file xiaozhi-esp32 của bo; các chân của v1.0 chỉ dựa
+vào file xiaozhi, nên v1.0 là bản kém chắc chắn hơn.
+
+Giới hạn đã biết: BOOT là nút duy nhất firmware đọc được, nên màn hình tắt theo
+hẹn giờ, và "tắt nguồn" ở trang Power trong Settings chỉ đưa bo vào ngủ sâu cho
+tới khi nhấn BOOT; muốn cắt nguồn thật thì dùng phím nguồn của bo. Hai miếng
+cảm ứng dưới vỏ, cảm biến chuyển động, khe thẻ SD và LED xanh chưa được dùng.
+IC đo pin chạy bằng chính viên pin, nên không gắn pin thì không có mức pin. Khi
+cắm vào cục sạc (không phải máy tính), bo chỉ hiện "đang sạc" trong lúc còn dòng
+chạy vào pin.
+
+Mã nguồn: [`board_echoear.c`](esp32/components/muse/boards/board_echoear.c),
+cấu hình build: [`sdkconfig.muse-echoear`](esp32/devices/sdkconfig.muse-echoear).
+
 ## Biên dịch và nạp
 
 Các bước giống nhau cho mọi bo. Lấy tên và profile của bo ở
@@ -265,7 +302,7 @@ Các bước giống nhau cho mọi bo. Lấy tên và profile của bo ở
    khi đăng file công khai.
 5. Trong ứng dụng Muse, bật **Settings > Devices > Developer mode**, thêm thiết
    bị tên `MuseGadget-XXXXXX`, rồi nhấn nút nói của bo khi được hỏi (BOOT trên
-   bo 1.85C và bo LCDWIKI, phím + của bo OSTB-3ST).
+   bo 1.85C, bo LCDWIKI và EchoEar, phím + của bo OSTB-3ST).
 
 ## Thêm một thiết bị khác
 

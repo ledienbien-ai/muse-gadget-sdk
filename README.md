@@ -57,6 +57,7 @@ settings by touch, and images from Muse.
 | [Waveshare ESP32-S3-Touch-LCD-1.85C](#waveshare-esp32-s3-touch-lcd-185c) | 1.85" round 360×360, touch | `s3lcd` | `waveshare-s3-185c` | Flash the firmware online at: https://dbrobot.vn/firmware.html |
 | [OSTB-3ST](#ostb-3st) | 1.83" 296×240, touch | `ostb` | `ostb-3st` | Flash the firmware online at: https://dbrobot.vn/firmware.html |
 | [LCDWIKI 2.8inch ESP32-S3 Display](#lcdwiki-28inch-esp32-s3-display) | 2.8" 320×240, touch on the ES3C28P | `lcd28` | `lcdwiki-s3-28` | Flash the firmware online at: https://dbrobot.vn/firmware.html |
+| [Espressif EchoEar](#espressif-echoear) | 1.85" round 360×360, touch | `echoear` | `echoear` | Flash the firmware online at: https://dbrobot.vn/firmware.html |
 
 The name is what `tools/muse/board.sh` calls the board; the profile names its
 build settings and build directory. The boards upstream supports are still
@@ -64,7 +65,7 @@ here, listed in [`esp32/devices/README.md`](esp32/devices/README.md).
 
 ## Vietnamese screen and spoken replies
 
-The three boards above add two things to the on-screen UI.
+The boards above add two things to the on-screen UI.
 
 <p align="center">
   <img src="doc/image/vietnamese-ui.png" width="720" alt="The UI in Vietnamese at 360×360, drawn by the simulator: ready, a reply being spoken, a reply read with the speaker off, an error, settings, the Language page, the Sound page and the pairing code">
@@ -219,6 +220,43 @@ card slot and the RGB LED aren't used.
 Code: [`board_lcdwiki_s3_28.c`](esp32/components/muse/boards/board_lcdwiki_s3_28.c),
 build settings: [`sdkconfig.muse-lcdwiki-s3-28`](esp32/devices/sdkconfig.muse-lcdwiki-s3-28).
 
+## Espressif EchoEar
+
+<p align="center">
+  <img src="doc/image/echoear.png" width="720" alt="The Muse UI at 360×360, drawn by the simulator">
+</p>
+
+Espressif's cat-shaped voice kit, also sold as the ESP-VoCat. Two versions of
+its board are around, v1.0 and v1.2, with a handful of pins moved between
+them. One firmware serves both: it tells them apart at boot and logs which it
+found.
+
+| Part | Details |
+|---|---|
+| Chip | ESP32-S3-WROOM-1-N16R16VA on v1.2 (16 MB flash), ESP32-S3-WROOM-2-N32R16V on v1.0 (32 MB flash); 16 MB octal PSRAM, native USB |
+| Display | 1.85" round 360×360 ST77916 LCD on QSPI, PWM backlight |
+| Touch | CST816S |
+| Audio | ES8311 codec, NS4150B speaker amp, ES7210 with two microphones (one is used) |
+| Button | BOOT: hold to talk |
+| Battery | BQ27220 gauge: level, voltage and charging |
+
+**Status:** builds with ESP-IDF v6.0.1. It has not been run on the board. The
+v1.2 pins and the display, touch and codec setup are those of Espressif's own
+[board support package](https://github.com/espressif/esp-bsp/tree/master/bsp/esp_vocat)
+and of the board's xiaozhi-esp32 files; the v1.0 pins come from the xiaozhi
+files alone, so v1.0 is the less certain of the two.
+
+Known limits: BOOT is the only button the firmware reads, so the screen sleeps
+on its timer, and powering off on the Power page in Settings puts the board in
+deep sleep until BOOT is pressed; the board's own power key is what cuts the
+supply. The two touch pads under the shell, the motion sensor, the SD card
+slot and the green LED aren't used. The gauge runs off the battery, so without
+one there is no battery level. On a charger that isn't a computer, the board
+shows "charging" only while current flows into the battery.
+
+Code: [`board_echoear.c`](esp32/components/muse/boards/board_echoear.c),
+build settings: [`sdkconfig.muse-echoear`](esp32/devices/sdkconfig.muse-echoear).
+
 ## Build and flash
 
 The steps are the same for every board. Take its name and profile from the
@@ -265,7 +303,8 @@ The steps are the same for every board. Take its name and profile from the
    publish the file.
 5. In the Muse app, turn on **Settings > Devices > Developer mode**, add the
    device named `MuseGadget-XXXXXX`, and press the board's talk button when
-   asked (BOOT on the 1.85C and the LCDWIKI board, the + key on the OSTB-3ST).
+   asked (BOOT on the 1.85C, the LCDWIKI board and the EchoEar, the + key on the
+   OSTB-3ST).
 
 ## Adding another device
 

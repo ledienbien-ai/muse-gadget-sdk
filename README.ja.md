@@ -58,6 +58,7 @@ ESP32 Device SDK がまだ対応していない ESP32-S3 ボードを追加し�
 | [Waveshare ESP32-S3-Touch-LCD-1.85C](#waveshare-esp32-s3-touch-lcd-185c) | 1.85 インチ円形 360×360、タッチ | `s3lcd` | `waveshare-s3-185c` | ファームウェアのオンライン書き込み：https://dbrobot.vn/firmware.html |
 | [OSTB-3ST](#ostb-3st) | 1.83 インチ 296×240、タッチ | `ostb` | `ostb-3st` | ファームウェアのオンライン書き込み：https://dbrobot.vn/firmware.html |
 | [LCDWIKI 2.8inch ESP32-S3 Display](#lcdwiki-28inch-esp32-s3-display) | 2.8 インチ 320×240、ES3C28P はタッチ付き | `lcd28` | `lcdwiki-s3-28` | ファームウェアのオンライン書き込み：https://dbrobot.vn/firmware.html |
+| [Espressif EchoEar](#espressif-echoear) | 1.85 インチ円形 360×360、タッチ | `echoear` | `echoear` | ファームウェアのオンライン書き込み：https://dbrobot.vn/firmware.html |
 
 名前は `tools/muse/board.sh` でのボードの呼び名、プロファイルはビルド設定と
 ビルドディレクトリの名前です。上流が対応しているボードもそのまま残っていて、
@@ -65,7 +66,7 @@ ESP32 Device SDK がまだ対応していない ESP32-S3 ボードを追加し�
 
 ## ベトナム語の画面と音声での返答
 
-上の 3 つのボードでは、画面の UI に 2 つの機能が加わっています。
+上のボードでは、画面の UI に 2 つの機能が加わっています。
 
 <p align="center">
   <img src="doc/image/vietnamese-ui.png" width="720" alt="シミュレーターで描いた 360×360 のベトナム語 UI：待機、返答の読み上げ中、スピーカーをオフにしたときの返答、エラー、設定、言語ページ、サウンドページ、ペアリングコード">
@@ -222,6 +223,42 @@ Settings の Power ページから行います（ボードはディープスリ�
 コード：[`board_lcdwiki_s3_28.c`](esp32/components/muse/boards/board_lcdwiki_s3_28.c)、
 ビルド設定：[`sdkconfig.muse-lcdwiki-s3-28`](esp32/devices/sdkconfig.muse-lcdwiki-s3-28)。
 
+## Espressif EchoEar
+
+<p align="center">
+  <img src="doc/image/echoear.png" width="720" alt="シミュレーターで描いた 360×360 の Muse UI">
+</p>
+
+Espressif の猫型音声開発キットで、ESP-VoCat の名前でも販売されています。ボードには
+v1.0 と v1.2 の 2 つの版があり、いくつかのピンの割り当てが違います。1 つの
+ファームウェアで両方に対応します。起動時に版を見分け、ログに記録します。
+
+| 部品 | 詳細 |
+|---|---|
+| チップ | v1.2 は ESP32-S3-WROOM-1-N16R16VA（16 MB フラッシュ）、v1.0 は ESP32-S3-WROOM-2-N32R16V（32 MB フラッシュ）。16 MB オクタル PSRAM、ネイティブ USB |
+| ディスプレイ | 1.85 インチ円形 360×360 ST77916 LCD（QSPI）、PWM バックライト |
+| タッチ | CST816S |
+| オーディオ | ES8311 コーデック、NS4150B スピーカーアンプ、ES7210 とマイク 2 個（1 個を使用） |
+| ボタン | BOOT：押している間だけ話す |
+| バッテリー | BQ27220 残量計：残量、電圧、充電状態 |
+
+**状態：** ESP-IDF v6.0.1 でビルドできます。実機ではまだ動かしていません。v1.2 の
+ピンと、ディスプレイ、タッチ、コーデックの設定は、Espressif 自身の
+[ボードサポートパッケージ](https://github.com/espressif/esp-bsp/tree/master/bsp/esp_vocat)
+と、このボードの xiaozhi-esp32 のファイルによるものです。v1.0 のピンは xiaozhi の
+ファイルだけに基づくため、v1.0 のほうが確実さに欠けます。
+
+既知の制限：ファームウェアが読めるボタンは BOOT だけなので、画面はタイマーで消灯
+し、Settings の Power ページでの電源オフはボードをディープスリープに入れるだけ
+です（BOOT を押すと復帰）。電源を実際に切るのはボードの電源キーです。筐体の下の
+2 つのタッチパッド、モーションセンサー、SD カードスロット、緑の LED は使って
+いません。残量計はバッテリーから給電されるため、バッテリーがないと残量は表示
+されません。パソコンではない充電器につないだ場合、「充電中」と表示されるのは
+バッテリーに電流が流れ込んでいる間だけです。
+
+コード：[`board_echoear.c`](esp32/components/muse/boards/board_echoear.c)、
+ビルド設定：[`sdkconfig.muse-echoear`](esp32/devices/sdkconfig.muse-echoear)。
+
 ## ビルドと書き込み
 
 手順はどのボードでも同じです。名前とプロファイルは
@@ -270,7 +307,7 @@ Settings の Power ページから行います（ボードはディープスリ�
    ファイルを公開する前によく考えてください。
 5. Muse アプリで **Settings > Devices > Developer mode** をオンにし、
    `MuseGadget-XXXXXX` という名前のデバイスを追加して、求められたらボードの
-   トークボタンを押します（1.85C と LCDWIKI のボードでは BOOT、OSTB-3ST では + キー）。
+   トークボタンを押します（1.85C、LCDWIKI のボード、EchoEar では BOOT、OSTB-3ST では + キー）。
 
 ## ほかのデバイスを追加する
 

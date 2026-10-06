@@ -55,6 +55,7 @@ ESP32 Device SDK 增加上游尚未支持的 ESP32-S3 开发板，SDK 的其余�
 | [Waveshare ESP32-S3-Touch-LCD-1.85C](#waveshare-esp32-s3-touch-lcd-185c) | 1.85 英寸圆形 360×360，触摸 | `s3lcd` | `waveshare-s3-185c` | 在线烧录固件：https://dbrobot.vn/firmware.html |
 | [OSTB-3ST](#ostb-3st) | 1.83 英寸 296×240，触摸 | `ostb` | `ostb-3st` | 在线烧录固件：https://dbrobot.vn/firmware.html |
 | [LCDWIKI 2.8inch ESP32-S3 Display](#lcdwiki-28inch-esp32-s3-display) | 2.8 英寸 320×240，ES3C28P 带触摸 | `lcd28` | `lcdwiki-s3-28` | 在线烧录固件：https://dbrobot.vn/firmware.html |
+| [Espressif EchoEar](#espressif-echoear) | 1.85 英寸圆形 360×360，触摸 | `echoear` | `echoear` | 在线烧录固件：https://dbrobot.vn/firmware.html |
 
 名称是 `tools/muse/board.sh` 对开发板的叫法；profile 是它的编译配置和编译目录的
 名字。上游支持的开发板仍然保留，见
@@ -62,7 +63,7 @@ ESP32 Device SDK 增加上游尚未支持的 ESP32-S3 开发板，SDK 的其余�
 
 ## 越南语界面与语音回复
 
-上面三块开发板的界面增加了两项功能。
+上面几块开发板的界面增加了两项功能。
 
 <p align="center">
   <img src="doc/image/vietnamese-ui.png" width="720" alt="模拟器绘制的 360×360 越南语界面：就绪、正在朗读回复、关闭扬声器时的回复、错误、设置、语言页面、声音页面和配对码">
@@ -204,6 +205,39 @@ SPI 上限采用 [esphome-es3c28p-light-panel](https://github.com/jvduuren/espho
 代码：[`board_lcdwiki_s3_28.c`](esp32/components/muse/boards/board_lcdwiki_s3_28.c)，
 编译配置：[`sdkconfig.muse-lcdwiki-s3-28`](esp32/devices/sdkconfig.muse-lcdwiki-s3-28)。
 
+## Espressif EchoEar
+
+<p align="center">
+  <img src="doc/image/echoear.png" width="720" alt="模拟器绘制的 360×360 Muse 界面">
+</p>
+
+乐鑫的猫形语音开发套件“喵伴”，也以 ESP-VoCat 的名字销售。这块板有 v1.0 和 v1.2
+两个版本，几个引脚的位置不同。同一个固件适用于两者：启动时自动识别版本并写入日志。
+
+| 部件 | 详情 |
+|---|---|
+| 芯片 | v1.2 为 ESP32-S3-WROOM-1-N16R16VA（16 MB flash），v1.0 为 ESP32-S3-WROOM-2-N32R16V（32 MB flash）；16 MB 八线 PSRAM，原生 USB |
+| 显示屏 | 1.85 英寸圆形 360×360 ST77916 LCD，QSPI 接口，PWM 背光 |
+| 触摸 | CST816S |
+| 音频 | ES8311 编解码器，NS4150B 功放，ES7210 接两个麦克风（使用其中一个） |
+| 按键 | BOOT：按住说话 |
+| 电池 | BQ27220 电量计：电量、电压和充电状态 |
+
+**状态：** 可用 ESP-IDF v6.0.1 构建。尚未在开发板上运行。v1.2 的引脚以及显示屏、
+触摸和编解码器的初始化，取自乐鑫自己的
+[板级支持包](https://github.com/espressif/esp-bsp/tree/master/bsp/esp_vocat)
+和这块板的 xiaozhi-esp32 文件；v1.0 的引脚只来自 xiaozhi 文件，因此 v1.0 的把握
+较小。
+
+已知限制：BOOT 是固件能读取的唯一按键，所以屏幕按定时器熄屏，在 Settings 的 Power
+页面关机只是让开发板进入深度睡眠，按 BOOT 唤醒；真正断电要用板上的电源键。外壳下
+的两个触摸片、运动传感器、SD 卡槽和绿色 LED 没有使用。电量计由电池供电，所以没接
+电池时没有电量显示。接在充电器（而不是电脑）上时，只有电流流入电池期间才显示
+“充电中”。
+
+代码：[`board_echoear.c`](esp32/components/muse/boards/board_echoear.c)，
+构建配置：[`sdkconfig.muse-echoear`](esp32/devices/sdkconfig.muse-echoear)。
+
 ## 编译和烧录
 
 每块开发板的步骤都一样。名称和 profile 见[上面的表格](#本分支中的开发板)。
@@ -247,7 +281,7 @@ SPI 上限采用 [esphome-es3c28p-light-panel](https://github.com/jvduuren/espho
    带有你的 SDK token 的固件会包含该 token，公开发布文件前请三思。
 5. 在 Muse 应用中打开 **Settings > Devices > Developer mode**，添加名为
    `MuseGadget-XXXXXX` 的设备，并在提示时按下开发板的说话键（1.85C 和
-   LCDWIKI 开发板是 BOOT，OSTB-3ST 是 + 键）。
+   LCDWIKI 开发板和 EchoEar 是 BOOT，OSTB-3ST 是 + 键）。
 
 ## 添加其他设备
 

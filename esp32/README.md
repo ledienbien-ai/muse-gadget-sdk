@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-<!-- Modified by ledienbien-ai (2026): added the Waveshare ESP32-S3-Touch-LCD-1.85C, the OSTB-3ST and the LCDWIKI 2.8inch ESP32-S3 Display. -->
+<!-- Modified by ledienbien-ai (2026): added the Waveshare ESP32-S3-Touch-LCD-1.85C, the OSTB-3ST, the LCDWIKI 2.8inch ESP32-S3 Display and the Espressif EchoEar. -->
 
 # ESP32 Device SDK
 
@@ -174,6 +174,7 @@ status screen.
 | Waveshare ESP32-S3-Touch-LCD-1.85C | UI, push-to-talk, settings, images | see [`AGENTS.md`](AGENTS.md#boards-with-the-full-ui-by-hand) |
 | OSTB-3ST | UI, push-to-talk, settings, images | see [`AGENTS.md`](AGENTS.md#boards-with-the-full-ui-by-hand) |
 | LCDWIKI 2.8inch ESP32-S3 Display | UI, push-to-talk, settings (touch model), images | see [`AGENTS.md`](AGENTS.md#boards-with-the-full-ui-by-hand) |
+| Espressif EchoEar (ESP-VoCat) | UI, push-to-talk, settings, images | see [`AGENTS.md`](AGENTS.md#boards-with-the-full-ui-by-hand) |
 | AIPI Lite | UI, push-to-talk, two-button menu, images | see [`AGENTS.md`](AGENTS.md#boards-with-the-full-ui-by-hand) |
 | Waveshare ESP32-C6-Touch-AMOLED-1.8 | UI, push-to-talk with text replies | see [`AGENTS.md`](AGENTS.md#boards-with-the-full-ui-by-hand) |
 | Seeed SenseCAP Watcher | UI, push-to-talk, settings, images | see [`AGENTS.md`](AGENTS.md#boards-with-the-full-ui-by-hand) |

@@ -13,7 +13,7 @@
 # limitations under the License.
 #
 # Modified by ledienbien-ai (2026): added the Waveshare ESP32-S3-Touch-LCD-1.85C,
-# the OSTB-3ST, the LCDWIKI 2.8inch ESP32-S3 Display, the startup logo, the
+# the OSTB-3ST, the LCDWIKI 2.8inch ESP32-S3 Display, the Espressif EchoEar, the startup logo, the
 # Vietnamese screen (muse_lang.c, muse_fonts.c, fonts/) and spoken replies
 # (muse_tts.c).
 
@@ -86,6 +86,8 @@ if(CONFIG_MUSE_ENABLED)
         list(APPEND srcs "boards/board_ostb_3st.c" "boards/muse_lcd_bands.c")
     elseif(CONFIG_MUSE_BOARD_LCDWIKI_S3_28)
         list(APPEND srcs "boards/board_lcdwiki_s3_28.c" "boards/muse_lcd_bands.c")
+    elseif(CONFIG_MUSE_BOARD_ECHOEAR)
+        list(APPEND srcs "boards/board_echoear.c" "boards/muse_lcd_bands.c")
     elseif(CONFIG_MUSE_BOARD_AIPI)
         list(APPEND srcs "boards/board_aipi.c")
     elseif(CONFIG_MUSE_BOARD_WAVESHARE_C6_18)

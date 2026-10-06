@@ -13,8 +13,8 @@
 # limitations under the License.
 #
 # Modified by ledienbien-ai (2026): added the Waveshare ESP32-S3-Touch-LCD-1.85C,
-# the OSTB-3ST, the LCDWIKI 2.8inch ESP32-S3 Display, the startup logo, the
-# Vietnamese screen and spoken replies.
+# the OSTB-3ST, the LCDWIKI 2.8inch ESP32-S3 Display, the Espressif EchoEar, the
+# startup logo, the Vietnamese screen and spoken replies.
 
 menu "Muse"
 
@@ -51,6 +51,10 @@ menu "Muse"
             bool "LCDWIKI 2.8inch ESP32-S3 Display (ES3C28P with touch, ES3N28P without)"
             depends on IDF_TARGET_ESP32S3
 
+        config MUSE_BOARD_ECHOEAR
+            bool "Espressif EchoEar (ESP-VoCat), v1.0 and v1.2"
+            depends on IDF_TARGET_ESP32S3
+
         config MUSE_BOARD_AIPI
             bool "AIPI Lite (ESP32-S3, two buttons, no touch)"
             depends on IDF_TARGET_ESP32S3
@@ -85,6 +89,7 @@ menu "Muse"
         default "waveshare_s3_185c" if MUSE_BOARD_WAVESHARE_S3_185C
         default "ostb_3st" if MUSE_BOARD_OSTB_3ST
         default "lcdwiki_s3_28" if MUSE_BOARD_LCDWIKI_S3_28
+        default "echoear" if MUSE_BOARD_ECHOEAR
         default "aipi" if MUSE_BOARD_AIPI
         default "waveshare_c6_18" if MUSE_BOARD_WAVESHARE_C6_18
         default "sensecap_watcher" if MUSE_BOARD_SENSECAP_WATCHER

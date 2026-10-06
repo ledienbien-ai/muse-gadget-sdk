@@ -13,7 +13,7 @@
 # limitations under the License.
 #
 # Modified by ledienbien-ai (2026): added the Waveshare ESP32-S3-Touch-LCD-1.85C,
-# the OSTB-3ST and the LCDWIKI 2.8inch ESP32-S3 Display.
+# the OSTB-3ST, the LCDWIKI 2.8inch ESP32-S3 Display and the Espressif EchoEar.
 
 dependencies:
   idf:
@@ -32,7 +32,7 @@ dependencies:
   espressif/esp_lvgl_adapter:
     version: "0.6.4"
     rules:
-      - if: "$CONFIG{MUSE_BOARD_ID} in [\"waveshare_s3_175c\", \"waveshare_s3_175\", \"waveshare_s3_185c\", \"ostb_3st\", \"lcdwiki_s3_28\", \"aipi\", \"sensecap_watcher\", \"m5stack_sticks3\", \"m5stack_stickc_plus2\"]"
+      - if: "$CONFIG{MUSE_BOARD_ID} in [\"waveshare_s3_175c\", \"waveshare_s3_175\", \"waveshare_s3_185c\", \"ostb_3st\", \"lcdwiki_s3_28\", \"echoear\", \"aipi\", \"sensecap_watcher\", \"m5stack_sticks3\", \"m5stack_stickc_plus2\"]"
   waveshare/esp32_s3_touch_amoled_1_75c:
     version: "^3.0.0"
     rules:
@@ -48,7 +48,7 @@ dependencies:
   espressif/esp_lcd_st77916:
     version: "^2.0.2"
     rules:
-      - if: "$CONFIG{MUSE_BOARD_ID} == \"waveshare_s3_185c\""
+      - if: "$CONFIG{MUSE_BOARD_ID} in [\"waveshare_s3_185c\", \"echoear\"]"
   espressif/esp_lcd_ili9341:
     version: "^2.0.1"
     rules:

@@ -66,6 +66,9 @@ Files added:
 | [`esp32/devices/sdkconfig.muse-ostb-3st`](esp32/devices/sdkconfig.muse-ostb-3st) | Build settings for the OSTB-3ST |
 | [`esp32/components/muse/boards/board_lcdwiki_s3_28.c`](esp32/components/muse/boards/board_lcdwiki_s3_28.c) | The LCDWIKI 2.8inch ESP32-S3 Display: display, touch, audio, button, battery, power |
 | [`esp32/devices/sdkconfig.muse-lcdwiki-s3-28`](esp32/devices/sdkconfig.muse-lcdwiki-s3-28) | Build settings for the LCDWIKI board |
+| [`esp32/components/muse/boards/board_echoear.c`](esp32/components/muse/boards/board_echoear.c) | The Espressif EchoEar, v1.0 and v1.2: display, touch, audio, button, battery gauge, power |
+| [`esp32/devices/sdkconfig.muse-echoear`](esp32/devices/sdkconfig.muse-echoear) | Build settings for the EchoEar |
+| [`esp32/components/muse/boards/echoear_lcd_init.h`](esp32/components/muse/boards/echoear_lcd_init.h) | The EchoEar panel's ST77916 register table. Not ledienbien-ai's: it is Espressif's file, under its own copyright line (section 3) |
 | [`esp32/components/muse/logo/logo.c`](esp32/components/muse/logo) | The DB_ROBOT startup logo, as LVGL's image converter exported it. Copyright (c) 2026 ledienbien-ai, free to use under the Apache License like the rest of this section |
 | `doc/image/` | Pictures for the READMEs: the UI at each added board's screen size, drawn by the simulator. They show the default Jollybot avatar, which the Apache License does not cover (section 1) |
 | [`esp32/components/muse/muse_lang.c`](esp32/components/muse/muse_lang.c), `muse_lang.h` | The screen's language, and its texts in Vietnamese |
@@ -101,7 +104,7 @@ license header, as section 4(b) of the Apache License asks:
 |---|---|
 | `README.md` | Describes this fork; links the translations and this file |
 | `esp32/README.md`, `esp32/AGENTS.md`, `esp32/devices/README.md`, `esp32/devices/AGENTS.md` | List the new boards; `AGENTS.md` also says how on-screen text gets its Vietnamese |
-| `esp32/components/muse/Kconfig`, `CMakeLists.txt`, `idf_component.yml` | Register the boards, the 1.85C's `esp_lcd_st77916` dependency and the LCDWIKI board's `esp_lcd_ili9341`; the startup logo's options; the starting language and spoken replies |
+| `esp32/components/muse/Kconfig`, `CMakeLists.txt`, `idf_component.yml` | Register the boards, the 1.85C's `esp_lcd_st77916` dependency (the EchoEar's too) and the LCDWIKI board's `esp_lcd_ili9341`; the startup logo's options; the starting language and spoken replies |
 | `esp32/components/muse/muse_ui.c` | On round screens smaller than 412 px, the speaker button sits under the state word. On a rectangular screen under 300 px tall (the OSTB-3ST's 296×240), a smaller Muse and a bar in place of the ring. The startup logo. The screen in Vietnamese: its texts, its fonts and the room their taller lines need |
 | `esp32/components/muse/muse_settings_ui.c` | Settings pages that fit a screen that short; a "Muse AI by DB-robot" line under the settings list; the pages in Vietnamese and a Language page |
 | `esp32/components/muse/muse_settings.c`, `muse_settings.h`, `muse_app.c`, `muse_ble.c` | The language setting: kept in NVS, applied at startup, set with the `lang` setup command |
@@ -110,7 +113,7 @@ license header, as section 4(b) of the Apache License asks:
 | `esp32/components/muse/muse_chat_session.cpp` | Sends each reply to `muse_tts.c` and plays the speech it fetches |
 | `esp32/simulator/CMakeLists.txt`, `src/main.c`, `README.md` | Build the Vietnamese texts and fonts; a `--lang` option |
 | `esp32/tools/muse/ble_setup.html` | A Language setting |
-| `esp32/tools/muse/board.sh`, `ports.py`, `avatar.py` | Add the `s3lcd`, `ostb` and `lcd28` board aliases |
+| `esp32/tools/muse/board.sh`, `ports.py`, `avatar.py` | Add the `s3lcd`, `ostb`, `lcd28` and `echoear` board aliases |
 
 ## 3. Sources used for the board ports
 
@@ -136,6 +139,14 @@ license header, as section 4(b) of the Apache License asks:
 | [LCDWIKI's page for the board](https://www.lcdwiki.com/2.8inch_ESP32-S3_Display) | Hardware facts: chip, memory, pins, the two models, the amp enable's polarity | Reference only; no text or code copied |
 | The board's xiaozhi-esp32 board directory, `xiaozhi-ai-iot-vietnam-es3n28p-lcd-2.8` (`config.h`, the board's `.cc`, `power_manager.h`), supplied by this fork's owner | Pins, the panel's orientation and colour settings, as reference; the two ends of the battery's ADC range, copied as numbers | The files carry no copyright or license notice. They are written against [78/xiaozhi-esp32](https://github.com/78/xiaozhi-esp32), which is MIT (notice below) |
 | [jvduuren/esphome-es3c28p-light-panel](https://github.com/jvduuren/esphome-es3c28p-light-panel) | Two things measured on the board: the touch panel's orientation and the 40 MHz SPI limit | Reference only; no text or code copied |
+
+### Espressif EchoEar (ESP-VoCat)
+
+| Source | Used for | License |
+|---|---|---|
+| [espressif/esp-bsp](https://github.com/espressif/esp-bsp) (`bsp/esp_vocat`), Espressif's board support package for the v1.2 board | The ST77916 register table, copied whole as [`echoear_lcd_init.h`](esp32/components/muse/boards/echoear_lcd_init.h) with its copyright line; the v1.2 pins, which way each supply switch and reset line works, and the touch and codec setup, as reference | Apache-2.0. Copyright 2026 Espressif Systems (Shanghai) CO LTD |
+| Espressif's user guides for the [EchoEar v1.2](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/echoear/user_guide_v1.2.html) and [v1.0](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/echoear/user_guide_v1.0.html) | Hardware facts: the two modules and their memory, the parts on the board, the pins v1.2 moved | Reference only; no text or code copied |
+| The board's xiaozhi-esp32 files (`config.h`, `EchoEar.cc` and others), supplied by this fork's owner; the board is in [78/xiaozhi-esp32](https://github.com/78/xiaozhi-esp32) | How v1.0 is told from v1.2 at boot and v1.0's pins, as reference; the fuel gauge's address and registers | MIT (notice below) |
 
 ### Notice for xiaozhi-esp32
 
@@ -175,7 +186,7 @@ each keeps its own license. For these boards they include:
 | Component | License |
 |---|---|
 | [ESP-IDF](https://github.com/espressif/esp-idf) v6.0.1 | Apache-2.0 |
-| `espressif/esp_lcd_st77916` (1.85C only), `esp_lcd_ili9341` (LCDWIKI board only), `esp_lvgl_adapter`, `esp_lcd_touch`, `esp_codec_dev`, `esp_websocket_client`, `led_strip`, `button`, `knob`, `esp_lv_fs`, `esp_lv_decoder`, `esp_mmap_assets`, `cmake_utilities` | Apache-2.0 |
+| `espressif/esp_lcd_st77916` (1.85C and EchoEar), `esp_lcd_ili9341` (LCDWIKI board only), `esp_lvgl_adapter`, `esp_lcd_touch`, `esp_codec_dev`, `esp_websocket_client`, `led_strip`, `button`, `knob`, `esp_lv_fs`, `esp_lv_decoder`, `esp_mmap_assets`, `cmake_utilities` | Apache-2.0 |
 | `lvgl/lvgl` 9.5.0 | MIT |
 | `espressif/cjson` (cJSON) | MIT |
 | `espressif/esp_new_jpeg` | Espressif MIT |

@@ -57,6 +57,7 @@ Muse gadget은 직접 만드는 오픈 소스 기기입니다. 시중에서 파�
 | [Waveshare ESP32-S3-Touch-LCD-1.85C](#waveshare-esp32-s3-touch-lcd-185c) | 1.85인치 원형 360×360, 터치 | `s3lcd` | `waveshare-s3-185c` | 펌웨어 온라인 플래시: https://dbrobot.vn/firmware.html |
 | [OSTB-3ST](#ostb-3st) | 1.83인치 296×240, 터치 | `ostb` | `ostb-3st` | 펌웨어 온라인 플래시: https://dbrobot.vn/firmware.html |
 | [LCDWIKI 2.8inch ESP32-S3 Display](#lcdwiki-28inch-esp32-s3-display) | 2.8인치 320×240, ES3C28P는 터치 지원 | `lcd28` | `lcdwiki-s3-28` | 펌웨어 온라인 플래시: https://dbrobot.vn/firmware.html |
+| [Espressif EchoEar](#espressif-echoear) | 1.85인치 원형 360×360, 터치 | `echoear` | `echoear` | 펌웨어 온라인 플래시: https://dbrobot.vn/firmware.html |
 
 이름은 `tools/muse/board.sh`가 보드를 부르는 이름이고, 프로필은 빌드 설정과
 빌드 디렉터리의 이름입니다. 업스트림이 지원하는 보드도 그대로 남아 있으며,
@@ -64,7 +65,7 @@ Muse gadget은 직접 만드는 오픈 소스 기기입니다. 시중에서 파�
 
 ## 베트남어 화면과 음성 응답
 
-위의 세 보드는 화면 UI에 두 가지 기능이 추가되었습니다.
+위의 보드들은 화면 UI에 두 가지 기능이 추가되었습니다.
 
 <p align="center">
   <img src="doc/image/vietnamese-ui.png" width="720" alt="시뮬레이터로 그린 360×360 베트남어 UI: 준비, 응답을 읽는 중, 스피커를 껐을 때의 응답, 오류, 설정, 언어 페이지, 소리 페이지, 페어링 코드">
@@ -220,6 +221,42 @@ RGB LED는 쓰지 않습니다.
 코드: [`board_lcdwiki_s3_28.c`](esp32/components/muse/boards/board_lcdwiki_s3_28.c),
 빌드 설정: [`sdkconfig.muse-lcdwiki-s3-28`](esp32/devices/sdkconfig.muse-lcdwiki-s3-28).
 
+## Espressif EchoEar
+
+<p align="center">
+  <img src="doc/image/echoear.png" width="720" alt="시뮬레이터로 그린 360×360 Muse UI">
+</p>
+
+Espressif의 고양이 모양 음성 개발 키트로, ESP-VoCat이라는 이름으로도 판매됩니다.
+보드에는 v1.0과 v1.2 두 가지 버전이 있고 몇몇 핀의 위치가 다릅니다. 하나의
+펌웨어가 둘 다 지원합니다. 부팅할 때 버전을 구분하고 로그에 남깁니다.
+
+| 부품 | 세부 사항 |
+|---|---|
+| 칩 | v1.2는 ESP32-S3-WROOM-1-N16R16VA(16 MB 플래시), v1.0은 ESP32-S3-WROOM-2-N32R16V(32 MB 플래시). 16 MB 옥탈 PSRAM, 네이티브 USB |
+| 디스플레이 | 1.85인치 원형 360×360 ST77916 LCD(QSPI), PWM 백라이트 |
+| 터치 | CST816S |
+| 오디오 | ES8311 코덱, NS4150B 스피커 앰프, ES7210과 마이크 2개(1개 사용) |
+| 버튼 | BOOT: 누르고 있는 동안 말하기 |
+| 배터리 | BQ27220 잔량 게이지: 잔량, 전압, 충전 상태 |
+
+**상태:** ESP-IDF v6.0.1로 빌드됩니다. 실제 보드에서는 아직 실행하지 않았습니다.
+v1.2의 핀과 디스플레이, 터치, 코덱 설정은 Espressif의
+[보드 지원 패키지](https://github.com/espressif/esp-bsp/tree/master/bsp/esp_vocat)와
+이 보드의 xiaozhi-esp32 파일을 따랐습니다. v1.0의 핀은 xiaozhi 파일에만 근거하므로
+v1.0 쪽이 덜 확실합니다.
+
+알려진 제한: 펌웨어가 읽는 버튼은 BOOT 하나뿐이어서 화면은 타이머에 따라 꺼지고,
+Settings의 Power 페이지에서 전원을 끄면 보드는 딥 슬립에 들어갈 뿐이며 BOOT를
+누르면 깨어납니다. 실제로 전원을 끊는 것은 보드의 전원 키입니다. 케이스 아래의
+터치 패드 두 개, 모션 센서, SD 카드 슬롯, 녹색 LED는 사용하지 않습니다. 잔량
+게이지는 배터리로 동작하므로 배터리가 없으면 잔량이 표시되지 않습니다. 컴퓨터가
+아닌 충전기에 연결하면 배터리로 전류가 흘러 들어가는 동안에만 "충전 중"으로
+표시됩니다.
+
+코드: [`board_echoear.c`](esp32/components/muse/boards/board_echoear.c),
+빌드 설정: [`sdkconfig.muse-echoear`](esp32/devices/sdkconfig.muse-echoear).
+
 ## 빌드와 플래시
 
 절차는 모든 보드에서 같습니다. 이름과 프로필은 [위의 표](#이-포크의-보드)에서
@@ -266,7 +303,7 @@ RGB LED는 쓰지 않습니다.
    공개하기 전에 신중히 생각하세요.
 5. Muse 앱에서 **Settings > Devices > Developer mode**를 켜고,
    `MuseGadget-XXXXXX`라는 이름의 기기를 추가한 다음, 요청이 나오면 보드의
-   말하기 버튼을 누릅니다(1.85C와 LCDWIKI 보드는 BOOT, OSTB-3ST는 + 키).
+   말하기 버튼을 누릅니다(1.85C, LCDWIKI 보드, EchoEar는 BOOT, OSTB-3ST는 + 키).
 
 ## 다른 기기 추가하기
 
