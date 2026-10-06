@@ -226,6 +226,16 @@ Settings の Power ページから行います（ボードはディープスリ�
 ## Espressif EchoEar
 
 <p align="center">
+  <img src="doc/image/echoear-muse.jpg" width="330" alt="EchoEar 上の Muse のイメージ画像。画面にはベトナム語の返答：シミュレーターの画面をデバイスの写真に合成したもの">
+  <img src="doc/image/echoear-device.jpg" width="330" alt="2 枚目のイメージ画像。聞き取り中">
+</p>
+<p align="center">
+  <img src="doc/image/echoear-boards-front.webp" width="720" alt="EchoEar の基板と本体の前面（説明付き）：ESP32-S3 モジュール、各コネクター、マイク、緑の LED、画面">
+</p>
+<p align="center">
+  <img src="doc/image/echoear-boards-back.jpg" width="605" alt="基板と本体の背面（説明付き）：コーデック、アンプ、モーションセンサー、SD カードスロット、BOOT と RST のボタン、マグネットコネクター、電源スイッチ">
+</p>
+<p align="center">
   <img src="doc/image/echoear.png" width="720" alt="シミュレーターで描いた 360×360 の Muse UI">
 </p>
 
@@ -239,7 +249,7 @@ v1.0 と v1.2 の 2 つの版があり、いくつかのピンの割り当てが
 | ディスプレイ | 1.85 インチ円形 360×360 ST77916 LCD（QSPI）、PWM バックライト |
 | タッチ | CST816S |
 | オーディオ | ES8311 コーデック、NS4150B スピーカーアンプ、ES7210 とマイク 2 個（1 個を使用） |
-| ボタン | BOOT：押している間だけ話す |
+| ボタン | BOOT（背面、マグネットコネクターの横）：押している間だけ話す |
 | バッテリー | BQ27220 残量計：残量、電圧、充電状態 |
 
 **状態：** ESP-IDF v6.0.1 でビルドできます。実機ではまだ動かしていません。v1.2 の

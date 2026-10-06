@@ -223,6 +223,16 @@ cấu hình build: [`sdkconfig.muse-lcdwiki-s3-28`](esp32/devices/sdkconfig.muse
 ## Espressif EchoEar
 
 <p align="center">
+  <img src="doc/image/echoear-muse.jpg" width="330" alt="Ảnh dựng Muse trên EchoEar, màn hình hiện câu trả lời tiếng Việt: màn hình của trình mô phỏng ghép vào ảnh thiết bị">
+  <img src="doc/image/echoear-device.jpg" width="330" alt="Ảnh dựng thứ hai, đang nghe">
+</p>
+<p align="center">
+  <img src="doc/image/echoear-boards-front.webp" width="720" alt="Các bo mạch của EchoEar và thiết bị nhìn từ phía trước, có chú thích: module ESP32-S3, các đầu nối, micro, LED xanh và màn hình">
+</p>
+<p align="center">
+  <img src="doc/image/echoear-boards-back.jpg" width="605" alt="Các bo mạch và thiết bị nhìn từ phía sau, có chú thích: codec, ampli, cảm biến chuyển động, khe thẻ SD, nút BOOT và RST, đầu nối nam châm và công tắc nguồn">
+</p>
+<p align="center">
   <img src="doc/image/echoear.png" width="720" alt="Giao diện Muse ở 360×360, vẽ bằng trình mô phỏng">
 </p>
 
@@ -236,7 +246,7 @@ firmware dùng cho cả hai: nó tự nhận phiên bản lúc khởi động v�
 | Màn hình | LCD tròn 1,85" 360×360 ST77916 qua QSPI, đèn nền PWM |
 | Cảm ứng | CST816S |
 | Âm thanh | Codec ES8311, ampli loa NS4150B, ES7210 với hai micro (dùng một) |
-| Nút | BOOT: giữ để nói |
+| Nút | BOOT, ở mặt sau cạnh đầu nối nam châm: giữ để nói |
 | Pin | IC đo pin BQ27220: mức pin, điện áp và trạng thái sạc |
 
 **Tình trạng:** biên dịch được với ESP-IDF v6.0.1. Chưa chạy trên bo thật. Các

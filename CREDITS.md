@@ -86,6 +86,12 @@ and `lcdwiki-s3-28-back.jpg` were supplied by this
 fork's owner and look to be the makers' or sellers' product pictures: they are
 here to show which hardware is meant, belong to their owners, and are not
 under the Apache License.
+`echoear-muse.jpg` and `echoear-device.jpg` were made by this fork's owner from
+pictures of the EchoEar, the simulator's Muse screen and the DB_ROBOT logo.
+`echoear-boards-front.webp` and `echoear-boards-back.jpg`, supplied by this
+fork's owner, look to be Espressif's labelled pictures of the boards from its
+EchoEar user guide. The pictures of the device and its boards belong to their
+owner and are not under the Apache License either.
 
 Fonts added, under their own license, for the Vietnamese letters that LVGL's
 built-in fonts lack. Each file is a subset of the font converted to LVGL's

@@ -208,6 +208,16 @@ SPI 上限采用 [esphome-es3c28p-light-panel](https://github.com/jvduuren/espho
 ## Espressif EchoEar
 
 <p align="center">
+  <img src="doc/image/echoear-muse.jpg" width="330" alt="EchoEar 上的 Muse 效果图，屏幕上是越南语回复：把模拟器的画面合成到设备图片里">
+  <img src="doc/image/echoear-device.jpg" width="330" alt="第二张效果图，正在聆听">
+</p>
+<p align="center">
+  <img src="doc/image/echoear-boards-front.webp" width="720" alt="EchoEar 的电路板和整机正面，带标注：ESP32-S3 模组、各连接器、麦克风、绿色 LED 和屏幕">
+</p>
+<p align="center">
+  <img src="doc/image/echoear-boards-back.jpg" width="605" alt="电路板和整机背面，带标注：编解码器、功放、运动传感器、SD 卡槽、BOOT 和 RST 按键、磁吸连接器和电源开关">
+</p>
+<p align="center">
   <img src="doc/image/echoear.png" width="720" alt="模拟器绘制的 360×360 Muse 界面">
 </p>
 
@@ -220,7 +230,7 @@ SPI 上限采用 [esphome-es3c28p-light-panel](https://github.com/jvduuren/espho
 | 显示屏 | 1.85 英寸圆形 360×360 ST77916 LCD，QSPI 接口，PWM 背光 |
 | 触摸 | CST816S |
 | 音频 | ES8311 编解码器，NS4150B 功放，ES7210 接两个麦克风（使用其中一个） |
-| 按键 | BOOT：按住说话 |
+| 按键 | BOOT，在背面磁吸连接器旁：按住说话 |
 | 电池 | BQ27220 电量计：电量、电压和充电状态 |
 
 **状态：** 可用 ESP-IDF v6.0.1 构建。尚未在开发板上运行。v1.2 的引脚以及显示屏、

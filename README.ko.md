@@ -224,6 +224,16 @@ RGB LED는 쓰지 않습니다.
 ## Espressif EchoEar
 
 <p align="center">
+  <img src="doc/image/echoear-muse.jpg" width="330" alt="EchoEar 위의 Muse 합성 이미지. 화면에 베트남어 응답: 시뮬레이터 화면을 기기 사진에 합성한 것">
+  <img src="doc/image/echoear-device.jpg" width="330" alt="두 번째 합성 이미지. 듣는 중">
+</p>
+<p align="center">
+  <img src="doc/image/echoear-boards-front.webp" width="720" alt="EchoEar의 보드와 기기 앞면(설명 포함): ESP32-S3 모듈, 커넥터, 마이크, 녹색 LED, 화면">
+</p>
+<p align="center">
+  <img src="doc/image/echoear-boards-back.jpg" width="605" alt="보드와 기기 뒷면(설명 포함): 코덱, 앰프, 모션 센서, SD 카드 슬롯, BOOT와 RST 버튼, 자석 커넥터, 전원 스위치">
+</p>
+<p align="center">
   <img src="doc/image/echoear.png" width="720" alt="시뮬레이터로 그린 360×360 Muse UI">
 </p>
 
@@ -237,7 +247,7 @@ Espressif의 고양이 모양 음성 개발 키트로, ESP-VoCat이라는 이름
 | 디스플레이 | 1.85인치 원형 360×360 ST77916 LCD(QSPI), PWM 백라이트 |
 | 터치 | CST816S |
 | 오디오 | ES8311 코덱, NS4150B 스피커 앰프, ES7210과 마이크 2개(1개 사용) |
-| 버튼 | BOOT: 누르고 있는 동안 말하기 |
+| 버튼 | BOOT(뒷면, 자석 커넥터 옆): 누르고 있는 동안 말하기 |
 | 배터리 | BQ27220 잔량 게이지: 잔량, 전압, 충전 상태 |
 
 **상태:** ESP-IDF v6.0.1로 빌드됩니다. 실제 보드에서는 아직 실행하지 않았습니다.

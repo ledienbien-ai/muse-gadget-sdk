@@ -223,6 +223,16 @@ build settings: [`sdkconfig.muse-lcdwiki-s3-28`](esp32/devices/sdkconfig.muse-lc
 ## Espressif EchoEar
 
 <p align="center">
+  <img src="doc/image/echoear-muse.jpg" width="330" alt="A mock-up of Muse on the EchoEar, a reply in Vietnamese on screen: the simulator's screen set into a picture of the device">
+  <img src="doc/image/echoear-device.jpg" width="330" alt="A second mock-up, listening">
+</p>
+<p align="center">
+  <img src="doc/image/echoear-boards-front.webp" width="720" alt="The EchoEar's boards and the device from the front, labelled: the ESP32-S3 module, the connectors, the microphones, the green LED and the screen">
+</p>
+<p align="center">
+  <img src="doc/image/echoear-boards-back.jpg" width="605" alt="The boards and the device from the back, labelled: the codecs, the amplifier, the motion sensor, the SD card slot, the BOOT and RST buttons, the magnetic connector and the power switch">
+</p>
+<p align="center">
   <img src="doc/image/echoear.png" width="720" alt="The Muse UI at 360×360, drawn by the simulator">
 </p>
 
@@ -237,7 +247,7 @@ found.
 | Display | 1.85" round 360×360 ST77916 LCD on QSPI, PWM backlight |
 | Touch | CST816S |
 | Audio | ES8311 codec, NS4150B speaker amp, ES7210 with two microphones (one is used) |
-| Button | BOOT: hold to talk |
+| Button | BOOT, on the back beside the magnetic connector: hold to talk |
 | Battery | BQ27220 gauge: level, voltage and charging |
 
 **Status:** builds with ESP-IDF v6.0.1. It has not been run on the board. The
