@@ -246,19 +246,25 @@ firmware dùng cho cả hai: nó tự nhận phiên bản lúc khởi động v�
 | Màn hình | LCD tròn 1,85" 360×360 ST77916 qua QSPI, đèn nền PWM |
 | Cảm ứng | CST816S |
 | Âm thanh | Codec ES8311, ampli loa NS4150B, ES7210 với hai micro (dùng một) |
-| Nút | BOOT, ở mặt sau cạnh đầu nối nam châm: giữ để nói |
+| Nút | BOOT, ở mặt sau cạnh đầu nối nam châm, và các miếng cảm ứng dưới vỏ (v1.2 có hai, v1.0 có một): giữ cái nào cũng để nói |
 | Pin | IC đo pin BQ27220: mức pin, điện áp và trạng thái sạc |
 
 **Tình trạng:** biên dịch được với ESP-IDF v6.0.1. Chưa chạy trên bo thật. Các
 chân của v1.2 và cách khởi tạo màn hình, cảm ứng, codec lấy theo
 [gói hỗ trợ bo](https://github.com/espressif/esp-bsp/tree/master/bsp/esp_vocat)
 của chính Espressif và các file xiaozhi-esp32 của bo; các chân của v1.0 chỉ dựa
-vào file xiaozhi, nên v1.0 là bản kém chắc chắn hơn.
+vào file xiaozhi, nên v1.0 là bản kém chắc chắn hơn. Các miếng cảm ứng được
+cấu hình theo gói của Espressif, và tính là đang chạm khi số đọc tăng 1,5 %;
+trên bo thật bàn tay làm số đọc đổi bao nhiêu thì chưa đo, nên có thể phải chỉnh
+con số đó (`PAD_THRESH` trong file của bo). Log ghi số đọc của mỗi lần chạm.
 
-Giới hạn đã biết: BOOT là nút duy nhất firmware đọc được, nên màn hình tắt theo
+Giới hạn đã biết: BOOT là phím duy nhất firmware đọc được, nên màn hình tắt theo
 hẹn giờ, và "tắt nguồn" ở trang Power trong Settings chỉ đưa bo vào ngủ sâu cho
-tới khi nhấn BOOT; muốn cắt nguồn thật thì dùng phím nguồn của bo. Hai miếng
-cảm ứng dưới vỏ, cảm biến chuyển động, khe thẻ SD và LED xanh chưa được dùng.
+tới khi nhấn BOOT; muốn cắt nguồn thật thì dùng phím nguồn của bo. Miếng cảm ứng
+dùng để nói và đánh thức màn hình như BOOT, nhưng không xác nhận ghép đôi với
+ứng dụng Muse và không đánh thức bo khỏi ngủ sâu: hai việc đó phải nhấn BOOT.
+Miếng cảm ứng bị giữ 20 giây được coi là bị che chứ không phải đang chạm, và
+được nhả ra. Cảm biến chuyển động, khe thẻ SD và LED xanh chưa được dùng.
 IC đo pin chạy bằng chính viên pin, nên không gắn pin thì không có mức pin. Khi
 cắm vào cục sạc (không phải máy tính), bo chỉ hiện "đang sạc" trong lúc còn dòng
 chạy vào pin.

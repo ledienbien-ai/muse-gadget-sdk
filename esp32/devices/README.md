@@ -61,7 +61,7 @@ session to Muse. The rest depends on the hardware.
 | Touch | — | — | — | — | — | ✅ | ✅ | ✅ | ✅ | ES3C28P | ✅ | — | ✅ | ✅ | — | — |
 | Battery status | — | — | — | — | — | ✅ | ✅ | ✅ | Level only | Level only | ✅ | ✅ | ✅ | ✅ | ✅ | Voltage only |
 | Over-the-air updates | Off | Off | Off | Off | Off | On | On | On | On | On | On | On | On | On | On | On |
-| Buttons | BOOT | BOOT | Top | Green | Centre (talk), dial | PWR (talk), BOOT | BOOT (talk), PWR | BOOT (talk) | + (talk), − | BOOT (talk) | BOOT (talk) | Two | BOOT (talk), PWR | Wheel (press to talk, turn to sleep) | Front (talk), side (menu), PWR | Front (talk), side (menu), PWR |
+| Buttons | BOOT | BOOT | Top | Green | Centre (talk), dial | PWR (talk), BOOT | BOOT (talk), PWR | BOOT (talk) | + (talk), − | BOOT (talk) | BOOT, touch pads (talk) | Two | BOOT (talk), PWR | Wheel (press to talk, turn to sleep) | Front (talk), side (menu), PWR | Front (talk), side (menu), PWR |
 
 Boards without PSRAM (the ideaspark and the Waveshare C6) don't have room for
 the home-network tunnel. Muse can still reach and control them once the

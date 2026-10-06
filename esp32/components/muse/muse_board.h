@@ -12,6 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modified by ledienbien-ai (2026): MUSE_BTN_TALK_TOUCH.
  */
 
 #pragma once
@@ -41,6 +43,9 @@ extern "C" {
 #define MUSE_BTN_TALK_RELEASE (1u << 1)
 #define MUSE_BTN_AUX_PRESS    (1u << 2)
 #define MUSE_BTN_AUX_RELEASE  (1u << 3)
+/* With MUSE_BTN_TALK_PRESS: the press is a hand on a touch pad, not a key.
+ * It talks, but doesn't confirm a pairing: a pad can go off unmeant. */
+#define MUSE_BTN_TALK_TOUCH   (1u << 4)
 
 /* Where a button's icon goes on screen: beside the button, inside the panel. */
 typedef struct {

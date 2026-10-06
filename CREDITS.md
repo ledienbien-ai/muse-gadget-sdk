@@ -66,7 +66,7 @@ Files added:
 | [`esp32/devices/sdkconfig.muse-ostb-3st`](esp32/devices/sdkconfig.muse-ostb-3st) | Build settings for the OSTB-3ST |
 | [`esp32/components/muse/boards/board_lcdwiki_s3_28.c`](esp32/components/muse/boards/board_lcdwiki_s3_28.c) | The LCDWIKI 2.8inch ESP32-S3 Display: display, touch, audio, button, battery, power |
 | [`esp32/devices/sdkconfig.muse-lcdwiki-s3-28`](esp32/devices/sdkconfig.muse-lcdwiki-s3-28) | Build settings for the LCDWIKI board |
-| [`esp32/components/muse/boards/board_echoear.c`](esp32/components/muse/boards/board_echoear.c) | The Espressif EchoEar, v1.0 and v1.2: display, touch, audio, button, battery gauge, power |
+| [`esp32/components/muse/boards/board_echoear.c`](esp32/components/muse/boards/board_echoear.c) | The Espressif EchoEar, v1.0 and v1.2: display, touch, audio, button, touch pads, battery gauge, power |
 | [`esp32/devices/sdkconfig.muse-echoear`](esp32/devices/sdkconfig.muse-echoear) | Build settings for the EchoEar |
 | [`esp32/components/muse/boards/echoear_lcd_init.h`](esp32/components/muse/boards/echoear_lcd_init.h) | The EchoEar panel's ST77916 register table. Not ledienbien-ai's: it is Espressif's file, under its own copyright line (section 3) |
 | [`esp32/components/muse/logo/logo.c`](esp32/components/muse/logo) | The DB_ROBOT startup logo, as LVGL's image converter exported it. Copyright (c) 2026 ledienbien-ai, free to use under the Apache License like the rest of this section |
@@ -110,12 +110,13 @@ license header, as section 4(b) of the Apache License asks:
 |---|---|
 | `README.md` | Describes this fork; links the translations and this file |
 | `esp32/README.md`, `esp32/AGENTS.md`, `esp32/devices/README.md`, `esp32/devices/AGENTS.md` | List the new boards; `AGENTS.md` also says how on-screen text gets its Vietnamese |
-| `esp32/components/muse/Kconfig`, `CMakeLists.txt`, `idf_component.yml` | Register the boards, the 1.85C's `esp_lcd_st77916` dependency (the EchoEar's too) and the LCDWIKI board's `esp_lcd_ili9341`; the startup logo's options; the starting language and spoken replies |
+| `esp32/components/muse/Kconfig`, `CMakeLists.txt`, `idf_component.yml` | Register the boards, the 1.85C's `esp_lcd_st77916` dependency (the EchoEar's too) and the LCDWIKI board's `esp_lcd_ili9341`; the startup logo's options; the starting language and spoken replies; ESP-IDF's touch sensor driver, for the EchoEar's pads |
 | `esp32/components/muse/muse_ui.c` | On round screens smaller than 412 px, the speaker button sits under the state word. On a rectangular screen under 300 px tall (the OSTB-3ST's 296×240), a smaller Muse and a bar in place of the ring. The startup logo. The screen in Vietnamese: its texts, its fonts and the room their taller lines need |
 | `esp32/components/muse/muse_settings_ui.c` | Settings pages that fit a screen that short; a "Muse AI by DB-robot" line under the settings list; the pages in Vietnamese and a Language page |
 | `esp32/components/muse/muse_settings.c`, `muse_settings.h`, `muse_app.c`, `muse_ble.c` | The language setting: kept in NVS, applied at startup, set with the `lang` setup command |
 | `esp32/components/muse/muse_text.c`, `muse_text.h`, `muse_chat_text.c` | Vietnamese letters kept in Vietnamese and made plain in English; the transcript's tail counted in characters |
 | `esp32/components/muse/muse_state.c`, `muse_state.h`, `muse_input.c`, `muse_voice.c`, `muse_keypad.c` | Captions and keys in the screen's language |
+| `esp32/components/muse/muse_board.h`, `muse_input.c` | A talk press can be marked as a hand on a touch pad (`MUSE_BTN_TALK_TOUCH`, the EchoEar's pads): it talks but doesn't confirm a pairing |
 | `esp32/components/muse/muse_chat_session.cpp` | Sends each reply to `muse_tts.c` and plays the speech it fetches |
 | `esp32/simulator/CMakeLists.txt`, `src/main.c`, `README.md` | Build the Vietnamese texts and fonts; a `--lang` option |
 | `esp32/tools/muse/ble_setup.html` | A Language setting |
@@ -150,9 +151,10 @@ license header, as section 4(b) of the Apache License asks:
 
 | Source | Used for | License |
 |---|---|---|
-| [espressif/esp-bsp](https://github.com/espressif/esp-bsp) (`bsp/esp_vocat`), Espressif's board support package for the v1.2 board | The ST77916 register table, copied whole as [`echoear_lcd_init.h`](esp32/components/muse/boards/echoear_lcd_init.h) with its copyright line; the v1.2 pins, which way each supply switch and reset line works, and the touch and codec setup, as reference | Apache-2.0. Copyright 2026 Espressif Systems (Shanghai) CO LTD |
-| Espressif's user guides for the [EchoEar v1.2](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/echoear/user_guide_v1.2.html) and [v1.0](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/echoear/user_guide_v1.0.html) | Hardware facts: the two modules and their memory, the parts on the board, the pins v1.2 moved | Reference only; no text or code copied |
-| The board's xiaozhi-esp32 files (`config.h`, `EchoEar.cc` and others), supplied by this fork's owner; the board is in [78/xiaozhi-esp32](https://github.com/78/xiaozhi-esp32) | How v1.0 is told from v1.2 at boot and v1.0's pins, as reference; the fuel gauge's address and registers | MIT (notice below) |
+| [espressif/esp-bsp](https://github.com/espressif/esp-bsp) (`bsp/esp_vocat`), Espressif's board support package for the v1.2 board | The ST77916 register table, copied whole as [`echoear_lcd_init.h`](esp32/components/muse/boards/echoear_lcd_init.h) with its copyright line; the v1.2 pins, which way each supply switch and reset line works, the touch and codec setup, and the touch pads' sensor settings and 1.5 % threshold (`bsp_button.c`), as reference | Apache-2.0. Copyright 2026 Espressif Systems (Shanghai) CO LTD |
+| Espressif's user guides for the [EchoEar v1.2](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/echoear/user_guide_v1.2.html) and [v1.0](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/echoear/user_guide_v1.0.html) | Hardware facts: the two modules and their memory, the parts on the board, the pins v1.2 moved, one touch pad on v1.0 and two on v1.2 | Reference only; no text or code copied |
+| ESP-IDF's [`touch_sens_sleep`](https://github.com/espressif/esp-idf/tree/v6.0.1/examples/peripherals/touch_sensor/touch_sens_sleep) example | The order the touch sensor is brought up in, with waking from light sleep, as reference | Unlicense OR CC0-1.0 |
+| The board's xiaozhi-esp32 files (`config.h`, `EchoEar.cc` and others), supplied by this fork's owner; the board is in [78/xiaozhi-esp32](https://github.com/78/xiaozhi-esp32) | How v1.0 is told from v1.2 at boot and v1.0's pins (its touch pad's among them), as reference; the fuel gauge's address and registers | MIT (notice below) |
 
 ### Notice for xiaozhi-esp32
 

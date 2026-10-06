@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Modified by ledienbien-ai (2026): a caption's words in the screen's language.
+ * Modified by ledienbien-ai (2026): a caption's words in the screen's language;
+ * a talk press from a touch pad doesn't confirm a pairing.
  */
 
 #include "muse_input.h"
@@ -239,7 +240,7 @@ static void talk_button(unsigned ev)
         released = false;
     }
     if (!talk_down && !swallow && (ev & MUSE_BTN_TALK_PRESS)) {
-        if (muse_link_talk_press()) {
+        if (!(ev & MUSE_BTN_TALK_TOUCH) && muse_link_talk_press()) {
             /* Confirmed a Muse app pairing (Link's setup button). */
             muse_state_poke();
             swallow = true;

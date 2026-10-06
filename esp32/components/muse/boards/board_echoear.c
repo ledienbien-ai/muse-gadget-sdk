@@ -18,9 +18,10 @@
  * Espressif EchoEar (sold since as ESP-VoCat): an ESP32-S3-WROOM module with
  * 16 MB of octal PSRAM, a round 360 px ST77916 LCD on QSPI with a PWM
  * backlight, CST816S touch, an ES8311 DAC into an NS4150B amplifier, an
- * ES7210 ADC with two microphones, and a BQ27220 gauge on the battery. BOOT
- * (GPIO0) is the only button the ESP32 reads: RESET resets it and the power
- * key latches the supply in hardware.
+ * ES7210 ADC with two microphones, a BQ27220 gauge on the battery and touch
+ * pads (copper foil under the shell). BOOT (GPIO0) is the only key the ESP32
+ * reads: RESET resets it and the power key latches the supply in hardware.
+ * BOOT is on the back, so a hand on a pad is the talk button too.
  *
  * Two versions of the board share this firmware, told apart at boot as
  * xiaozhi-esp32 does it: v1.2 powers its codecs from a rail that GPIO48
@@ -30,21 +31,24 @@
  *   I2S DIN  GPIO15                              GPIO3
  *   Amp on   GPIO4                               GPIO15
  *   LCD RST  GPIO3, low resets                   GPIO47, high resets
+ *   Pads     one, GPIO7                          two, GPIO6 and GPIO7
  *
  * Pins are from Espressif's BSP for the v1.2 board (esp-bsp, bsp/esp_vocat),
  * its user guides (docs.espressif.com/projects/esp-dev-kits, EchoEar v1.0 and
  * v1.2) and xiaozhi-esp32's echoear board, which covers both versions.
  * CREDITS.md at the repository root lists these sources and their licenses.
  *
- * Not used: the two touch pads under the shell (GPIO6 and 7), the BMI270
- * motion sensor, the microSD slot, the green LED on the microphone board and
- * the serial port on the magnetic connector.
+ * Not used: the BMI270 motion sensor, the microSD slot, the green LED on the
+ * microphone board and the serial port on the magnetic connector.
  */
+#include <stdlib.h>
+
 #include "driver/i2c_master.h"
 #include "driver/i2s_std.h"
 #include "driver/ledc.h"
 #include "driver/rtc_io.h"
 #include "driver/spi_master.h"
+#include "driver/touch_sens.h"
 #include "driver/usb_serial_jtag.h"
 #include "esp_attr.h"
 #include "esp_check.h"
@@ -101,6 +105,16 @@ static const char *TAG = "board";
 #define PA_EN_V12 GPIO_NUM_15
 
 #define BOOT_GPIO GPIO_NUM_0
+
+/* Touch pads under the shell. On the ESP32-S3, touch channel n is GPIO n. */
+#define PAD_CHAN 7
+#define PAD_CHAN_V12 6              /* v1.0 has no pad here: the pin is UART1's TX */
+#define PAD_MAX 2
+#define PAD_THRESH 150              /* in 0.01 %: a hand raises the reading by over 1.5 %, as Espressif's BSP takes it */
+#define PAD_MIN_REST 1000           /* a reading under this isn't a pad's */
+#define PAD_DEBOUNCE 3              /* polls, 10 ms apart */
+#define PAD_STUCK_MS 20000          /* past the longest recording: something is lying on the pad */
+#define PAD_LOW_MS 1000             /* this long under its rest level: the level is wrong */
 #define LED_GPIO GPIO_NUM_43        /* green, lit while low; also UART0's TX pin */
 
 /* BQ27220 fuel gauge: 16-bit registers, low byte first. */
@@ -115,6 +129,19 @@ static i2c_master_dev_handle_t s_gauge;
 static esp_lcd_panel_io_handle_t s_io;
 static esp_lcd_panel_handle_t s_panel;
 static muse_gpio_button_t s_boot;
+typedef struct {
+    touch_channel_handle_t chan;
+    int gpio;
+    bool pressed;
+    uint8_t count;                  /* polls its reading has said otherwise */
+    TickType_t rested;              /* when it last read near its rest level */
+    int peak;                       /* the furthest above it in this touch, in 0.01 % */
+} pad_t;
+static touch_sensor_handle_t s_touch;
+static pad_t s_pads[PAD_MAX];
+static int s_pad_count;
+static TaskHandle_t s_pad_waiter;   /* the task in wait_buttons() */
+static enum { TALK_UP, TALK_PAD, TALK_KEY } s_talk;
 static bool s_v12;                  /* the v1.2 board rather than v1.0 */
 /* Which board this is, kept through restarts and deep sleep (not through
  * power-off): it can only be told while the codecs' rail is off. */
@@ -162,6 +189,173 @@ static uint32_t detect_version(void)
         }
     }
     return VERSION_V10;
+}
+
+/* A pad took a hand, by the sensor's own count: out of wait_buttons(). */
+static bool IRAM_ATTR on_pad_active(touch_sensor_handle_t sens, const touch_active_event_data_t *event, void *ctx)
+{
+    (void)sens;
+    (void)event;
+    (void)ctx;
+    BaseType_t woken = pdFALSE;
+    if (s_pad_waiter) {
+        vTaskNotifyGiveFromISR(s_pad_waiter, &woken);
+    }
+    return woken == pdTRUE;
+}
+
+static esp_err_t pads_start(void)
+{
+    /* The controller, the channels and the filter are set up as Espressif's
+     * BSP has them (bsp/esp_vocat, bsp_button.c), and the order is ESP-IDF's
+     * touch_sens_sleep example. */
+    touch_sensor_sample_config_t sample[] = {
+        TOUCH_SENSOR_V2_DEFAULT_SAMPLE_CONFIG(500, TOUCH_VOLT_LIM_L_0V5, TOUCH_VOLT_LIM_H_2V2),
+    };
+    const touch_sensor_config_t sens_cfg = TOUCH_SENSOR_DEFAULT_BASIC_CONFIG(1, sample);
+    ESP_RETURN_ON_ERROR(touch_sensor_new_controller(&sens_cfg, &s_touch), TAG, "touch sensor");
+    touch_channel_config_t chan_cfg = {
+        .active_thresh = { 2000 },   /* until the pad's rest level is known */
+        .charge_speed = TOUCH_CHARGE_SPEED_7,
+        .init_charge_volt = TOUCH_INIT_CHARGE_VOLT_DEFAULT,
+    };
+    const int chans[PAD_MAX] = { PAD_CHAN, PAD_CHAN_V12 };
+    int n = s_v12 ? 2 : 1;
+    for (int i = 0; i < n; i++) {
+        s_pads[i].gpio = chans[i];
+        ESP_RETURN_ON_ERROR(touch_sensor_new_channel(s_touch, chans[i], &chan_cfg, &s_pads[i].chan), TAG,
+                            "touch channel %d", chans[i]);
+    }
+    const touch_sensor_filter_config_t filter_cfg = TOUCH_SENSOR_DEFAULT_FILTER_CONFIG();
+    ESP_RETURN_ON_ERROR(touch_sensor_config_filter(s_touch, &filter_cfg), TAG, "touch filter");
+
+    /* A few scans to learn each pad's rest level. The sensor then counts a
+     * pad as touched at the same 1.5 % above it that poll_pad() does, which
+     * is when it wakes the chip from light sleep. */
+    ESP_RETURN_ON_ERROR(touch_sensor_enable(s_touch), TAG, "touch enable");
+    for (int i = 0; i < 3; i++) {
+        ESP_RETURN_ON_ERROR(touch_sensor_trigger_oneshot_scanning(s_touch, 2000), TAG, "touch scan");
+    }
+    ESP_RETURN_ON_ERROR(touch_sensor_disable(s_touch), TAG, "touch disable");
+    for (int i = 0; i < n; i++) {
+        uint32_t rest = 0;
+        ESP_RETURN_ON_ERROR(touch_channel_read_data(s_pads[i].chan, TOUCH_CHAN_DATA_TYPE_BENCHMARK, &rest), TAG,
+                            "touch read");
+        ESP_RETURN_ON_FALSE(rest >= PAD_MIN_REST, ESP_ERR_INVALID_RESPONSE, TAG, "touch pad on GPIO%d reads %lu",
+                            chans[i], (unsigned long)rest);
+        chan_cfg.active_thresh[0] = (uint32_t)((uint64_t)rest * PAD_THRESH / 10000);
+        ESP_RETURN_ON_ERROR(touch_sensor_reconfig_channel(s_pads[i].chan, &chan_cfg), TAG, "touch threshold");
+        ESP_LOGI(TAG, "touch pad on GPIO%d rests at %lu, touched from +%lu", chans[i], (unsigned long)rest,
+                 (unsigned long)chan_cfg.active_thresh[0]);
+    }
+    const touch_event_callbacks_t callbacks = { .on_active = on_pad_active };
+    ESP_RETURN_ON_ERROR(touch_sensor_register_callbacks(s_touch, &callbacks, NULL), TAG, "touch callback");
+    /* Screen off and the chip in light sleep, a hand on a pad wakes it. */
+    const touch_sleep_config_t sleep_cfg = TOUCH_SENSOR_DEFAULT_LSLP_CONFIG();
+    ESP_RETURN_ON_ERROR(touch_sensor_config_sleep_wakeup(s_touch, &sleep_cfg), TAG, "touch wake");
+    ESP_RETURN_ON_ERROR(touch_sensor_enable(s_touch), TAG, "touch enable");
+    ESP_RETURN_ON_ERROR(touch_sensor_start_continuous_scanning(s_touch), TAG, "touch scanning");
+    for (int i = 0; i < n; i++) {
+        s_pads[i].rested = xTaskGetTickCount();
+    }
+    s_pad_count = n;
+    return ESP_OK;
+}
+
+static void pads_off(void)
+{
+    touch_sensor_stop_continuous_scanning(s_touch);
+    touch_sensor_disable(s_touch);
+    touch_sensor_config_sleep_wakeup(s_touch, NULL);
+}
+
+/* Before deep sleep: the pads must not be what ends it. */
+static void pads_stop(void)
+{
+    if (s_pad_count) {
+        s_pad_count = 0;
+        pads_off();
+    }
+}
+
+/* Without the pads the board still works: BOOT talks. */
+static void pads_init(void)
+{
+    if (pads_start() == ESP_OK) {
+        return;
+    }
+    ESP_LOGW(TAG, "no touch pads: BOOT is the talk button");
+    if (s_touch) {
+        /* Nothing is left that could wake the chip. A step pads_start()
+         * didn't reach only logs that it has nothing to undo. */
+        pads_off();
+    }
+}
+
+/* How far the pad reads above its rest level, in 0.01 %; under it, below zero. */
+static bool pad_read(const pad_t *p, int *up)
+{
+    uint32_t now = 0, rest = 0;
+    if (touch_channel_read_data(p->chan, TOUCH_CHAN_DATA_TYPE_SMOOTH, &now) != ESP_OK ||
+        touch_channel_read_data(p->chan, TOUCH_CHAN_DATA_TYPE_BENCHMARK, &rest) != ESP_OK || !rest) {
+        return false;
+    }
+    int64_t d = ((int64_t)now - (int64_t)rest) * 10000 / (int64_t)rest;
+    *up = d > INT16_MAX ? INT16_MAX : d < INT16_MIN ? INT16_MIN : (int)d;
+    return true;
+}
+
+/* Lets go at half of what it takes to count as touched. */
+static bool pad_touched(const pad_t *p, int up)
+{
+    return up > (p->pressed ? PAD_THRESH / 2 : PAD_THRESH);
+}
+
+/*
+ * The sensor follows each pad's rest level by itself, also through light
+ * sleep, but only while the reading stays near it. A reading that stays away
+ * is put right here by taking it for the rest level. Above the level, that
+ * is after PAD_STUCK_MS, so that something left lying on a pad doesn't hold
+ * the talk button down for good. Under it, after PAD_LOW_MS: a hand only
+ * raises the reading, so the level was taken with one on the pad (at
+ * power-on, say).
+ */
+static void poll_pad(pad_t *p)
+{
+    int up;
+    if (!pad_read(p, &up)) {
+        return;
+    }
+    TickType_t now = xTaskGetTickCount();
+    if (abs(up) <= PAD_THRESH / 4) {
+        p->rested = now;
+    } else if (now - p->rested >= pdMS_TO_TICKS(up < 0 ? PAD_LOW_MS : PAD_STUCK_MS)) {
+        if (p->pressed) {
+            ESP_LOGW(TAG, "touch pad on GPIO%d held too long: let go of", p->gpio);
+        }
+        const touch_chan_benchmark_config_t cfg = { .do_reset = true };
+        touch_channel_config_benchmark(p->chan, &cfg);
+        p->rested = now;
+        return;   /* the next reading is against the new level */
+    }
+    if (pad_touched(p, up) == p->pressed) {
+        p->count = 0;
+        if (p->pressed && up > p->peak) {
+            p->peak = up;
+        }
+        return;
+    }
+    if (++p->count < PAD_DEBOUNCE) {
+        return;
+    }
+    p->count = 0;
+    p->pressed = !p->pressed;
+    if (p->pressed) {
+        p->peak = up;
+    } else {
+        /* The figure to set PAD_THRESH by. */
+        ESP_LOGI(TAG, "touch pad on GPIO%d: touched, up to +%d.%02d %%", p->gpio, p->peak / 100, p->peak % 100);
+    }
 }
 
 static esp_err_t init(void)
@@ -214,6 +408,7 @@ static esp_err_t init(void)
 
     /* The amp stays off until the codec driver has its pin. */
     ESP_RETURN_ON_ERROR(output_pin(s_v12 ? PA_EN_V12 : PA_EN_V10, 0), TAG, "amp enable");
+    pads_init();
     return muse_gpio_button_init(&s_boot, BOOT_GPIO);
 }
 
@@ -478,13 +673,47 @@ static void set_mic_gain(esp_codec_dev_handle_t mic, int db)
     esp_codec_dev_set_in_gain(mic, db == 33 ? 34.5f : (float)db);
 }
 
+/*
+ * BOOT and the pads are one talk button, and BOOT comes first: pressed while
+ * a hand is on a pad, it ends that press and starts its own, since a key
+ * press confirms a pairing and a touch doesn't (MUSE_BTN_TALK_TOUCH).
+ */
 static unsigned poll_buttons(void)
 {
-    return muse_gpio_button_poll(&s_boot);
+    muse_gpio_button_poll(&s_boot);
+    int talk = s_boot.pressed ? TALK_KEY : TALK_UP;
+    for (int i = 0; i < s_pad_count; i++) {
+        poll_pad(&s_pads[i]);
+        if (talk == TALK_UP && s_pads[i].pressed) {
+            talk = TALK_PAD;
+        }
+    }
+    int was = s_talk;
+    s_talk = talk;
+    if (talk == was || (was == TALK_KEY && talk == TALK_PAD)) {
+        return 0;   /* BOOT let go with a hand still on a pad: still held */
+    }
+    if (talk == TALK_UP) {
+        return MUSE_BTN_TALK_RELEASE;
+    }
+    if (talk == TALK_PAD) {
+        return MUSE_BTN_TALK_PRESS | MUSE_BTN_TALK_TOUCH;
+    }
+    return was == TALK_PAD ? MUSE_BTN_TALK_RELEASE | MUSE_BTN_TALK_PRESS : MUSE_BTN_TALK_PRESS;
 }
 
 static void wait_buttons(int timeout_ms)
 {
+    s_pad_waiter = xTaskGetCurrentTaskHandle();
+    for (int i = 0; i < s_pad_count; i++) {
+        int up;
+        if (pad_read(&s_pads[i], &up) && pad_touched(&s_pads[i], up) != s_pads[i].pressed) {
+            /* Mid-change: debounce at the awake poll rate. */
+            vTaskDelay(pdMS_TO_TICKS(10));
+            return;
+        }
+    }
+    /* on_pad_active() ends this wait as a change on BOOT's line does. */
     muse_gpio_buttons_wait((muse_gpio_button_t *const[]){ &s_boot }, 1, timeout_ms);
 }
 
@@ -540,11 +769,13 @@ static void panel_off(void *arg)
 /*
  * The power key cuts the supply by itself; nothing here can. This turns off
  * what the ESP32 switches (the backlight, the panel's supply, and on v1.2 the
- * codecs') and deep-sleeps until BOOT is pressed, which restarts it. The
- * three pins are held where they are, or they would float while asleep.
+ * codecs') and deep-sleeps until BOOT is pressed, which restarts it: the pads
+ * don't. The three pins are held where they are, or they would float while
+ * asleep.
  */
 static esp_err_t power_off(void)
 {
+    pads_stop();
     set_brightness(0);
     muse_lcd_bands_run(panel_off, NULL);
     ledc_stop(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 0);
@@ -575,7 +806,7 @@ static const muse_board_t s_board = {
     .diagonal_in = 1.85f,
     .talk_button = "boot",
     .aux_button = "boot",
-    /* BOOT is the only button, so there's no aux_hint: the screen sleeps on its
+    /* BOOT is the only key, so there's no aux_hint: the screen sleeps on its
      * timer and Settings has the power page. The mic icon mirrors the speaker
      * button, under the state word on the right, as on the Waveshare 1.85C,
      * which has the same screen. */

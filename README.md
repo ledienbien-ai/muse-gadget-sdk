@@ -247,20 +247,26 @@ found.
 | Display | 1.85" round 360×360 ST77916 LCD on QSPI, PWM backlight |
 | Touch | CST816S |
 | Audio | ES8311 codec, NS4150B speaker amp, ES7210 with two microphones (one is used) |
-| Button | BOOT, on the back beside the magnetic connector: hold to talk |
+| Buttons | BOOT, on the back beside the magnetic connector, and the touch pads under the shell (two on v1.2, one on v1.0): hold either to talk |
 | Battery | BQ27220 gauge: level, voltage and charging |
 
 **Status:** builds with ESP-IDF v6.0.1. It has not been run on the board. The
 v1.2 pins and the display, touch and codec setup are those of Espressif's own
 [board support package](https://github.com/espressif/esp-bsp/tree/master/bsp/esp_vocat)
 and of the board's xiaozhi-esp32 files; the v1.0 pins come from the xiaozhi
-files alone, so v1.0 is the less certain of the two.
+files alone, so v1.0 is the less certain of the two. The touch pads are set up
+as Espressif's package sets them up, and count as touched when their reading
+rises by 1.5 %; how far a hand moves it on a real board hasn't been measured,
+so that figure (`PAD_THRESH` in the board file) may need changing. The log
+gives each touch's reading.
 
-Known limits: BOOT is the only button the firmware reads, so the screen sleeps
+Known limits: BOOT is the only key the firmware reads, so the screen sleeps
 on its timer, and powering off on the Power page in Settings puts the board in
 deep sleep until BOOT is pressed; the board's own power key is what cuts the
-supply. The two touch pads under the shell, the motion sensor, the SD card
-slot and the green LED aren't used. The gauge runs off the battery, so without
+supply. A touch pad talks and wakes the screen as BOOT does, but it doesn't
+confirm a pairing with the Muse app or end that deep sleep: those take BOOT. A
+pad held for 20 seconds is taken to be covered, not touched, and is let go of.
+The motion sensor, the SD card slot and the green LED aren't used. The gauge runs off the battery, so without
 one there is no battery level. On a charger that isn't a computer, the board
 shows "charging" only while current flows into the battery.
 
